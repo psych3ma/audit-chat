@@ -1,12 +1,15 @@
 """FastAPI application entry point."""
 from contextlib import asynccontextmanager
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from backend.config import get_settings
 from backend.database import Neo4jDriver
-from backend.routers import health, chat, graph
+from backend.routers import health, chat, graph, independence
 
 
 @asynccontextmanager
@@ -32,15 +35,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 준비 완료 체크 (Neo4j 없이 즉시 200, run.sh 대기용)
+@app.get("/ready")
+def ready():
+    return {"status": "ok"}
+
 app.include_router(health.router)
 app.include_router(chat.router)
 app.include_router(graph.router)
+app.include_router(independence.router)
+
+# Static files (삼일PwC 내부통제 AI 검토 UI)
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+if STATIC_DIR.is_dir():
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/")
 def root():
+    """Redirect to 내부통제 AI 검토 UI. internal-control.html(레거시) 없으면 audit-chat-pwc.html 사용."""
+    internal_control = STATIC_DIR / "internal-control.html"
+    pwc_html = STATIC_DIR / "audit-chat-pwc.html"
+    if internal_control.is_file():
+        return RedirectResponse(url="/static/internal-control.html", status_code=302)
+    if pwc_html.is_file():
+        return RedirectResponse(url="/static/audit-chat-pwc.html", status_code=302)
     return {
         "service": "Audit Chat API",
         "docs": "/docs",
         "health": "/health",
     }
+
+
+@app.get("/pwc")
+def pwc_ui():
+    """PwC 내부통제 UI (audit-chat-pwc.html) — /chat/completions 백엔드 연동."""
+    pwc_html = STATIC_DIR / "audit-chat-pwc.html"
+    if pwc_html.is_file():
+        return RedirectResponse(url="/static/audit-chat-pwc.html", status_code=302)
+    return {"error": "audit-chat-pwc.html not found", "static_dir": str(STATIC_DIR)}

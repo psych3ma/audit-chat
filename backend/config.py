@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     llm_model: str = "gpt-4-turbo-preview"
     llm_temperature: float = 0.7
+    # 독립성 검토 전용 모델
+    independence_extraction_model: str = "gpt-4o-mini"
+    independence_analysis_model: str = "gpt-4o"
 
     # App
     debug: bool = False
