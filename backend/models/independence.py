@@ -50,6 +50,13 @@ def _normalize_legal_ref(v: Any) -> LegalRefItem:
     return LegalRefItem(name=str(v), url=None)
 
 
+class VulnerableConnection(BaseModel):
+    """독립성 위협이 되는 관계 식별."""
+    source_id: str = Field(..., description="취약 관계의 시작 엔티티 ID")
+    target_id: str = Field(..., description="취약 관계의 대상 엔티티 ID")
+    reason: str = Field("", description="취약 사유 (선택)")
+
+
 class AnalysisResult(BaseModel):
     status: IndependenceStatus
     risk_level: str
@@ -57,6 +64,10 @@ class AnalysisResult(BaseModel):
     legal_references: List[LegalRefItem] = Field(default_factory=list)
     considerations: str
     suggested_safeguards: List[str] = Field(default_factory=list)
+    vulnerable_connections: List[VulnerableConnection] = Field(
+        default_factory=list,
+        description="독립성 위협이 되는 관계 목록 (시각화에서 하이라이트)"
+    )
 
     @field_validator("legal_references", mode="before")
     @classmethod

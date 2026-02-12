@@ -314,6 +314,9 @@
       .report-header.denied {
         background: var(--red);
       }
+      .report-header.conditional {
+        background: var(--orange);
+      }
       .report-header.approved {
         background: linear-gradient(135deg, #1a5c38, #22834f);
       }
@@ -464,7 +467,7 @@
         border-radius: var(--space-xs);
         padding: var(--space-sm) var(--space-md);
       }
-      .issue-box { border-left: 3px solid var(--gray-600); }
+      .issue-box { border-left: 3px solid var(--gray-400); }
       .safeguard-box { border-left: 3px solid var(--gray-400); }
       .law-box {
         font-size: var(--fs-base);
@@ -740,6 +743,7 @@
         border: 1px solid var(--border);
         border-radius: 12px;
         overflow: hidden;
+        color: var(--text);
         scroll-margin-top: 20px;  /* 스크롤 시 상단 여백 */
         margin-top: 12px;
         background: var(--surface);
@@ -837,15 +841,22 @@
       }
       .independence-report .section-title {
         font-size: var(--fs-base);
+        font-weight: 700;
+        color: var(--black);
         margin-bottom: var(--space-sm);
+      }
+      .independence-report .report-content .section-title:not(:first-child) {
+        margin-top: var(--space-xl);
       }
       .independence-report .issue-box,
       .independence-report .safeguard-box {
-        margin-top: var(--space-md);
+        margin-top: var(--space-sm);
+        border: none;
+        background: transparent;
       }
       .independence-report .opinion-text {
-        background: #f0f4f8;
-        border-left: 3px solid #5c6bc0;
+        background: var(--gray-50);
+        border-left: 3px solid var(--gray-400);
         padding: var(--space-md);
         border-radius: var(--space-xs);
         margin: var(--space-sm) 0;
@@ -858,9 +869,11 @@
         font-size: var(--fs-base);
         line-height: 1.5;
       }
-      .independence-report .issue-box .box-item,
-      .independence-report .issue-box li {
-        color: var(--gray-800);
+      .independence-report .issue-box,
+      .independence-report .issue-box li,
+      .independence-report .safeguard-box,
+      .independence-report .safeguard-box li {
+        color: var(--black);
       }
       .independence-report .law-box {
         margin-top: var(--space-xs);
@@ -1307,7 +1320,7 @@
         var legalHtml = Array.isArray(legalRefs) && legalRefs.length
           ? legalRefs.map(oneLegalRefHtml).join(', ')
           : '';
-        var issuesHtml = issues.length ? issues.map(function (i) { return '<li style="color:#c62828;">' + escapeHtml(i) + '</li>'; }).join('') : '<li>주요 이슈 없음</li>';
+        var issuesHtml = issues.length ? issues.map(function (i) { return '<li>' + escapeHtml(i) + '</li>'; }).join('') : '<li>주요 이슈 없음</li>';
         var safeguardsHtml = safeguards.length ? safeguards.map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('') : '<li>권고 안전장치 없음</li>';
         var lawBoxHtml = legalHtml ? '<div class="legal-section"><div class="section-title">근거 법령</div><div class="law-box">' + legalHtml + '</div></div>' : '';
         var card = document.createElement('div');

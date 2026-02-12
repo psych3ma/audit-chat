@@ -7,7 +7,7 @@ import re
 from openai import AsyncOpenAI
 
 from backend.config import get_settings
-from backend.models.independence import AnalysisResult, IndependenceMap, LegalRefItem
+from backend.models.independence import AnalysisResult, IndependenceMap, LegalRefItem, VulnerableConnection
 from backend.services.llm_structured import chat_completion_structured
 from backend.utils.law_registry import get_law_url, is_valid_law
 
@@ -52,8 +52,9 @@ Rules:
 3. considerations: Write a clear paragraph of at least 2–4 sentences explaining the independence threat and your reasoning. Be concrete.
 4. key_issues: List concrete issues that reference the scenario and the Relationship Map; avoid one-line generic statements.
 5. legal_references: You may cite Korean laws (e.g. "공인회계사법 제21조") and professional standards/ethics codes (e.g. "공인회계사 윤리기준", "회계감사기준").
+6. vulnerable_connections: IMPORTANT - Identify which specific connections in the Relationship Map cause independence threats. Use the exact source_id and target_id from the map. This will be highlighted in the visualization.
 
-Output only valid JSON with: "status" (one of: 수임 불가, 안전장치 적용 시 수임 가능, 수임 가능), "risk_level", "key_issues" (array of strings, Korean), "legal_references" (array of strings e.g. ["공인회계사법 제21조"] or objects with "name" and optional "url"), "considerations" (string, Korean, 2–4 sentences), "suggested_safeguards" (array of strings, Korean). No markdown, no explanation."""
+Output only valid JSON with: "status" (one of: 수임 불가, 안전장치 적용 시 수임 가능, 수임 가능), "risk_level", "key_issues" (array of strings, Korean), "legal_references" (array of strings e.g. ["공인회계사법 제21조"] or objects with "name" and optional "url"), "considerations" (string, Korean, 2–4 sentences), "suggested_safeguards" (array of strings, Korean), "vulnerable_connections" (array of objects with "source_id", "target_id", and optional "reason" in Korean - identify the problematic relationships from the map). No markdown, no explanation."""
 
     ANALYSIS_USER = "Scenario: {scenario}\n\nRelationship Map: {map_json}\n\nUsing the entities and relationships in the map above, provide your assessment in JSON only. Refer to specific entities and rel_type in your key_issues and considerations."
 
@@ -102,15 +103,26 @@ async def analyze_independence(scenario_text: str, rel_map: IndependenceMap) -> 
     )
 
 
-def build_mermaid_graph(rel_map: IndependenceMap) -> str:
-    """Mermaid flowchart 생성 (엔티티 유형별 스타일 적용).
+def build_mermaid_graph(
+    rel_map: IndependenceMap,
+    vulnerable_connections: list[VulnerableConnection] | None = None
+) -> str:
+    """Mermaid flowchart 생성 (엔티티 유형별 스타일 + 취약 관계 하이라이트).
     
-    CTO 검토사항:
-    - mermaid.ink는 classDef/style을 부분 지원 (테마에 따라 다름)
-    - 노드 모양(shape)은 완전 지원
-    - 한글 라벨은 URL 인코딩으로 처리됨
+    Args:
+        rel_map: 추출된 엔티티/관계 맵
+        vulnerable_connections: 독립성 위협 관계 목록 (빨간색으로 표시)
     """
     lines = ["graph TD"]  # Top-Down: 관계 계층 표현에 적합
+    
+    # 취약 관계 집합 생성 (빠른 조회용)
+    vulnerable_set = set()
+    vulnerable_entities = set()
+    if vulnerable_connections:
+        for vc in vulnerable_connections:
+            vulnerable_set.add((vc.source_id, vc.target_id))
+            vulnerable_entities.add(vc.source_id)
+            vulnerable_entities.add(vc.target_id)
     
     # 노드 모양 매핑 (엔티티 유형별)
     shape_map = {
@@ -139,10 +151,23 @@ def build_mermaid_graph(rel_map: IndependenceMap) -> str:
         node_text = f"{clean_name}<br>{label}" if label else clean_name
         lines.append(f'    {entity.id}{open_s}"{node_text}"{close_s}')
     
-    # 엣지 정의 (표준 문법)
+    # 엣지 정의 (취약 관계는 빨간색 굵은 선으로 표시)
     for conn in rel_map.connections:
         rel = (conn.rel_type or "관계").replace('"', "'")[:20]
-        lines.append(f"    {conn.source_id} -->|{rel}| {conn.target_id}")
+        is_vulnerable = (conn.source_id, conn.target_id) in vulnerable_set
+        if is_vulnerable:
+            # 취약 관계: 라벨에 [!] 표시 (이모지/특수문자 회피 - mermaid.ink 호환)
+            lines.append(f"    {conn.source_id} -->|[!] {rel}| {conn.target_id}")
+        else:
+            lines.append(f"    {conn.source_id} -->|{rel}| {conn.target_id}")
+    
+    # 취약 엔티티 스타일 정의 (mermaid.ink 지원)
+    if vulnerable_entities:
+        lines.append("")
+        lines.append("    %% 취약 관계 하이라이트")
+        # Mermaid style 문법: 각 노드에 개별 스타일 적용
+        for entity_id in vulnerable_entities:
+            lines.append(f"    style {entity_id} fill:#ffebee,stroke:#c62828,stroke-width:2px")
     
     return "\n".join(lines)
 
@@ -177,12 +202,13 @@ def save_independence_map_to_neo4j(trace_id: str, rel_map: IndependenceMap) -> N
 
 
 async def run_independence_review(scenario: str, save_to_neo4j: bool = True) -> dict:
-    """추출 → 분석 → Mermaid 생성. 선택 시 Neo4j 저장."""
+    """추출 → 분석 → Mermaid 생성 (취약 관계 하이라이트). 선택 시 Neo4j 저장."""
     trace_id = hashlib.md5(scenario.encode()).hexdigest()[:8].upper()
     rel_map = await extract_relationships(scenario)
     analysis = await analyze_independence(scenario, rel_map)
     analysis = _enrich_legal_ref_urls(analysis)
-    mermaid_code = build_mermaid_graph(rel_map)
+    # 취약 관계를 Mermaid 그래프에 반영
+    mermaid_code = build_mermaid_graph(rel_map, analysis.vulnerable_connections)
     if save_to_neo4j:
         try:
             save_independence_map_to_neo4j(trace_id, rel_map)
