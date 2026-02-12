@@ -6,6 +6,7 @@
     <title>삼일PwC — 감사 독립성 AI 검토</title>
     <style>
       :root {
+        /* Colors */
         --black: #000000;
         --red: #ad1b02;
         --orange: #d85604;
@@ -18,6 +19,32 @@
         --text: #1a1a1a;
         --muted: #6b6560;
         --subtle: #f4f1ed;
+        /* Grays */
+        --gray-900: #1a1a1a;
+        --gray-800: #333333;
+        --gray-700: #424242;
+        --gray-600: #616161;
+        --gray-500: #757575;
+        --gray-400: #9e9e9e;
+        --gray-300: #bdbdbd;
+        --gray-200: #e0e0e0;
+        --gray-100: #f5f5f5;
+        --gray-50: #fafafa;
+        /* Typography Scale */
+        --fs-xs: 13px;
+        --fs-sm: 14px;
+        --fs-base: 15px;
+        --fs-md: 17px;
+        --fs-lg: 18px;
+        --fs-xl: 17px;
+        --fs-2xl: 26px;
+        /* Spacing Scale */
+        --space-xs: 4px;
+        --space-sm: 8px;
+        --space-md: 12px;
+        --space-lg: 16px;
+        --space-xl: 20px;
+        --space-2xl: 28px;
       }
 
       * {
@@ -43,8 +70,8 @@
       .header {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 0 28px;
+        gap: var(--space-md);
+        padding: 0 var(--space-2xl);
         height: 56px;
         background: #ffffff;
         border-bottom: 3px solid var(--red);
@@ -55,7 +82,7 @@
       .header-wordmark {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: var(--space-md);
       }
 
       .header-brand img {
@@ -69,21 +96,27 @@
         background: #ddd;
       }
       .header-service {
-        font-size: 13px;
-        color: #666;
+        font-size: var(--fs-xl);
+        color: var(--gray-800);
+        font-weight: 500;
+      }
+      .powered-by {
+        font-size: var(--fs-sm);
         font-weight: 400;
+        color: var(--muted);
+        margin-left: var(--space-sm);
       }
 
       .reset-btn {
         margin-left: auto;
         display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 14px;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
         background: transparent;
         border: 1.5px solid var(--border);
         border-radius: 8px;
-        font-size: 12px;
+        font-size: var(--fs-md);
         font-weight: 600;
         color: var(--muted);
         cursor: pointer;
@@ -101,11 +134,11 @@
       }
       .header-badge {
         margin-left: auto;
-        font-size: 10px;
-        padding: 3px 10px;
-        border: 1px solid #ccc;
+        font-size: var(--fs-sm);
+        padding: var(--space-xs) var(--space-md);
+        border: 1px solid var(--gray-300);
         border-radius: 20px;
-        color: #888;
+        color: var(--gray-500);
         letter-spacing: 0.5px;
         text-transform: uppercase;
       }
@@ -125,20 +158,20 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 48px 24px 32px;
+        padding: calc(var(--space-2xl) * 2) var(--space-xl) var(--space-2xl);
         text-align: center;
       }
 
       .empty-eyebrow {
-        font-size: 11px;
+        font-size: var(--fs-base);
         font-weight: 600;
         letter-spacing: 1.5px;
         text-transform: uppercase;
         color: var(--red);
-        margin-bottom: 12px;
+        margin-bottom: var(--space-md);
       }
       .empty-title {
-        font-size: 26px;
+        font-size: var(--fs-2xl);
         font-weight: 800;
         color: var(--black);
         margin-bottom: 10px;
@@ -146,7 +179,7 @@
         line-height: 1.2;
       }
       .empty-sub {
-        font-size: 14px;
+        font-size: var(--fs-xl);
         color: var(--muted);
         margin-bottom: 40px;
         line-height: 1.7;
@@ -156,21 +189,24 @@
       .suggestion-grid {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        gap: 12px;
+        gap: var(--space-md);
         width: 100%;
-        max-width: 860px;
+        max-width: 1040px;
       }
 
       .chip {
         background: var(--surface);
         border: 1.5px solid var(--border);
-        border-radius: 12px;
-        padding: 16px 18px;
+        border-radius: var(--space-md);
+        padding: var(--space-lg) var(--space-xl);
         cursor: pointer;
         text-align: left;
         transition: all 0.15s;
         position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 120px;
       }
       .chip::before {
         content: "";
@@ -194,7 +230,7 @@
       }
 
       .chip-label {
-        font-size: 10px;
+        font-size: var(--fs-sm);
         font-weight: 700;
         color: var(--orange);
         margin-bottom: 6px;
@@ -202,24 +238,25 @@
         text-transform: uppercase;
       }
       .chip-text {
-        font-size: 13px;
+        font-size: var(--fs-lg);
         color: var(--text);
         line-height: 1.45;
         font-weight: 500;
       }
       .chip-arrow {
-        font-size: 11px;
+        font-size: var(--fs-base);
         color: var(--muted);
-        margin-top: 6px;
+        margin-top: auto;
+        padding-top: var(--space-sm);
       }
 
       /* ── MESSAGES ── */
       .messages {
-        padding: 28px 28px 20px;
+        padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        max-width: 960px;
+        gap: var(--space-xl);
+        max-width: 1040px;
         margin: 0 auto;
         width: 100%;
       }
@@ -229,9 +266,9 @@
         background: var(--black);
         color: #fff;
         border-radius: 16px 16px 3px 16px;
-        padding: 12px 18px;
+        padding: var(--space-md) 18px;
         max-width: 62%;
-        font-size: 14px;
+        font-size: var(--fs-xl);
         line-height: 1.55;
       }
 
@@ -241,9 +278,9 @@
         background: var(--surface);
         border: 1.5px solid var(--border);
         border-radius: 16px 16px 16px 3px;
-        padding: 16px 20px;
+        padding: var(--space-lg) var(--space-xl);
         max-width: 85%;
-        font-size: 14px;
+        font-size: var(--fs-xl);
         line-height: 1.65;
         color: var(--text);
         white-space: pre-wrap;
@@ -267,7 +304,7 @@
       }
 
       .report-header {
-        padding: 14px 20px;
+        padding: var(--space-md) var(--space-xl);
         display: flex;
         align-items: flex-end;
         justify-content: space-between;
@@ -293,13 +330,13 @@
       }
 
       .report-id {
-        font-size: 10px;
+        font-size: var(--fs-sm);
         color: rgba(255, 255, 255, 0.55);
-        margin-bottom: 4px;
+        margin-bottom: var(--space-xs);
         letter-spacing: 1px;
       }
       .report-verdict {
-        font-size: 26px;
+        font-size: var(--fs-2xl);
         font-weight: 900;
         color: #fff;
         letter-spacing: -0.5px;
@@ -309,7 +346,7 @@
         text-align: right;
       }
       .report-risk-label {
-        font-size: 10px;
+        font-size: var(--fs-sm);
         color: rgba(255, 255, 255, 0.6);
         margin-bottom: 3px;
         letter-spacing: 0.8px;
@@ -317,9 +354,9 @@
       }
       .risk-pill {
         display: inline-block;
-        padding: 4px 12px;
+        padding: var(--space-xs) var(--space-md);
         border-radius: 20px;
-        font-size: 13px;
+        font-size: var(--fs-lg);
         font-weight: 700;
         letter-spacing: 0.5px;
       }
@@ -346,20 +383,27 @@
       }
 
       .report-body {
-        display: grid;
-        grid-template-columns: 1fr 1.2fr;
+        padding: var(--space-xl);
       }
-
+      .conclusion-row {
+        margin-bottom: var(--space-lg);
+      }
+      .details-row {
+        display: flex;
+        gap: var(--space-xl);
+      }
       .report-left {
-        padding: 16px 20px;
+        flex: 0 0 50%;
         border-right: 1.5px solid var(--border);
+        padding-right: var(--space-xl);
       }
       .report-right {
-        padding: 16px 20px;
+        flex: 1;
+        min-width: 0;
       }
 
       .section-title {
-        font-size: 11px;
+        font-size: var(--fs-base);
         font-weight: 700;
         color: var(--black);
         margin-bottom: 10px;
@@ -374,22 +418,22 @@
       .flow-diagram {
         background: var(--subtle);
         border: 1.5px solid var(--border);
-        border-radius: 10px;
-        padding: 14px 12px;
-        margin-bottom: 16px;
+        border-radius: var(--space-sm);
+        padding: var(--space-md);
+        margin-bottom: var(--space-lg);
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: var(--space-sm);
         flex-wrap: wrap;
       }
       .flow-node {
         background: #fff;
         border: 1.5px solid var(--border);
-        border-radius: 7px;
-        padding: 6px 10px;
+        border-radius: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
         text-align: center;
         color: var(--text);
-        font-size: 11px;
+        font-size: var(--fs-lg);
         font-weight: 600;
         line-height: 1.4;
         white-space: pre-line;
@@ -398,67 +442,32 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 2px;
+        gap: var(--space-xs);
       }
       .flow-arrow {
         color: var(--orange);
-        font-size: 13px;
+        font-size: var(--fs-lg);
         font-weight: 700;
       }
       .flow-edge-label {
-        font-size: 9px;
+        font-size: var(--fs-xs);
         color: var(--muted);
         font-weight: 500;
       }
 
-      /* Issue box */
-      .issue-box {
-        background: #fff5f3;
-        border: 1.5px solid #f5ccc5;
-        border-left: 3px solid var(--red);
-        border-radius: 6px;
-        padding: 10px 12px;
-      }
-      .box-title {
-        font-size: 10px;
-        font-weight: 700;
-        margin-bottom: 6px;
-        display: flex;
-        align-items: center;
-        gap: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      .issue-box .box-title {
-        color: var(--red);
-      }
-      .box-item {
-        font-size: 11px;
-        color: var(--text);
-        line-height: 1.5;
-        padding-left: 12px;
-        position: relative;
-        margin-bottom: 3px;
-      }
-      .box-item::before {
-        content: "—";
-        position: absolute;
-        left: 0;
-        font-size: 10px;
-        line-height: 1.7;
-      }
-      .issue-box .box-item::before {
-        color: var(--red);
-      }
-
-      /* Law box */
+      /* Content Boxes */
+      .issue-box,
+      .safeguard-box,
       .law-box {
-        background: #f4f1ed;
-        border: 1.5px solid #e0d8cf;
-        border-radius: 6px;
-        padding: 8px 12px;
-        margin-bottom: 10px;
-        font-size: 11px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--space-xs);
+        padding: var(--space-sm) var(--space-md);
+      }
+      .issue-box { border-left: 3px solid var(--gray-600); }
+      .safeguard-box { border-left: 3px solid var(--gray-400); }
+      .law-box {
+        font-size: var(--fs-base);
         color: var(--muted);
         line-height: 1.5;
       }
@@ -467,26 +476,36 @@
         font-weight: 700;
       }
 
-      .opinion-text {
-        font-size: 12px;
-        color: #3a3530;
-        line-height: 1.6;
-        margin-bottom: 12px;
+      .box-title {
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        margin-bottom: var(--space-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--gray-700);
+      }
+      .box-item {
+        font-size: var(--fs-base);
+        color: var(--text);
+        line-height: 1.5;
+        padding-left: var(--space-md);
+        position: relative;
+        margin-bottom: var(--space-xs);
+      }
+      .box-item::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        font-size: var(--fs-sm);
+        line-height: 1.7;
+        color: var(--gray-500);
       }
 
-      /* Safeguard */
-      .safeguard-box {
-        background: #fffbee;
-        border: 1.5px solid #f0dfa0;
-        border-left: 3px solid var(--amber);
-        border-radius: 6px;
-        padding: 10px 12px;
-      }
-      .safeguard-box .box-title {
-        color: var(--amber);
-      }
-      .safeguard-box .box-item::before {
-        color: var(--amber);
+      .opinion-text {
+        font-size: var(--fs-md);
+        color: var(--gray-800);
+        line-height: 1.6;
+        margin-bottom: var(--space-md);
       }
 
       /* ── TYPING ── */
@@ -494,10 +513,10 @@
         align-self: flex-start;
         background: var(--surface);
         border: 1.5px solid var(--border);
-        border-radius: 16px 16px 16px 3px;
-        padding: 14px 18px;
+        border-radius: var(--space-lg) var(--space-lg) var(--space-lg) var(--space-xs);
+        padding: var(--space-md) var(--space-lg);
         display: flex;
-        gap: 5px;
+        gap: var(--space-xs);
         align-items: center;
       }
       .dot {
@@ -528,23 +547,73 @@
 
       /* ── INPUT AREA ── */
       .input-area {
-        padding: 14px 28px 24px;
+        padding: var(--space-md) var(--space-2xl) var(--space-md);
         background: var(--bg);
         border-top: 1.5px solid var(--border);
         flex-shrink: 0;
       }
       .input-inner {
-        max-width: 900px;
+        max-width: 1040px;
         margin: 0 auto;
+      }
+      
+      /* 입력 모드 토글 */
+      .mode-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-sm);
+        margin-bottom: 6px;
+        font-size: var(--fs-base);
+        color: var(--muted);
+      }
+      .mode-toggle-label {
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.15s;
+      }
+      .mode-toggle-label:hover {
+        color: var(--text);
+      }
+      .mode-toggle-label.active {
+        color: var(--red);
+        font-weight: 600;
+      }
+      .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background: #ddd;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .toggle-switch.active {
+        background: var(--red);
+      }
+      .toggle-switch::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        transition: transform 0.2s;
+      }
+      .toggle-switch.active::after {
+        transform: translateX(20px);
       }
       .input-wrap {
         background: var(--surface);
         border: 1.5px solid var(--border);
-        border-radius: 14px;
-        padding: 12px 14px;
+        border-radius: var(--space-md);
+        padding: var(--space-md);
         display: flex;
         align-items: flex-end;
-        gap: 10px;
+        gap: var(--space-md);
         transition:
           border-color 0.15s,
           box-shadow 0.15s;
@@ -559,7 +628,7 @@
         border: none;
         outline: none;
         color: var(--text);
-        font-size: 14px;
+        font-size: var(--fs-xl);
         resize: none;
         font-family: inherit;
         line-height: 1.55;
@@ -598,9 +667,9 @@
       }
 
       .input-hint {
-        margin-top: 8px;
-        font-size: 11px;
-        color: #b0aba6;
+        margin-top: var(--space-sm);
+        font-size: var(--fs-base);
+        color: var(--gray-400);
         text-align: center;
       }
 
@@ -611,7 +680,7 @@
         margin-top: -4px;
       }
       .post-chips-label {
-        font-size: 11px;
+        font-size: var(--fs-base);
         color: var(--muted);
         margin-bottom: 10px;
         letter-spacing: 0.3px;
@@ -619,13 +688,13 @@
       .post-chips-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+        gap: var(--space-sm);
       }
       .post-chip {
         background: var(--surface);
         border: 1.5px solid var(--border);
-        border-radius: 10px;
-        padding: 10px 14px;
+        border-radius: var(--space-sm);
+        padding: var(--space-md);
         cursor: pointer;
         text-align: left;
         transition: all 0.15s;
@@ -651,7 +720,7 @@
         opacity: 1;
       }
       .post-chip-label {
-        font-size: 10px;
+        font-size: var(--fs-sm);
         font-weight: 700;
         color: var(--orange);
         letter-spacing: 0.5px;
@@ -659,7 +728,7 @@
         margin-bottom: 3px;
       }
       .post-chip-text {
-        font-size: 12px;
+        font-size: var(--fs-md);
         color: var(--text);
         line-height: 1.4;
       }
@@ -667,105 +736,149 @@
       /* Colab 독립성 검토 리포트 (ReportGenerator 스타일) */
       .independence-report {
         font-family: inherit;
-        max-width: 900px;
+        max-width: 1040px;
         border: 1px solid var(--border);
         border-radius: 12px;
         overflow: hidden;
+        scroll-margin-top: 20px;  /* 스크롤 시 상단 여백 */
         margin-top: 12px;
         background: var(--surface);
+        animation: reportFadeIn 0.5s ease-out;
+      }
+      @keyframes reportFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
       .independence-report .report-header {
         color: white;
-        padding: 16px 20px;
+        padding: var(--space-lg) var(--space-xl);
       }
       .independence-report .report-header small {
         opacity: 0.9;
-        font-size: 11px;
+        font-size: var(--fs-base);
       }
       .independence-report .report-body {
+        padding: var(--space-xl);
+      }
+      /* Row 1: 검토 결론 (full width) */
+      .independence-report .conclusion-row {
+        margin-bottom: var(--space-lg);
+      }
+      /* Row 2: 관계도 + 상세내용 */
+      .independence-report .details-row {
         display: flex;
-        padding: 20px;
-        gap: 20px;
+        gap: var(--space-xl);
       }
       .independence-report .report-left.report-viz {
-        flex: 0 0 42%;
-        max-width: 380px;
+        flex: 0 0 50%;
+        max-width: 500px;
         border-right: 1px solid var(--border);
-        padding-right: 20px;
+        padding-right: var(--space-xl);
         display: flex;
         flex-direction: column;
       }
       .independence-report .viz-wrap {
-        min-height: 200px;
+        flex: 1 1 auto;
+        min-height: 250px;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
-        background: #fafafa;
-        border-radius: 8px;
-        padding: 12px;
+        padding: var(--space-lg);
       }
       .independence-report .viz-wrap img {
         max-width: 100%;
         height: auto;
+        object-fit: contain;
+        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
+      }
+      .independence-report .viz-wrap img.loaded {
+        opacity: 1;
+      }
+      /* 그래프 로딩 스켈레톤 */
+      .graph-skeleton {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: skeleton-pulse 1.5s ease-in-out infinite;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+        font-size: var(--fs-md);
+      }
+      @keyframes skeleton-pulse {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      .graph-skeleton-icon {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-sm);
+        color: var(--gray-300);
+      }
+      .graph-skeleton-icon svg {
+        width: 32px;
+        height: 32px;
+        opacity: 0.5;
       }
       .independence-report .report-right.report-content {
         flex: 1;
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 16px 20px;
+        min-width: 0;
       }
       .independence-report .section-title {
-        font-weight: 700;
-        margin-bottom: 8px;
-        font-size: 11px;
+        font-size: var(--fs-base);
+        margin-bottom: var(--space-sm);
       }
       .independence-report .issue-box,
       .independence-report .safeguard-box {
-        margin-top: 10px;
-        padding: 10px 12px;
-        border-radius: 6px;
-      }
-      .independence-report .issue-box {
-        background: #fff3e0;
-      }
-      .independence-report .safeguard-box {
-        background: #e8f5e9;
-        border: 1px solid #c8e6c9;
+        margin-top: var(--space-md);
       }
       .independence-report .opinion-text {
-        background: #f5f5f5;
-        padding: 10px 12px;
-        border-radius: 6px;
-        margin: 8px 0;
-        font-size: 12px;
-        line-height: 1.55;
+        background: #f0f4f8;
+        border-left: 3px solid #5c6bc0;
+        padding: var(--space-md);
+        border-radius: var(--space-xs);
+        margin: var(--space-sm) 0;
+        font-size: var(--fs-base);
+        line-height: 1.6;
       }
       .independence-report ul {
-        margin: 4px 0 0;
-        padding-left: 16px;
-        font-size: 11px;
+        margin: var(--space-xs) 0 0;
+        padding-left: var(--space-lg);
+        font-size: var(--fs-base);
         line-height: 1.5;
       }
       .independence-report .issue-box .box-item,
       .independence-report .issue-box li {
-        color: #c62828;
+        color: var(--gray-800);
       }
       .independence-report .law-box {
-        margin-top: 4px;
-        font-size: 11px;
+        margin-top: var(--space-xs);
+        font-size: var(--fs-base);
         line-height: 1.5;
       }
       .independence-report .law-box:empty {
         display: none;
       }
       .independence-report .legal-section {
-        margin-top: 16px;
-        padding-top: 12px;
+        margin-top: var(--space-lg);
+        padding-top: var(--space-md);
         border-top: 1px solid var(--border);
       }
       .independence-report .law-link {
-        color: #1565c0;
+        color: #37474f;
         text-decoration: none;
+        font-weight: 500;
       }
       .independence-report .law-link:hover {
         text-decoration: underline;
@@ -794,7 +907,7 @@
           />
         </div>
         <div class="header-divider"></div>
-        <div class="header-service">감사 독립성 검토 AI</div>
+        <div class="header-service">감사 독립성 검토 AI <span class="powered-by">Powered by Samil</span></div>
       </div>
       <div class="header-badge" id="betaBadge" title="실험 단계 서비스입니다">Beta</div>
       <button
@@ -812,44 +925,10 @@
       <!-- EMPTY STATE -->
       <div class="empty-state" id="emptyState">
         <div class="empty-eyebrow">감사 독립성 검토</div>
-        <div class="empty-title">
-          감사 독립성 시나리오를<br />AI로 검토해보세요
-        </div>
-        <div class="empty-sub">
-          시나리오를 선택하면 수임 가능성, 주요 이슈, 권고 안전장치를<br />검토해드립니다.
-        </div>
-        <div class="suggestion-grid">
-          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="B회계법인 소속 이유명 공인회계사는 회계법인 퇴직 후 10개월 뒤에 B회계법인의 감사대상회사인 서울㈜의 재무담당임원으로 취임하였다. 이유명 공인회계사는 B회계법인 재직 당시 서울㈜의 재무제표 감사업무에 관여하지 않았다.">
-            <div class="chip-label">퇴직 후 감사대상회사 임원 취임</div>
-            <div class="chip-text">이유명 공인회계사, 퇴직 10개월 후 서울㈜ 재무담당임원</div>
-            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
-          </div>
-          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="공인회계사 자격증 소지자인 이대한씨는 경기㈜에서 경리과장으로 근무하던 중 20x8년 11월에 B회계법인 소속 공인회계사로 입사하였다. 20x9년 1월에 B회계법인과 경기㈜는 재무제표 감사계약을 체결하였다.">
-            <div class="chip-label">전 경리과장 입사 후 감사계약</div>
-            <div class="chip-text">이대한, 경기㈜ 경리과장 출신 → B회계법인 입사 후 감사계약</div>
-            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
-          </div>
-          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="B회계법인의 사원인 이영희 공인회계사는 직계비속의 사망으로 인하여 B회계법인의 감사대상회사 주식 0.5%를 소유하게 되었다.">
-            <div class="chip-label">직계비속 사망으로 주식 보유</div>
-            <div class="chip-text">이영희 공인회계사, 감사대상회사 주식 0.5% 소유</div>
-            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
-          </div>
-          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="이지수 공인회계사는 B회계법인의 사원으로 근무하고 있으며, B회계법인은 경북㈜를 감사하고 있다. 이지수 공인회계사의 부친은 경북㈜의 대표이사로 재직 중이다.">
-            <div class="chip-label">부친이 감사대상회사 대표이사</div>
-            <div class="chip-text">이지수 공인회계사, 부친이 경북㈜ 대표이사</div>
-            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
-          </div>
-          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="부산㈜의 재무제표감사 인증업무팀의 구성원인 이장래 공인회계사는 이번 부산㈜의 감사업무가 종료된 후에 부산㈜의 재무담당이사로 합류할 예정이다.">
-            <div class="chip-label">감사 종료 후 재무담당이사 합류</div>
-            <div class="chip-text">이장래 공인회계사, 부산㈜ 감사 후 재무담당이사 예정</div>
-            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
-          </div>
-          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="이관상 공인회계사는 전남㈜의 대표이사의 부탁으로 회계부서 직원 채용면접심사에 참여하고 가장 적합한 후보자를 선발하여 추천하였다. 또한, 대표이사와 함께 최종면접에 참석하여 박수리씨를 회계팀장으로 선발하였다. 해당 연도에 이관상 공인회계사는 전남㈜의 재무제표에 대한 외부감사업무를 의뢰받았다.">
-            <div class="chip-label">채용 참여 후 해당 연도 외부감사</div>
-            <div class="chip-text">이관상, 전남㈜ 채용 참여·선발 후 같은 연도 외부감사 의뢰</div>
-            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
-          </div>
-        </div>
+        <div class="empty-title">감사 독립성 시나리오를 AI로 검토해보세요</div>
+        <div class="empty-sub">수임 가능성, 주요 이슈, 권고 안전장치 검토를 지원합니다.</div>
+        <!-- 시나리오 칩: SCENARIOS 배열에서 동적 생성 -->
+        <div class="suggestion-grid" id="scenarioChips"></div>
       </div>
 
       <!-- MESSAGES -->
@@ -859,12 +938,19 @@
     <!-- INPUT AREA (답변 후에는 "다른 시나리오를 선택하세요" 칩만 사용) -->
     <div class="input-area">
       <div class="input-inner">
+        <!-- 입력 모드 토글 -->
+        <div class="mode-toggle">
+          <span class="mode-toggle-label active" id="modeChip" onclick="setInputMode('chip')">예시 선택</span>
+          <div class="toggle-switch" id="modeSwitch" onclick="toggleInputMode()"></div>
+          <span class="mode-toggle-label" id="modeFree" onclick="setInputMode('free')">직접 입력</span>
+        </div>
         <div class="input-wrap">
           <textarea
             id="inputBox"
             rows="1"
-            placeholder="시나리오를 선택하면 여기에 입력됩니다"
-            readonly
+            placeholder="시나리오를 직접 입력하거나 위 예시를 선택하세요"
+            oninput="autoResize(this)"
+            onkeydown="handleKey(event)"
           ></textarea>
           <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="검토 요청">
             <svg viewBox="0 0 24 24">
@@ -872,7 +958,7 @@
             </svg>
           </button>
         </div>
-        <div class="input-hint">시나리오를 선택한 뒤 전송하면 검토를 시작합니다</div>
+        <div class="input-hint">*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.</div>
       </div>
     </div>
 
@@ -886,7 +972,117 @@
       const API_BASE_URL = window.API_BASE_URL ?? '';
       const USE_BACKEND_API = window.USE_BACKEND_API !== false;
 
+      // ═══════════════════════════════════════════════════════════════
+      // SCENARIOS: Single Source of Truth (SSOT)
+      // 시나리오 추가/수정 시 이 배열만 변경하면 초기 칩과 응답 후 칩 모두 반영됨
+      // ═══════════════════════════════════════════════════════════════
+      const SCENARIOS = [
+        {
+          label: '동일 회계법인 내 매수·매각 자문',
+          text: 'X회계법인은 5개의 사업부(1∼5본부)로 구성되어 있으며, 주요 업무영역은 인증업무와 재무자문(deal service)업무이다. 현재 1본부의 파트너(사원)인 김 회계사는 A㈜가 보유중인 비상장주식(C)의 매각자문업무를 수행하고 있다. 한편 최근에 3본부의 파트너(사원)인 박 회계사는 B㈜로부터 A㈜가 매각을 추진하고 있는 C주식을 매수하고 싶다는 의향과 함께 매수자문서비스를 제공해 줄 것을 요청받았다.',
+          shortText: 'X회계법인 1본부 매각자문, 3본부 매수자문 요청',
+          source: '2018_CPA2차_회계감사'
+        },
+        {
+          label: '자회사 사업부 인수 평가업무',
+          text: '상장회사 ㈜G는 비상장자회사 ㈜H와 ㈜I에 대해 각각 60%와 70%의 지분율을 보유하고 있다. ㈜G는 자회사 ㈜H의 사업부를 인수하고자 하는데, ㈜I의 감사인인 한국회계법인의 사원인 최 회계사가 이에 대한 평가업무를 수임하고자 한다. 단, 한국회계법인은 ㈜G와 ㈜H의 감사인이 아니다.',
+          shortText: '㈜G, 자회사 ㈜H 사업부 인수 시 ㈜I 감사인이 평가업무 수임',
+          source: '2023_CPA2차_회계감사'
+        },
+        {
+          label: '직계비속 사망으로 주식 보유',
+          text: 'B회계법인의 사원인 이영희 공인회계사는 직계비속의 사망으로 인하여 B회계법인의 감사대상회사 주식 0.5%를 소유하게 되었다.',
+          shortText: '이영희 공인회계사, 감사대상회사 주식 0.5% 소유',
+          source: '2019_CPA2차_회계감사'
+        },
+        {
+          label: '부친이 감사대상회사 대표이사',
+          text: '이지수 공인회계사는 B회계법인의 사원으로 근무하고 있으며, B회계법인은 경북㈜를 감사하고 있다. 이지수 공인회계사의 부친은 경북㈜의 대표이사로 재직 중이다.',
+          shortText: '이지수 공인회계사, 부친이 경북㈜ 대표이사',
+          source: '2019_CPA2차_회계감사'
+        },
+        {
+          label: '감사 종료 후 재무담당이사 합류',
+          text: '부산㈜의 재무제표감사 인증업무팀의 구성원인 이장래 공인회계사는 이번 부산㈜의 감사업무가 종료된 후에 부산㈜의 재무담당이사로 합류할 예정이다.',
+          shortText: '이장래 공인회계사, 부산㈜ 감사 후 재무담당이사 예정',
+          source: '2019_CPA2차_회계감사'
+        },
+        {
+          label: '채용 참여 후 해당 연도 외부감사',
+          text: '이관상 공인회계사는 전남㈜의 대표이사의 부탁으로 회계부서 직원 채용면접심사에 참여하고 가장 적합한 후보자를 선발하여 추천하였다. 또한, 대표이사와 함께 최종면접에 참석하여 박수리씨를 회계팀장으로 선발하였다. 해당 연도에 이관상 공인회계사는 전남㈜의 재무제표에 대한 외부감사업무를 의뢰받았다.',
+          shortText: '이관상, 전남㈜ 채용 참여·선발 후 같은 연도 외부감사 의뢰',
+          source: '2019_CPA2차_회계감사'
+        },
+      ];
+
       let isLoading = false;
+      
+      // 입력 모드: 'chip' (예시 선택) / 'free' (직접 입력)
+      let inputMode = localStorage.getItem('inputMode') || 'chip';
+      
+      function initInputMode() {
+        setInputMode(inputMode, false);
+      }
+      
+      /** 초기 화면 시나리오 칩 렌더링 (SCENARIOS 기반) */
+      function renderScenarioChips() {
+        const grid = document.getElementById('scenarioChips');
+        if (!grid) return;
+        grid.innerHTML = '';
+        SCENARIOS.forEach((d) => {
+          const chip = document.createElement('div');
+          chip.className = 'chip';
+          chip.dataset.text = d.text;
+          chip.onclick = function() { fillInput(this.dataset.text); };
+          chip.innerHTML = 
+            '<div class="chip-label">' + d.label + '</div>' +
+            '<div class="chip-text">' + d.shortText + '</div>' +
+            '<div class="chip-arrow">출처: ' + d.source + '</div>';
+          grid.appendChild(chip);
+        });
+      }
+      
+      function setInputMode(mode, save = true) {
+        inputMode = mode;
+        if (save) localStorage.setItem('inputMode', mode);
+        
+        const inputBox = document.getElementById('inputBox');
+        const modeSwitch = document.getElementById('modeSwitch');
+        const modeChip = document.getElementById('modeChip');
+        const modeFree = document.getElementById('modeFree');
+        const inputHint = document.querySelector('.input-hint');
+        const emptyChips = document.querySelector('.empty-state .card-grid');
+        
+        if (mode === 'free') {
+          // 직접 입력 모드
+          modeSwitch.classList.add('active');
+          modeChip.classList.remove('active');
+          modeFree.classList.add('active');
+          inputBox.removeAttribute('readonly');
+          inputBox.placeholder = '감사 독립성 검토가 필요한 시나리오를 입력하세요';
+          if (inputHint) inputHint.textContent = '*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.';
+          if (emptyChips) emptyChips.style.opacity = '0.5';
+        } else {
+          // 예시 선택 모드
+          modeSwitch.classList.remove('active');
+          modeChip.classList.add('active');
+          modeFree.classList.remove('active');
+          inputBox.setAttribute('readonly', '');
+          inputBox.placeholder = '위 예시 시나리오를 선택하세요';
+          if (inputHint) inputHint.textContent = '*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.';
+          if (emptyChips) emptyChips.style.opacity = '1';
+        }
+      }
+      
+      function toggleInputMode() {
+        setInputMode(inputMode === 'chip' ? 'free' : 'chip');
+      }
+      
+      // 페이지 로드 시 초기화
+      document.addEventListener('DOMContentLoaded', function() {
+        renderScenarioChips();  // 시나리오 칩 렌더링
+        initInputMode();        // 입력 모드 초기화
+      });
 
       const scenarios = {
         loan: {
@@ -1023,11 +1219,11 @@
         msgs.appendChild(typing);
         scrollDown();
 
-        function done() {
+        function done(skipScroll) {
           try { msgs.removeChild(typing); } catch (_) {}
           document.getElementById('sendBtn').disabled = false;
           isLoading = false;
-          scrollDown();
+          if (!skipScroll) scrollDown();
         }
 
         if (!USE_BACKEND_API) {
@@ -1055,9 +1251,11 @@
             return res.json();
           })
           .then(function (data) {
-            msgs.appendChild(buildIndependenceReportCard(data));
+            var reportCard = buildIndependenceReportCard(data);
+            msgs.appendChild(reportCard);
             msgs.appendChild(buildPostChips());
-            done();
+            scrollToMessage(reportCard);  // 카드 상단으로 스크롤
+            done(true);  // skipScroll: 이미 scrollToMessage로 처리
           })
           .catch(function (err) {
             const bubble = document.createElement('div');
@@ -1072,10 +1270,14 @@
       /** Colab ReportGenerator와 동일: mermaid.ink URL 생성 */
       function mermaidToImgUrl(mermaidCode) {
         try {
+          console.log('[Mermaid] Input code:', mermaidCode);
           var bin = unescape(encodeURIComponent(mermaidCode));
           var b64 = btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-          return 'https://mermaid.ink/img/' + b64;
+          var url = 'https://mermaid.ink/img/' + b64;
+          console.log('[Mermaid] Generated URL:', url);
+          return url;
         } catch (e) {
+          console.error('[Mermaid] Encoding error:', e);
           return '';
         }
       }
@@ -1110,28 +1312,63 @@
         var lawBoxHtml = legalHtml ? '<div class="legal-section"><div class="section-title">근거 법령</div><div class="law-box">' + legalHtml + '</div></div>' : '';
         var card = document.createElement('div');
         card.className = 'independence-report';
+        // 스켈레톤 HTML (로딩 중 표시)
+        var skeletonHtml = '<div class="graph-skeleton"><div class="graph-skeleton-icon">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="10.5" y2="16"/><line x1="15.5" y1="7.5" x2="13.5" y2="16"/></svg>' +
+          '<span>관계도 생성 중...</span></div></div>';
+
         card.innerHTML =
           '<div class="report-header" style="background:' + color + ';">' +
             '<h2 style="margin:0;font-size:1rem;font-weight:700;">' + escapeHtml(status) + (riskLevel ? ' (위험도: ' + escapeHtml(riskLevel) + ')' : '') + '</h2>' +
             '<small>검토 ID: ' + escapeHtml(traceId) + '</small>' +
           '</div>' +
           '<div class="report-body">' +
-            '<div class="report-left report-viz">' +
-              '<div class="section-title">관계도</div>' +
-              '<div class="viz-wrap">' +
-                (graphUrl ? '<img src="' + graphUrl + '" alt="감사·회사 간 관계도" />' : '') +
+            '<div class="conclusion-row">' +
+              '<div class="section-title">검토 결론</div>' +
+              '<div class="opinion-text">' + escapeHtml(considerations) + '</div>' +
+            '</div>' +
+            '<div class="details-row">' +
+              '<div class="report-left report-viz">' +
+                '<div class="section-title">이해관계 구조</div>' +
+                '<div class="viz-wrap">' +
+                  (graphUrl ? skeletonHtml : '') +
+                '</div>' +
+              '</div>' +
+              '<div class="report-right report-content">' +
+                '<div class="section-title">주요 이슈</div>' +
+                '<div class="issue-box"><ul>' + issuesHtml + '</ul></div>' +
+                '<div class="section-title">권고 안전장치</div>' +
+                '<div class="safeguard-box"><ul>' + safeguardsHtml + '</ul></div>' +
+                lawBoxHtml +
               '</div>' +
             '</div>' +
-            '<div class="report-right report-content">' +
-              '<div class="section-title">주요 이슈</div>' +
-              '<div class="issue-box"><ul>' + issuesHtml + '</ul></div>' +
-              '<div class="section-title">검토 의견</div>' +
-              '<div class="opinion-text">' + escapeHtml(considerations) + '</div>' +
-              '<div class="section-title">권고 안전장치</div>' +
-              '<div class="safeguard-box"><ul>' + safeguardsHtml + '</ul></div>' +
-              lawBoxHtml +
-            '</div>' +
           '</div>';
+
+        // 이미지 프리로드 후 페이드인
+        if (graphUrl) {
+          var vizWrap = card.querySelector('.viz-wrap');
+          var img = new Image();
+          img.alt = '감사·회사 간 관계도';
+          img.onload = function() {
+            vizWrap.innerHTML = '';
+            vizWrap.appendChild(img);
+            // requestAnimationFrame으로 opacity 전환 트리거
+            requestAnimationFrame(function() {
+              requestAnimationFrame(function() {
+                img.classList.add('loaded');
+              });
+            });
+          };
+          img.onerror = function() {
+            console.error('[Mermaid] Image load failed. URL:', img.src);
+            vizWrap.innerHTML = '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">' +
+              '<div style="margin-bottom:8px;">관계도 로드 실패</div>' +
+              '<div style="font-size:var(--fs-xs);color:#999;">mermaid.ink 서비스 연결 오류</div>' +
+              '</div>';
+          };
+          img.src = graphUrl;
+        }
+
         return card;
       }
 
@@ -1160,36 +1397,31 @@
           </div>
           <div class="accent-bar"></div>
           <div class="report-body">
-            <div class="report-left">
-              <div class="section-title">관계도</div>
-              <div class="flow-diagram">${flowHTML}</div>
-              <div class="issue-box">
-                <div class="box-title">주요 이슈</div>
-                ${d.issues.map(i => `<div class="box-item">${i}</div>`).join('')}
-              </div>
-            </div>
-            <div class="report-right">
-              <div class="section-title">검토 의견</div>
+            <div class="conclusion-row">
+              <div class="section-title">검토 결론</div>
               <div class="law-box"><strong>적용 기준:</strong> ${d.law}</div>
               <div class="opinion-text">${d.opinion}</div>
-              <div class="safeguard-box">
-                <div class="box-title">권고 안전장치</div>
-                ${d.safeguards.map(s => `<div class="box-item">${s}</div>`).join('')}
+            </div>
+            <div class="details-row">
+              <div class="report-left">
+                <div class="section-title">이해관계 구조</div>
+                <div class="flow-diagram">${flowHTML}</div>
+              </div>
+              <div class="report-right">
+                <div class="section-title">주요 이슈</div>
+                <div class="issue-box">
+                  ${d.issues.map(i => `<div class="box-item">${i}</div>`).join('')}
+                </div>
+                <div class="section-title">권고 안전장치</div>
+                <div class="safeguard-box">
+                  ${d.safeguards.map(s => `<div class="box-item">${s}</div>`).join('')}
+                </div>
               </div>
             </div>
           </div>
         `;
         return card;
       }
-
-      const chipData = [
-        { label: '퇴직 후 감사대상회사 임원 취임', text: 'B회계법인 소속 이유명 공인회계사는 회계법인 퇴직 후 10개월 뒤에 B회계법인의 감사대상회사인 서울㈜의 재무담당임원으로 취임하였다. 이유명 공인회계사는 B회계법인 재직 당시 서울㈜의 재무제표 감사업무에 관여하지 않았다.', shortText: '이유명, 퇴직 10개월 후 서울㈜ 재무담당임원' },
-        { label: '전 경리과장 입사 후 감사계약', text: '공인회계사 자격증 소지자인 이대한씨는 경기㈜에서 경리과장으로 근무하던 중 20x8년 11월에 B회계법인 소속 공인회계사로 입사하였다. 20x9년 1월에 B회계법인과 경기㈜는 재무제표 감사계약을 체결하였다.', shortText: '이대한, 경기㈜ 경리과장 출신 → 입사 후 감사계약' },
-        { label: '직계비속 사망으로 주식 보유', text: 'B회계법인의 사원인 이영희 공인회계사는 직계비속의 사망으로 인하여 B회계법인의 감사대상회사 주식 0.5%를 소유하게 되었다.', shortText: '이영희, 감사대상회사 주식 0.5% 소유' },
-        { label: '부친이 감사대상회사 대표이사', text: '이지수 공인회계사는 B회계법인의 사원으로 근무하고 있으며, B회계법인은 경북㈜를 감사하고 있다. 이지수 공인회계사의 부친은 경북㈜의 대표이사로 재직 중이다.', shortText: '이지수, 부친이 경북㈜ 대표이사' },
-        { label: '감사 종료 후 재무담당이사 합류', text: '부산㈜의 재무제표감사 인증업무팀의 구성원인 이장래 공인회계사는 이번 부산㈜의 감사업무가 종료된 후에 부산㈜의 재무담당이사로 합류할 예정이다.', shortText: '이장래, 부산㈜ 감사 후 재무담당이사 예정' },
-        { label: '채용 참여 후 해당 연도 외부감사', text: '이관상 공인회계사는 전남㈜의 대표이사의 부탁으로 회계부서 직원 채용면접심사에 참여하고 가장 적합한 후보자를 선발하여 추천하였다. 또한, 대표이사와 함께 최종면접에 참석하여 박수리씨를 회계팀장으로 선발하였다. 해당 연도에 이관상 공인회계사는 전남㈜의 재무제표에 대한 외부감사업무를 의뢰받았다.', shortText: '이관상, 전남㈜ 채용 참여 후 같은 연도 외부감사 의뢰' },
-      ];
 
       function buildPostChips() {
         const wrap = document.createElement('div');
@@ -1199,7 +1431,7 @@
         label.className = 'post-chips-label';
         label.textContent = '다른 시나리오를 선택하세요';
         grid.className = 'post-chips-grid';
-        chipData.forEach((d, i) => {
+        SCENARIOS.forEach((d) => {
           const chip = document.createElement('div');
           chip.className = 'post-chip';
           chip.innerHTML = '<div class="post-chip-label">' + d.label + '</div><div class="post-chip-text">' + d.shortText + '</div>';
@@ -1226,6 +1458,14 @@
       function scrollDown() {
         const ca = document.getElementById('chatArea');
         setTimeout(() => ca.scrollTop = ca.scrollHeight, 50);
+      }
+      // 새 메시지 상단으로 부드럽게 스크롤 (응답 카드용)
+      function scrollToMessage(element) {
+        if (element) {
+          requestAnimationFrame(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
       }
     </script>
   </body>

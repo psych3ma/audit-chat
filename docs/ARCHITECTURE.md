@@ -22,62 +22,6 @@
 
 ## 2. 시스템 아키텍처
 
-### 2.1 Architecture Diagram (Mermaid v11.1.0+)
-
-> ⚠️ `architecture-beta`는 Mermaid v11.1.0+ 필요. GitHub/일부 렌더러 미지원 시 2.2 Flowchart 버전 사용.
-
-```mermaid
-architecture-beta
-    group user(cloud)[사용자]
-    group frontend(server)[프론트엔드]
-    group backend(server)[백엔드 FastAPI]
-    group services(database)[서비스 레이어]
-    group external(internet)[외부 서비스]
-
-    service browser(internet)[브라우저] in user
-
-    service static_html(disk)[audit-chat-pwc.html] in frontend
-    service streamlit(server)[Streamlit App] in frontend
-
-    service fastapi(server)[FastAPI] in backend
-    service router_independence(disk)[/independence] in backend
-    service router_chat(disk)[/chat] in backend
-    service router_graph(disk)[/graph] in backend
-
-    service independence_svc(database)[independence_service] in services
-    service llm_structured(database)[llm_structured] in services
-    service llm_service(database)[llm_service] in services
-    service law_registry(disk)[law_registry] in services
-
-    service openai(cloud)[OpenAI API] in external
-    service neo4j(database)[Neo4j] in external
-    service law_go_kr(internet)[law.go.kr] in external
-
-    browser:R --> L:static_html
-    browser:R --> L:streamlit
-
-    static_html:B --> T:fastapi
-    streamlit:B --> T:fastapi
-
-    fastapi:B --> T:router_independence
-    fastapi:B --> T:router_chat
-    fastapi:B --> T:router_graph
-
-    router_independence:R --> L:independence_svc
-    router_chat:R --> L:llm_service
-    router_graph:R --> L:neo4j
-
-    independence_svc:R --> L:llm_structured
-    independence_svc:R --> L:law_registry
-    independence_svc:B --> T:neo4j
-
-    llm_structured:B --> T:openai
-    llm_service:B --> T:openai
-    law_registry:B --> T:law_go_kr
-```
-
-### 2.2 Architecture Diagram (Flowchart 호환 버전)
-
 ```mermaid
 flowchart TB
     subgraph User["👤 사용자"]
@@ -632,8 +576,7 @@ gitGraph
 
 | 섹션 | 다이어그램 타입 | 용도 |
 |------|----------------|------|
-| 2.1 | `architecture-beta` | 시스템 아키텍처 (v11.1.0+) |
-| 2.2 | `flowchart TB` | 시스템 아키텍처 (호환) |
+| 2 | `flowchart TB` | 시스템 아키텍처 |
 | 4 | `flowchart TD` | 독립성 검토 파이프라인 |
 | 5.1 | `sequenceDiagram` | 전체 흐름 |
 | 5.2 | `sequenceDiagram` | LLM 구조적 출력 |
