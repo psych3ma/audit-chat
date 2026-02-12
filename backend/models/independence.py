@@ -1,7 +1,7 @@
 """독립성 검토 시스템용 Pydantic 모델 (감사 수임 독립성)."""
 import re
 from enum import Enum
-from typing import List
+from typing import Any, List, Union
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -36,13 +36,38 @@ class IndependenceMap(BaseModel):
     connections: List[Relationship]
 
 
+class LegalRefItem(BaseModel):
+    """근거 법령 한 건: 표시 문구와 선택적 조문 URL."""
+    name: str = Field(..., description="법령·조문 표시명 (예: 공인회계사법 제21조)")
+    url: str | None = Field(None, description="조문 URL (있으면 새 창에서 열기)")
+
+
+def _normalize_legal_ref(v: Any) -> LegalRefItem:
+    if isinstance(v, str):
+        return LegalRefItem(name=v.strip(), url=None)
+    if isinstance(v, dict):
+        return LegalRefItem(name=v.get("name", str(v)).strip(), url=v.get("url") or None)
+    return LegalRefItem(name=str(v), url=None)
+
+
 class AnalysisResult(BaseModel):
     status: IndependenceStatus
     risk_level: str
     key_issues: List[str]
-    legal_references: List[str] = Field(default_factory=list)
+    legal_references: List[LegalRefItem] = Field(default_factory=list)
     considerations: str
     suggested_safeguards: List[str] = Field(default_factory=list)
+
+    @field_validator("legal_references", mode="before")
+    @classmethod
+    def normalize_legal_references(cls, v: Any) -> List[dict]:
+        if not v:
+            return []
+        out = []
+        for item in v if isinstance(v, list) else [v]:
+            ref = _normalize_legal_ref(item)
+            out.append(ref.model_dump())
+        return out
 
     @field_validator("status", mode="before")
     @classmethod

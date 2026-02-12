@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>삼일PwC — 내부통제 AI 검토</title>
+    <title>삼일PwC — 감사 독립성 AI 검토</title>
     <style>
       :root {
         --black: #000000;
@@ -267,7 +267,7 @@
       }
 
       .report-header {
-        padding: 20px 26px;
+        padding: 14px 20px;
         display: flex;
         align-items: flex-end;
         justify-content: space-between;
@@ -351,21 +351,21 @@
       }
 
       .report-left {
-        padding: 22px 24px;
+        padding: 16px 20px;
         border-right: 1.5px solid var(--border);
       }
       .report-right {
-        padding: 22px 24px;
+        padding: 16px 20px;
       }
 
       .section-title {
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         color: var(--black);
-        margin-bottom: 14px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
-        gap: 7px;
+        gap: 0;
         letter-spacing: 0.3px;
         text-transform: uppercase;
       }
@@ -416,16 +416,16 @@
         background: #fff5f3;
         border: 1.5px solid #f5ccc5;
         border-left: 3px solid var(--red);
-        border-radius: 8px;
-        padding: 12px 14px;
+        border-radius: 6px;
+        padding: 10px 12px;
       }
       .box-title {
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 0;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -433,12 +433,12 @@
         color: var(--red);
       }
       .box-item {
-        font-size: 12px;
+        font-size: 11px;
         color: var(--text);
-        line-height: 1.55;
-        padding-left: 13px;
+        line-height: 1.5;
+        padding-left: 12px;
         position: relative;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
       }
       .box-item::before {
         content: "—";
@@ -455,10 +455,10 @@
       .law-box {
         background: #f4f1ed;
         border: 1.5px solid #e0d8cf;
-        border-radius: 8px;
-        padding: 10px 14px;
-        margin-bottom: 14px;
-        font-size: 12px;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+        font-size: 11px;
         color: var(--muted);
         line-height: 1.5;
       }
@@ -468,10 +468,10 @@
       }
 
       .opinion-text {
-        font-size: 13px;
+        font-size: 12px;
         color: #3a3530;
-        line-height: 1.75;
-        margin-bottom: 14px;
+        line-height: 1.6;
+        margin-bottom: 12px;
       }
 
       /* Safeguard */
@@ -479,8 +479,8 @@
         background: #fffbee;
         border: 1.5px solid #f0dfa0;
         border-left: 3px solid var(--amber);
-        border-radius: 8px;
-        padding: 12px 14px;
+        border-radius: 6px;
+        padding: 10px 12px;
       }
       .safeguard-box .box-title {
         color: var(--amber);
@@ -663,6 +663,117 @@
         color: var(--text);
         line-height: 1.4;
       }
+
+      /* Colab 독립성 검토 리포트 (ReportGenerator 스타일) */
+      .independence-report {
+        font-family: inherit;
+        max-width: 900px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 12px;
+        background: var(--surface);
+      }
+      .independence-report .report-header {
+        color: white;
+        padding: 16px 20px;
+      }
+      .independence-report .report-header small {
+        opacity: 0.9;
+        font-size: 11px;
+      }
+      .independence-report .report-body {
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+      }
+      .independence-report .report-left.report-viz {
+        flex: 0 0 42%;
+        max-width: 380px;
+        border-right: 1px solid var(--border);
+        padding-right: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .independence-report .viz-wrap {
+        min-height: 200px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background: #fafafa;
+        border-radius: 8px;
+        padding: 12px;
+      }
+      .independence-report .viz-wrap img {
+        max-width: 100%;
+        height: auto;
+      }
+      .independence-report .report-right.report-content {
+        flex: 1;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 16px 20px;
+      }
+      .independence-report .section-title {
+        font-weight: 700;
+        margin-bottom: 8px;
+        font-size: 11px;
+      }
+      .independence-report .issue-box,
+      .independence-report .safeguard-box {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 6px;
+      }
+      .independence-report .issue-box {
+        background: #fff3e0;
+      }
+      .independence-report .safeguard-box {
+        background: #e8f5e9;
+        border: 1px solid #c8e6c9;
+      }
+      .independence-report .opinion-text {
+        background: #f5f5f5;
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin: 8px 0;
+        font-size: 12px;
+        line-height: 1.55;
+      }
+      .independence-report ul {
+        margin: 4px 0 0;
+        padding-left: 16px;
+        font-size: 11px;
+        line-height: 1.5;
+      }
+      .independence-report .issue-box .box-item,
+      .independence-report .issue-box li {
+        color: #c62828;
+      }
+      .independence-report .law-box {
+        margin-top: 4px;
+        font-size: 11px;
+        line-height: 1.5;
+      }
+      .independence-report .law-box:empty {
+        display: none;
+      }
+      .independence-report .legal-section {
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+      .independence-report .law-link {
+        color: #1565c0;
+        text-decoration: none;
+      }
+      .independence-report .law-link:hover {
+        text-decoration: underline;
+      }
+      .independence-report .law-link-icon {
+        font-size: 0.85em;
+        opacity: 0.8;
+      }
       ::-webkit-scrollbar {
         width: 4px;
       }
@@ -683,16 +794,16 @@
           />
         </div>
         <div class="header-divider"></div>
-        <div class="header-service">내부통제 검토 AI</div>
+        <div class="header-service">감사 독립성 검토 AI</div>
       </div>
-      <div class="header-badge" id="betaBadge">Beta</div>
+      <div class="header-badge" id="betaBadge" title="실험 단계 서비스입니다">Beta</div>
       <button
         class="reset-btn"
         id="resetBtn"
         onclick="resetChat()"
         style="display: none"
       >
-        ↩ 새 분석
+        ↩ 새 검토 시작
       </button>
     </div>
 
@@ -700,74 +811,43 @@
     <div class="chat-area" id="chatArea">
       <!-- EMPTY STATE -->
       <div class="empty-state" id="emptyState">
-        <div class="empty-eyebrow">Internal Control Review</div>
+        <div class="empty-eyebrow">감사 독립성 검토</div>
         <div class="empty-title">
-          내부통제 시나리오를<br />AI로 검토해보세요
+          감사 독립성 시나리오를<br />AI로 검토해보세요
         </div>
         <div class="empty-sub">
-          시나리오를 선택하면 통제 적절성, 관련 기준, 개선 방향을<br />분석해드립니다.
+          시나리오를 선택하면 수임 가능성, 주요 이슈, 권고 안전장치를<br />검토해드립니다.
         </div>
-
         <div class="suggestion-grid">
-          <div
-            class="chip"
-            onclick="fillInput(this.dataset.text)"
-            data-text="㈜투명은행은 자체적 신용조사를 통해 각 지점의 개별 대출금액 3억원까지는 횟수 제한 없이 지점장의 전결로 가능하도록 하고, 그 금액을 초과하는 경우 본사 승인을 받아 대출이 이루어지도록 한다."
-          >
-            <div class="chip-label">대출 전결 한도</div>
-            <div class="chip-text">
-              3억원 이하 지점장 전결, 초과 시 본사 승인
-            </div>
-            <div class="chip-arrow">시나리오 입력 →</div>
+          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="B회계법인 소속 이유명 공인회계사는 회계법인 퇴직 후 10개월 뒤에 B회계법인의 감사대상회사인 서울㈜의 재무담당임원으로 취임하였다. 이유명 공인회계사는 B회계법인 재직 당시 서울㈜의 재무제표 감사업무에 관여하지 않았다.">
+            <div class="chip-label">퇴직 후 감사대상회사 임원 취임</div>
+            <div class="chip-text">이유명 공인회계사, 퇴직 10개월 후 서울㈜ 재무담당임원</div>
+            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
           </div>
-          <div
-            class="chip"
-            onclick="fillInput(this.dataset.text)"
-            data-text="각 지점 직원은 최장 3년 내 타 지점으로 옮기도록 하고 있으며, 고향에 파견된 직원은 지역에 대한 이해와 영업 확대를 위해 3년을 초과하여 계속 근무가 가능하다."
-          >
-            <div class="chip-label">직원 순환근무</div>
-            <div class="chip-text">
-              3년 순환 원칙, 고향 파견 직원은 예외 인정
-            </div>
-            <div class="chip-arrow">시나리오 입력 →</div>
+          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="공인회계사 자격증 소지자인 이대한씨는 경기㈜에서 경리과장으로 근무하던 중 20x8년 11월에 B회계법인 소속 공인회계사로 입사하였다. 20x9년 1월에 B회계법인과 경기㈜는 재무제표 감사계약을 체결하였다.">
+            <div class="chip-label">전 경리과장 입사 후 감사계약</div>
+            <div class="chip-text">이대한, 경기㈜ 경리과장 출신 → B회계법인 입사 후 감사계약</div>
+            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
           </div>
-          <div
-            class="chip"
-            onclick="fillInput(this.dataset.text)"
-            data-text="규모가 작은 지점의 경우 근속연수가 10년 이상인 경험이 풍부한 직원에 한하여 예금 및 대출거래의 승인과 회계업무를 동시에 수행한다."
-          >
-            <div class="chip-label">직무 겸직</div>
-            <div class="chip-text">소규모 지점 — 승인·회계 업무 겸직 허용</div>
-            <div class="chip-arrow">시나리오 입력 →</div>
+          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="B회계법인의 사원인 이영희 공인회계사는 직계비속의 사망으로 인하여 B회계법인의 감사대상회사 주식 0.5%를 소유하게 되었다.">
+            <div class="chip-label">직계비속 사망으로 주식 보유</div>
+            <div class="chip-text">이영희 공인회계사, 감사대상회사 주식 0.5% 소유</div>
+            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
           </div>
-          <div
-            class="chip"
-            onclick="fillInput(this.dataset.text)"
-            data-text="신입사원 선발 시 인적 보증 절차를 마련하고 단체손해보험에 가입하여 금융사고에 대비한다."
-          >
-            <div class="chip-label">신입사원 보증</div>
-            <div class="chip-text">
-              인적보증 + 단체손해보험으로 금융사고 대비
-            </div>
-            <div class="chip-arrow">시나리오 입력 →</div>
+          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="이지수 공인회계사는 B회계법인의 사원으로 근무하고 있으며, B회계법인은 경북㈜를 감사하고 있다. 이지수 공인회계사의 부친은 경북㈜의 대표이사로 재직 중이다.">
+            <div class="chip-label">부친이 감사대상회사 대표이사</div>
+            <div class="chip-text">이지수 공인회계사, 부친이 경북㈜ 대표이사</div>
+            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
           </div>
-          <div
-            class="chip"
-            onclick="fillInput(this.dataset.text)"
-            data-text="모범직원에게는 사용하지 않은 월차나 정기휴가를 휴가 수당으로 대체할 수 있는 인센티브를 제공한다."
-          >
-            <div class="chip-label">모범직원 인센티브</div>
-            <div class="chip-text">미사용 휴가 → 수당 전환 인센티브 제공</div>
-            <div class="chip-arrow">시나리오 입력 →</div>
+          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="부산㈜의 재무제표감사 인증업무팀의 구성원인 이장래 공인회계사는 이번 부산㈜의 감사업무가 종료된 후에 부산㈜의 재무담당이사로 합류할 예정이다.">
+            <div class="chip-label">감사 종료 후 재무담당이사 합류</div>
+            <div class="chip-text">이장래 공인회계사, 부산㈜ 감사 후 재무담당이사 예정</div>
+            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
           </div>
-          <div
-            class="chip"
-            onclick="fillInput(this.dataset.text)"
-            data-text="지점에 대손이 발생한 경우, 지점장은 즉각적으로 최고재무책임자(CFO) 및 최고경영자에게 보고하고 본사의 내부감사팀이 지점에 방문하여 대출계약이 적절했는지 조사하고 회수가능성을 확인한다."
-          >
-            <div class="chip-label">대손 보고체계</div>
-            <div class="chip-text">대손 즉시 CFO·CEO 보고 및 내부감사 실시</div>
-            <div class="chip-arrow">시나리오 입력 →</div>
+          <div class="chip" onclick="fillInput(this.dataset.text)" data-text="이관상 공인회계사는 전남㈜의 대표이사의 부탁으로 회계부서 직원 채용면접심사에 참여하고 가장 적합한 후보자를 선발하여 추천하였다. 또한, 대표이사와 함께 최종면접에 참석하여 박수리씨를 회계팀장으로 선발하였다. 해당 연도에 이관상 공인회계사는 전남㈜의 재무제표에 대한 외부감사업무를 의뢰받았다.">
+            <div class="chip-label">채용 참여 후 해당 연도 외부감사</div>
+            <div class="chip-text">이관상, 전남㈜ 채용 참여·선발 후 같은 연도 외부감사 의뢰</div>
+            <div class="chip-arrow">이 시나리오로 검토하기 →</div>
           </div>
         </div>
       </div>
@@ -776,33 +856,32 @@
       <div class="messages" id="messages" style="display: none"></div>
     </div>
 
-    <!-- INPUT AREA -->
+    <!-- INPUT AREA (답변 후에는 "다른 시나리오를 선택하세요" 칩만 사용) -->
     <div class="input-area">
       <div class="input-inner">
         <div class="input-wrap">
           <textarea
             id="inputBox"
             rows="1"
-            placeholder="위 예시 버튼을 선택하면 시나리오가 입력됩니다"
+            placeholder="시나리오를 선택하면 여기에 입력됩니다"
             readonly
           ></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="검토 요청">
             <svg viewBox="0 0 24 24">
               <path d="M2 21L23 12 2 3v7l15 2-15 2z" />
             </svg>
           </button>
         </div>
-        <div class="input-hint">위 시나리오 버튼을 눌러 분석을 시작하세요</div>
+        <div class="input-hint">시나리오를 선택한 뒤 전송하면 검토를 시작합니다</div>
       </div>
     </div>
 
     <script>
       /**
-       * CTO 검토 — 설정 및 운영
+       * CTO 검토 — 설정 및 운영 (Colab Independence Review 흐름 적용)
        * - API_BASE_URL: 백엔드 주소. 빈 문자열이면 현재 페이지와 동일 오리진 사용 (권장).
-       * - USE_BACKEND_API: true 시 POST /chat/completions 호출, 실패 시 기존 시나리오 폴백.
-       * - 보안: 동일 오리진 배포 시 CORS/쿠키 이슈 없음. 별도 도메인이면 백엔드 CORS 설정 필요.
-       * - 에러: 네트워크/5xx 시 사용자에게 메시지 표시 후 로컬 시나리오로 폴백.
+       * - USE_BACKEND_API: true 시 POST /independence/review 호출 → 관계 추출(GPT-4o-mini) → 독립성 분석(GPT-4o) → Colab 스타일 리포트 표시.
+       * - 실패 시 로컬 시나리오(내부통제 폴백) 표시.
        */
       const API_BASE_URL = window.API_BASE_URL ?? '';
       const USE_BACKEND_API = window.USE_BACKEND_API !== false;
@@ -959,36 +1038,101 @@
           return;
         }
 
-        const url = (API_BASE_URL || '').replace(/\/$/, '') + '/chat/completions';
+        // Colab Independence Review 흐름: POST /independence/review → 관계 추출 → 독립성 분석 → 리포트
+        const url = (API_BASE_URL || '').replace(/\/$/, '') + '/independence/review';
         fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [{ role: 'user', content: text }],
-            stream: false
-          })
+          body: JSON.stringify({ scenario: text })
         })
           .then(function (res) {
-            if (!res.ok) throw new Error('API 오류: ' + res.status + ' ' + res.statusText);
+            if (!res.ok) {
+              return res.json().catch(function () { return {}; }).then(function (body) {
+                var detail = (body && body.detail) ? body.detail : (res.status + ' ' + res.statusText);
+                throw new Error(detail);
+              });
+            }
             return res.json();
           })
           .then(function (data) {
-            const content = (data.message && data.message.content) ? data.message.content : (data.content != null ? data.content : '');
-            const bubble = document.createElement('div');
-            bubble.className = 'assistant-bubble';
-            bubble.textContent = content || '응답이 비어 있습니다.';
-            msgs.appendChild(bubble);
+            msgs.appendChild(buildIndependenceReportCard(data));
             msgs.appendChild(buildPostChips());
             done();
           })
           .catch(function (err) {
             const bubble = document.createElement('div');
             bubble.className = 'assistant-bubble error';
-            bubble.textContent = '백엔드 연결 실패. 로컬 시나리오로 표시합니다.\n' + (err && err.message ? err.message : String(err));
+            bubble.textContent = '검토 요청 연결에 실패했습니다. 예시 기준 결과를 표시합니다.\n' + (err && err.message ? err.message : String(err));
             msgs.appendChild(bubble);
             renderFallbackReport(msgs, text);
             done();
           });
+      }
+
+      /** Colab ReportGenerator와 동일: mermaid.ink URL 생성 */
+      function mermaidToImgUrl(mermaidCode) {
+        try {
+          var bin = unescape(encodeURIComponent(mermaidCode));
+          var b64 = btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+          return 'https://mermaid.ink/img/' + b64;
+        } catch (e) {
+          return '';
+        }
+      }
+
+      /** Colab ReportGenerator.render_report 형식의 독립성 검토 리포트 카드 */
+      function buildIndependenceReportCard(data) {
+        var status = data.analysis && data.analysis.status ? data.analysis.status : '검토 완료';
+        var riskLevel = (data.analysis && data.analysis.risk_level) ? data.analysis.risk_level : '';
+        var traceId = data.trace_id || '';
+        var statusColors = { '수임 불가': '#d32f2f', '안전장치 적용 시 수임 가능': '#ed6c02', '수임 가능': '#2e7d32' };
+        var color = statusColors[status] || '#455a64';
+        var graphUrl = data.mermaid_code ? mermaidToImgUrl(data.mermaid_code) : '';
+        var issues = (data.analysis && data.analysis.key_issues) ? data.analysis.key_issues : [];
+        var considerations = (data.analysis && data.analysis.considerations) ? data.analysis.considerations : '';
+        var safeguards = (data.analysis && data.analysis.suggested_safeguards) ? data.analysis.suggested_safeguards : [];
+        var legalRefs = (data.analysis && data.analysis.legal_references) ? data.analysis.legal_references : [];
+        function escapeHtml(str) { var div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+        function oneLegalRefHtml(r) {
+          var name = typeof r === 'string' ? r : (r && r.name) ? r.name : '';
+          var url = typeof r === 'object' && r && r.url ? r.url : '';
+          var safeName = escapeHtml(name);
+          if (url && /^https?:\/\//i.test(url)) {
+            return '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer" class="law-link">' + safeName + ' <span class="law-link-icon" aria-hidden="true">↗</span></a>';
+          }
+          return safeName;
+        }
+        var legalHtml = Array.isArray(legalRefs) && legalRefs.length
+          ? legalRefs.map(oneLegalRefHtml).join(', ')
+          : '';
+        var issuesHtml = issues.length ? issues.map(function (i) { return '<li style="color:#c62828;">' + escapeHtml(i) + '</li>'; }).join('') : '<li>주요 이슈 없음</li>';
+        var safeguardsHtml = safeguards.length ? safeguards.map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('') : '<li>권고 안전장치 없음</li>';
+        var lawBoxHtml = legalHtml ? '<div class="legal-section"><div class="section-title">근거 법령</div><div class="law-box">' + legalHtml + '</div></div>' : '';
+        var card = document.createElement('div');
+        card.className = 'independence-report';
+        card.innerHTML =
+          '<div class="report-header" style="background:' + color + ';">' +
+            '<h2 style="margin:0;font-size:1rem;font-weight:700;">' + escapeHtml(status) + (riskLevel ? ' (위험도: ' + escapeHtml(riskLevel) + ')' : '') + '</h2>' +
+            '<small>검토 ID: ' + escapeHtml(traceId) + '</small>' +
+          '</div>' +
+          '<div class="report-body">' +
+            '<div class="report-left report-viz">' +
+              '<div class="section-title">관계도</div>' +
+              '<div class="viz-wrap">' +
+                (graphUrl ? '<img src="' + graphUrl + '" alt="감사·회사 간 관계도" />' : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="report-right report-content">' +
+              '<div class="section-title">주요 이슈</div>' +
+              '<div class="issue-box"><ul>' + issuesHtml + '</ul></div>' +
+              '<div class="section-title">검토 의견</div>' +
+              '<div class="opinion-text">' + escapeHtml(considerations) + '</div>' +
+              '<div class="section-title">권고 안전장치</div>' +
+              '<div class="safeguard-box"><ul>' + safeguardsHtml + '</ul></div>' +
+              lawBoxHtml +
+            '</div>' +
+          '</div>';
+        return card;
       }
 
       function buildReportCard(d) {
@@ -1017,19 +1161,19 @@
           <div class="accent-bar"></div>
           <div class="report-body">
             <div class="report-left">
-              <div class="section-title">🗺 관계 지형도</div>
+              <div class="section-title">관계도</div>
               <div class="flow-diagram">${flowHTML}</div>
               <div class="issue-box">
-                <div class="box-title">⚠ 주요 이슈</div>
+                <div class="box-title">주요 이슈</div>
                 ${d.issues.map(i => `<div class="box-item">${i}</div>`).join('')}
               </div>
             </div>
             <div class="report-right">
-              <div class="section-title">📋 품질관리실 검토 의견</div>
-              <div class="law-box"><strong>적용 기준 :</strong> ${d.law}</div>
+              <div class="section-title">검토 의견</div>
+              <div class="law-box"><strong>적용 기준:</strong> ${d.law}</div>
               <div class="opinion-text">${d.opinion}</div>
               <div class="safeguard-box">
-                <div class="box-title">🛡 권고 안전장치</div>
+                <div class="box-title">권고 안전장치</div>
                 ${d.safeguards.map(s => `<div class="box-item">${s}</div>`).join('')}
               </div>
             </div>
@@ -1039,12 +1183,12 @@
       }
 
       const chipData = [
-        { label: '대출 전결 한도', text: '㈜투명은행은 자체적 신용조사를 통해 각 지점의 개별 대출금액 3억원까지는 횟수 제한 없이 지점장의 전결로 가능하도록 하고, 그 금액을 초과하는 경우 본사 승인을 받아 대출이 이루어지도록 한다.', shortText: '3억원 이하 지점장 전결, 초과 시 본사 승인' },
-        { label: '직원 순환근무', text: '각 지점 직원은 최장 3년 내 타 지점으로 옮기도록 하고 있으며, 고향에 파견된 직원은 지역에 대한 이해와 영업 확대를 위해 3년을 초과하여 계속 근무가 가능하다.', shortText: '3년 순환 원칙, 고향 파견 직원은 예외 인정' },
-        { label: '직무 겸직', text: '규모가 작은 지점의 경우 근속연수가 10년 이상인 경험이 풍부한 직원에 한하여 예금 및 대출거래의 승인과 회계업무를 동시에 수행한다.', shortText: '소규모 지점 — 승인·회계 업무 겸직 허용' },
-        { label: '신입사원 보증', text: '신입사원 선발 시 인적 보증 절차를 마련하고 단체손해보험에 가입하여 금융사고에 대비한다.', shortText: '인적보증 + 단체손해보험으로 금융사고 대비' },
-        { label: '모범직원 인센티브', text: '모범직원에게는 사용하지 않은 월차나 정기휴가를 휴가 수당으로 대체할 수 있는 인센티브를 제공한다.', shortText: '미사용 휴가 → 수당 전환 인센티브 제공' },
-        { label: '대손 보고체계', text: '지점에 대손이 발생한 경우, 지점장은 즉각적으로 최고재무책임자(CFO) 및 최고경영자에게 보고하고 본사의 내부감사팀이 지점에 방문하여 대출계약이 적절했는지 조사하고 회수가능성을 확인한다.', shortText: '대손 즉시 CFO·CEO 보고 및 내부감사 실시' },
+        { label: '퇴직 후 감사대상회사 임원 취임', text: 'B회계법인 소속 이유명 공인회계사는 회계법인 퇴직 후 10개월 뒤에 B회계법인의 감사대상회사인 서울㈜의 재무담당임원으로 취임하였다. 이유명 공인회계사는 B회계법인 재직 당시 서울㈜의 재무제표 감사업무에 관여하지 않았다.', shortText: '이유명, 퇴직 10개월 후 서울㈜ 재무담당임원' },
+        { label: '전 경리과장 입사 후 감사계약', text: '공인회계사 자격증 소지자인 이대한씨는 경기㈜에서 경리과장으로 근무하던 중 20x8년 11월에 B회계법인 소속 공인회계사로 입사하였다. 20x9년 1월에 B회계법인과 경기㈜는 재무제표 감사계약을 체결하였다.', shortText: '이대한, 경기㈜ 경리과장 출신 → 입사 후 감사계약' },
+        { label: '직계비속 사망으로 주식 보유', text: 'B회계법인의 사원인 이영희 공인회계사는 직계비속의 사망으로 인하여 B회계법인의 감사대상회사 주식 0.5%를 소유하게 되었다.', shortText: '이영희, 감사대상회사 주식 0.5% 소유' },
+        { label: '부친이 감사대상회사 대표이사', text: '이지수 공인회계사는 B회계법인의 사원으로 근무하고 있으며, B회계법인은 경북㈜를 감사하고 있다. 이지수 공인회계사의 부친은 경북㈜의 대표이사로 재직 중이다.', shortText: '이지수, 부친이 경북㈜ 대표이사' },
+        { label: '감사 종료 후 재무담당이사 합류', text: '부산㈜의 재무제표감사 인증업무팀의 구성원인 이장래 공인회계사는 이번 부산㈜의 감사업무가 종료된 후에 부산㈜의 재무담당이사로 합류할 예정이다.', shortText: '이장래, 부산㈜ 감사 후 재무담당이사 예정' },
+        { label: '채용 참여 후 해당 연도 외부감사', text: '이관상 공인회계사는 전남㈜의 대표이사의 부탁으로 회계부서 직원 채용면접심사에 참여하고 가장 적합한 후보자를 선발하여 추천하였다. 또한, 대표이사와 함께 최종면접에 참석하여 박수리씨를 회계팀장으로 선발하였다. 해당 연도에 이관상 공인회계사는 전남㈜의 재무제표에 대한 외부감사업무를 의뢰받았다.', shortText: '이관상, 전남㈜ 채용 참여 후 같은 연도 외부감사 의뢰' },
       ];
 
       function buildPostChips() {

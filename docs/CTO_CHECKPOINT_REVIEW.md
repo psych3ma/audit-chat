@@ -1,6 +1,7 @@
 # CTO 관점 — GitHub 체크포인트 전 검토
 
-체크포인트(커밋/푸시) 직전 CTO 관점에서의 요약 검토입니다.
+체크포인트(커밋/푸시) 직전 CTO 관점에서의 요약 검토입니다.  
+*(최종 갱신: 독립성 검토·법령 레지스트리·GenAI 프롬프트 보강 반영)*
 
 ---
 
@@ -21,8 +22,8 @@ git commit -m "chore: remove .env from tracking"
 ```
 
 - **절대 커밋하면 안 되는 것**: `.env`, `venv/`, `.env.local`, `*.log`, `.streamlit/secrets.toml`
-- **로컬 `.env`** 에는 실제 API 키·DB 비밀번호가 있으므로, 이 파일은 **절대** 커밋하지 마세요.
-- **과거에 .env를 한 번이라도 커밋했다면**: 해당 저장소에서 키 노출 이력이 있으므로, **OPENAI_API_KEY**와 **NEO4J_PASSWORD** 재발급·변경 권장.
+- **로컬 `.env`** 에는 실제 API 키·DB 비밀번호·**LAW_GO_KR_OC**(국가법령정보센터 API 키) 등이 있으므로, 이 파일은 **절대** 커밋하지 마세요.
+- **과거에 .env를 한 번이라도 커밋했다면**: 해당 저장소에서 키 노출 이력이 있으므로, **OPENAI_API_KEY**, **NEO4J_PASSWORD**, **LAW_GO_KR_OC** 재발급·변경 권장.
 
 ### 1.2 설정 관리
 - 비밀값은 모두 `backend/config.py` → `.env` 로 일원화. 코드에 하드코딩 없음.
@@ -35,10 +36,11 @@ git commit -m "chore: remove .env from tracking"
 | 영역 | 평가 | 비고 |
 |------|------|------|
 | **아키텍처** | ✅ | Backend(FastAPI) / Frontend(Streamlit) / Static(HTML) 분리, 라우터·서비스·모델 구조 |
-| **설정** | ✅ | `pydantic-settings` + `.env`, `get_settings()` 일관 사용 |
-| **API** | ✅ | `/health`, `/ready`, `/chat/completions`, `/pwc`, 그래프·독립성 검토 라우터 |
-| **정적 UI** | ✅ | `audit-chat-pwc.html` — 백엔드 연동 + 폴백, CTO 설정 주석 있음 |
-| **문서** | ✅ | README, PRE_PUSH_CHECKLIST, LEGACY-internal-control, CODE_REVIEW 등 |
+| **설정** | ✅ | `pydantic-settings` + `.env`, `get_settings()` 일관 사용. LAW_GO_KR_OC, law_csv_path 포함 |
+| **API** | ✅ | `/health`, `/ready`, `/independence/review`, `/pwc` 등. 독립성 검토 → 엔티티/관계 추출 → 분석 → 법령 URL 보강 |
+| **정적 UI** | ✅ | `audit-chat-pwc.html` — 감사 독립성 검토, 관계도(Mermaid)·보고서·근거 법령 링크 |
+| **법령 URL** | ✅ | `backend/utils/law_registry.py` 단일 소스, CSV(법령검색목록.csv) 기반, 조문 링크(한글 경로) 지원 |
+| **문서** | ✅ | README, PRE_PUSH_CHECKLIST, CTO_MAINTENANCE, 법령검색목록-URL-검토, GENAI_INDEPENDENCE_REVIEW 등 |
 | **TODO/FIXME** | ✅ | Python 코드에 미등록 이슈 없음 |
 
 ---
@@ -88,5 +90,5 @@ git status
 
 커밋 메시지 예시:
 ```text
-chore: CTO 검토 후 체크포인트 (Streamlit+FastAPI+Neo4j+PwC UI+독립성 검토)
+chore: CTO 검토 후 체크포인트 (감사 독립성 검토·법령 레지스트리·GenAI 프롬프트 보강)
 ```
