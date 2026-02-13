@@ -142,32 +142,29 @@ def build_mermaid_graph(
         "재무이사": ("(", ")"),
     }
     
-    # 노드 정의
+    # classDef: 참고 코드와 동일 (노드 정의 전에 선언)
+    lines.append("    classDef normalNode fill:#fff,stroke:#333,stroke-width:1px")
+    lines.append("    classDef riskyNode fill:#fff5f5,stroke:#c62828,stroke-width:2px,stroke-dasharray:5 5")
+    
+    # 노드 정의 (취약 노드는 riskyNode 클래스로 표시)
     for entity in rel_map.entities:
         clean_name = re.sub(r"[^가-힣a-zA-Z0-9\s]", "", entity.name)
         label = entity.label or ""
         open_s, close_s = shape_map.get(label, ("[", "]"))
-        # mermaid.ink에서 줄바꿈은 <br> 태그 사용
         node_text = f"{clean_name}<br>{label}" if label else clean_name
-        lines.append(f'    {entity.id}{open_s}"{node_text}"{close_s}')
+        node_class = "riskyNode" if entity.id in vulnerable_entities else "normalNode"
+        lines.append(f'    {entity.id}{open_s}"{node_text}"{close_s}:::{node_class}')
     
-    # 엣지 정의 (취약 관계는 빨간색 굵은 선으로 표시)
+    # 엣지 정의 (참고: 라벨은 반드시 큰따옴표로 감싸야 파서 오류 방지)
     for conn in rel_map.connections:
-        rel = (conn.rel_type or "관계").replace('"', "'")[:20]
+        raw_rel = (conn.rel_type or "관계").strip()[:20]
+        rel = raw_rel.replace('"', "'").replace("\n", " ")
         is_vulnerable = (conn.source_id, conn.target_id) in vulnerable_set
         if is_vulnerable:
-            # 취약 관계: 라벨에 [!] 표시 (이모지/특수문자 회피 - mermaid.ink 호환)
-            lines.append(f"    {conn.source_id} -->|[!] {rel}| {conn.target_id}")
+            # 취약 관계: 점선 + "[!] 관계명" (참고 Colab과 동일 패턴)
+            lines.append(f'    {conn.source_id} -. "[!] {rel}" .-> {conn.target_id}')
         else:
-            lines.append(f"    {conn.source_id} -->|{rel}| {conn.target_id}")
-    
-    # 취약 엔티티 스타일 정의 (mermaid.ink 지원)
-    if vulnerable_entities:
-        lines.append("")
-        lines.append("    %% 취약 관계 하이라이트")
-        # Mermaid style 문법: 각 노드에 개별 스타일 적용
-        for entity_id in vulnerable_entities:
-            lines.append(f"    style {entity_id} fill:#ffebee,stroke:#c62828,stroke-width:2px")
+            lines.append(f'    {conn.source_id} ---|"{rel}"| {conn.target_id}')
     
     return "\n".join(lines)
 

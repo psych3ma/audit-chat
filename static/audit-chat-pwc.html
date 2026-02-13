@@ -795,15 +795,23 @@
         justify-content: center;
         padding: var(--space-lg);
       }
-      .independence-report .viz-wrap img {
+      .independence-report .viz-wrap img,
+      .independence-report .viz-wrap svg {
         max-width: 100%;
         height: auto;
-        object-fit: contain;
-        opacity: 0;
-        transition: opacity 0.4s ease-in-out;
+        display: block;
       }
-      .independence-report .viz-wrap img.loaded {
+      .independence-report .viz-wrap img { opacity: 0; transition: opacity 0.4s ease-in-out; }
+      .independence-report .viz-wrap img.loaded { opacity: 1; }
+      .independence-report .viz-wrap svg {
         opacity: 1;
+        min-height: 200px;
+      }
+      .independence-report .viz-wrap pre.mermaid {
+        margin: 0;
+        font-size: 0;
+        overflow: hidden;
+        min-height: 200px;
       }
       /* 그래프 로딩 스켈레톤 */
       .graph-skeleton {
@@ -975,7 +983,13 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>
+      /** Mermaid: 브라우저에서 직접 렌더링 (mermaid.ink 의존 제거) */
+      if (window.mermaid) {
+        mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+      }
+
       /**
        * CTO 검토 — 설정 및 운영 (Colab Independence Review 흐름 적용)
        * - API_BASE_URL: 백엔드 주소. 빈 문자열이면 현재 페이지와 동일 오리진 사용 (권장).
@@ -1266,6 +1280,7 @@
           .then(function (data) {
             var reportCard = buildIndependenceReportCard(data);
             msgs.appendChild(reportCard);
+            renderMermaidInCard(reportCard);  // Mermaid 브라우저 렌더링
             msgs.appendChild(buildPostChips());
             scrollToMessage(reportCard);  // 카드 상단으로 스크롤
             done(true);  // skipScroll: 이미 scrollToMessage로 처리
@@ -1280,21 +1295,6 @@
           });
       }
 
-      /** Colab ReportGenerator와 동일: mermaid.ink URL 생성 */
-      function mermaidToImgUrl(mermaidCode) {
-        try {
-          console.log('[Mermaid] Input code:', mermaidCode);
-          var bin = unescape(encodeURIComponent(mermaidCode));
-          var b64 = btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-          var url = 'https://mermaid.ink/img/' + b64;
-          console.log('[Mermaid] Generated URL:', url);
-          return url;
-        } catch (e) {
-          console.error('[Mermaid] Encoding error:', e);
-          return '';
-        }
-      }
-
       /** Colab ReportGenerator.render_report 형식의 독립성 검토 리포트 카드 */
       function buildIndependenceReportCard(data) {
         var status = data.analysis && data.analysis.status ? data.analysis.status : '검토 완료';
@@ -1302,7 +1302,7 @@
         var traceId = data.trace_id || '';
         var statusColors = { '수임 불가': '#d32f2f', '안전장치 적용 시 수임 가능': '#ed6c02', '수임 가능': '#2e7d32' };
         var color = statusColors[status] || '#455a64';
-        var graphUrl = data.mermaid_code ? mermaidToImgUrl(data.mermaid_code) : '';
+        var mermaidCode = data.mermaid_code || '';
         var issues = (data.analysis && data.analysis.key_issues) ? data.analysis.key_issues : [];
         var considerations = (data.analysis && data.analysis.considerations) ? data.analysis.considerations : '';
         var safeguards = (data.analysis && data.analysis.suggested_safeguards) ? data.analysis.suggested_safeguards : [];
@@ -1344,7 +1344,7 @@
               '<div class="report-left report-viz">' +
                 '<div class="section-title">이해관계 구조</div>' +
                 '<div class="viz-wrap">' +
-                  (graphUrl ? skeletonHtml : '') +
+                  (mermaidCode ? skeletonHtml : '') +
                 '</div>' +
               '</div>' +
               '<div class="report-right report-content">' +
@@ -1357,32 +1357,41 @@
             '</div>' +
           '</div>';
 
-        // 이미지 프리로드 후 페이드인
-        if (graphUrl) {
+        // Mermaid: 브라우저에서 직접 렌더링 (외부 서비스 미사용)
+        if (mermaidCode) {
           var vizWrap = card.querySelector('.viz-wrap');
-          var img = new Image();
-          img.alt = '감사·회사 간 관계도';
-          img.onload = function() {
-            vizWrap.innerHTML = '';
-            vizWrap.appendChild(img);
-            // requestAnimationFrame으로 opacity 전환 트리거
-            requestAnimationFrame(function() {
-              requestAnimationFrame(function() {
-                img.classList.add('loaded');
-              });
-            });
-          };
-          img.onerror = function() {
-            console.error('[Mermaid] Image load failed. URL:', img.src);
-            vizWrap.innerHTML = '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">' +
-              '<div style="margin-bottom:8px;">관계도 로드 실패</div>' +
-              '<div style="font-size:var(--fs-xs);color:#999;">mermaid.ink 서비스 연결 오류</div>' +
-              '</div>';
-          };
-          img.src = graphUrl;
+          var pre = document.createElement('pre');
+          pre.className = 'mermaid';
+          pre.textContent = mermaidCode;
+          vizWrap.innerHTML = '';
+          vizWrap.appendChild(pre);
         }
 
         return card;
+      }
+
+      /** 카드가 DOM에 붙은 뒤 Mermaid 렌더링 실행 */
+      function renderMermaidInCard(card) {
+        var wrap = card.querySelector('.viz-wrap');
+        var el = wrap && wrap.querySelector('.mermaid');
+        if (!el || !window.mermaid) {
+          if (wrap && wrap.querySelector('.mermaid')) wrap.innerHTML = '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">Mermaid 라이브러리 로드 실패</div>';
+          return;
+        }
+        mermaid.run({ nodes: [el] }).then(function() {
+          var svg = wrap && wrap.querySelector('svg');
+          if (!svg) {
+            wrap.innerHTML = '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">관계도 생성 실패 (SVG 없음)</div>';
+          }
+        }).catch(function(err) {
+          console.error('[Mermaid] Render error:', err);
+          if (wrap) {
+            wrap.innerHTML = '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">' +
+              '<div style="margin-bottom:8px;">관계도 로드 실패</div>' +
+              '<div style="font-size:var(--fs-xs);color:#999;">' + (err.message || '다이어그램 렌더 오류') + '</div>' +
+              '</div>';
+          }
+        });
       }
 
       function buildReportCard(d) {
