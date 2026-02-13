@@ -98,6 +98,19 @@ class IndependenceReviewRequest(BaseModel):
     scenario: str = Field(..., min_length=1)
 
 
+class AnalyzeStepRequest(BaseModel):
+    """2단계: 독립성 분석 요청 (1단계 rel_map 필요)."""
+    scenario: str = Field(..., min_length=1)
+    rel_map: dict = Field(..., description="1단계 extract 응답의 rel_map")
+
+
+class ReportStepRequest(BaseModel):
+    """3단계: 보고서 생성 요청 (1·2단계 결과 필요)."""
+    scenario: str = Field(..., min_length=1)
+    rel_map: dict = Field(..., description="1단계 extract 응답의 rel_map")
+    analysis: dict = Field(..., description="2단계 analyze 응답의 analysis")
+
+
 class IndependenceReviewResponse(BaseModel):
     trace_id: str
     rel_map: IndependenceMap

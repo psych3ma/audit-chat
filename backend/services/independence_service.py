@@ -198,13 +198,15 @@ def save_independence_map_to_neo4j(trace_id: str, rel_map: IndependenceMap) -> N
             )
 
 
-async def run_independence_review(scenario: str, save_to_neo4j: bool = True) -> dict:
-    """추출 → 분석 → Mermaid 생성 (취약 관계 하이라이트). 선택 시 Neo4j 저장."""
+def build_independence_report(
+    scenario: str,
+    rel_map: IndependenceMap,
+    analysis: AnalysisResult,
+    save_to_neo4j: bool = True,
+) -> dict:
+    """3단계: 법령 URL 보강, Mermaid 생성, Neo4j 저장. (실제 진행률 연동용 — docs/WORKFLOW_STEP_CODE_MAPPING.md)"""
     trace_id = hashlib.md5(scenario.encode()).hexdigest()[:8].upper()
-    rel_map = await extract_relationships(scenario)
-    analysis = await analyze_independence(scenario, rel_map)
     analysis = _enrich_legal_ref_urls(analysis)
-    # 취약 관계를 Mermaid 그래프에 반영
     mermaid_code = build_mermaid_graph(rel_map, analysis.vulnerable_connections)
     if save_to_neo4j:
         try:
@@ -217,3 +219,10 @@ async def run_independence_review(scenario: str, save_to_neo4j: bool = True) -> 
         "analysis": analysis.model_dump(),
         "mermaid_code": mermaid_code,
     }
+
+
+async def run_independence_review(scenario: str, save_to_neo4j: bool = True) -> dict:
+    """추출 → 분석 → Mermaid 생성 (취약 관계 하이라이트). 선택 시 Neo4j 저장."""
+    rel_map = await extract_relationships(scenario)
+    analysis = await analyze_independence(scenario, rel_map)
+    return build_independence_report(scenario, rel_map, analysis, save_to_neo4j=save_to_neo4j)

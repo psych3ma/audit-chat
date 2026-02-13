@@ -548,6 +548,63 @@
         }
       }
 
+      /* 3단계 프로그레스 (DESIGN_PROGRESS_HANDOFF.md): 1행 상태바 가운데, 2·3행 왼쪽. 너비는 JS에서 3단계 문구 최대 너비로 설정 */
+      .typing.workflow-progress {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
+        max-width: 100%;
+        box-sizing: border-box;
+        text-align: left;
+      }
+      .workflow-progress .progress-dots-row {
+        text-align: center;
+      }
+      .workflow-progress .progress-dots {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        justify-content: center;
+      }
+      .workflow-progress .progress-dots .dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--gray-200);
+        animation: bounce 1.2s infinite;
+      }
+      .workflow-progress .progress-dots .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .workflow-progress .progress-dots .dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      .workflow-progress .progress-dots .dot.active {
+        background: var(--orange);
+      }
+      .workflow-progress .progress-dots .dot.done {
+        background: var(--gray-400);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .workflow-progress .progress-dots .dot {
+          animation: none;
+        }
+      }
+      .workflow-progress .progress-step-line {
+        font-size: var(--fs-sm);
+        line-height: 1.4;
+        color: var(--gray-500);
+        font-weight: 600;
+      }
+      .workflow-progress .progress-desc {
+        font-size: calc(var(--fs-sm) - 1px);
+        line-height: 1.45;
+        color: var(--gray-500);
+        font-weight: 400;
+        white-space: nowrap;
+      }
+
       /* ── INPUT AREA ── */
       .input-area {
         padding: var(--space-md) var(--space-2xl) var(--space-md);
@@ -993,11 +1050,22 @@
       /**
        * CTO 검토 — 설정 및 운영 (Colab Independence Review 흐름 적용)
        * - API_BASE_URL: 백엔드 주소. 빈 문자열이면 현재 페이지와 동일 오리진 사용 (권장).
-       * - USE_BACKEND_API: true 시 POST /independence/review 호출 → 관계 추출(GPT-4o-mini) → 독립성 분석(GPT-4o) → Colab 스타일 리포트 표시.
+       * - USE_BACKEND_API: true 시 단계별 POST /independence/extract → /analyze → /report 호출 (실제 진행률에 맞춰 프로그레스 전환).
        * - 실패 시 로컬 시나리오(내부통제 폴백) 표시.
        */
       const API_BASE_URL = window.API_BASE_URL ?? '';
       const USE_BACKEND_API = window.USE_BACKEND_API !== false;
+
+      /**
+       * 프로그레스 UI SSOT (docs: DESIGN_PROGRESS_HANDOFF.md, WORKFLOW_3STEPS.md)
+       * 단계 추가/문구 변경 시 여기만 수정. 전환 시점은 백엔드 단계별 API 응답 수신 시(하드코딩 없음).
+       */
+      const WORKFLOW_STEPS = [
+        { name: '관계 추출', desc: '시나리오에서 인물·회사·관계 구조를 추출하고 있습니다.' },
+        { name: '독립성 분석', desc: '추출된 구조를 바탕으로 수임 가능성과 위험을 판단하고 있습니다.' },
+        { name: '보고서 생성', desc: '결론, 관계도, 법령 링크를 정리해 보고서를 만들고 있습니다.' }
+      ];
+      /* 단계 전환: 백엔드 단계별 API 응답 수신 시점에 setProgressStep 호출 (하드코딩 타이머 없음, docs/WORKFLOW_STEP_CODE_MAPPING.md) */
 
       // ═══════════════════════════════════════════════════════════════
       // SCENARIOS: Single Source of Truth (SSOT)
@@ -1240,10 +1308,66 @@
         document.getElementById('sendBtn').disabled = true;
         isLoading = true;
 
+        var totalSteps = WORKFLOW_STEPS.length;
+        var dotsHtml = '';
+        for (var d = 0; d < totalSteps; d++) {
+          dotsHtml += '<span class="dot' + (d === 0 ? ' active' : '') + '"></span>';
+        }
         const typing = document.createElement('div');
-        typing.className = 'typing';
-        typing.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+        typing.className = 'typing workflow-progress';
+        typing.setAttribute('aria-live', 'polite');
+        typing.setAttribute('aria-atomic', 'true');
+        typing.setAttribute('role', 'status');
+        typing.innerHTML =
+          '<div class="progress-dots-row"><div class="progress-dots">' + dotsHtml + '</div></div>' +
+          '<div class="progress-step-line"></div>' +
+          '<div class="progress-desc"></div>';
         msgs.appendChild(typing);
+
+        function setProgressStep(stepIndex) {
+          var step = WORKFLOW_STEPS[stepIndex];
+          if (!step) return;
+          var stepLineEl = typing.querySelector('.progress-step-line');
+          var descEl = typing.querySelector('.progress-desc');
+          var dots = typing.querySelectorAll('.progress-dots .dot');
+          if (stepLineEl) stepLineEl.textContent = '(' + (stepIndex + 1) + '/' + totalSteps + ') ' + step.name;
+          if (descEl) descEl.textContent = step.desc;
+          typing.setAttribute('aria-label', (stepIndex + 1) + '/' + totalSteps + ' ' + step.name + '. ' + step.desc);
+          dots.forEach(function (dot, i) {
+            dot.classList.remove('active', 'done');
+            if (i < stepIndex) dot.classList.add('done');
+            else if (i === stepIndex) dot.classList.add('active');
+          });
+        }
+        setProgressStep(0);
+
+        (function setBubbleWidthFromLongestStep() {
+          /* CTO: 설명(3행) 1줄 유지 — 3단계 설명 문구 중 최대 폭으로 너비 설정. 패딩은 computed style 사용. */
+          var descEl = typing.querySelector('.progress-desc');
+          if (!descEl) return;
+          var cs = getComputedStyle(descEl);
+          var measure = document.createElement('span');
+          measure.style.position = 'absolute';
+          measure.style.left = '-9999px';
+          measure.style.visibility = 'hidden';
+          measure.style.whiteSpace = 'nowrap';
+          measure.style.fontSize = cs.fontSize;
+          measure.style.fontWeight = cs.fontWeight;
+          measure.style.fontFamily = cs.fontFamily;
+          measure.style.letterSpacing = cs.letterSpacing;
+          document.body.appendChild(measure);
+          var maxW = 0;
+          for (var i = 0; i < totalSteps; i++) {
+            measure.textContent = WORKFLOW_STEPS[i].desc;
+            maxW = Math.max(maxW, measure.offsetWidth);
+          }
+          measure.parentNode.removeChild(measure);
+          var pad = parseFloat(getComputedStyle(typing).paddingLeft) + parseFloat(getComputedStyle(typing).paddingRight);
+          var totalW = maxW + pad;
+          typing.style.width = totalW + 'px';
+          typing.style.minWidth = totalW + 'px';
+        })();
+
         scrollDown();
 
         function done(skipScroll) {
@@ -1254,39 +1378,65 @@
         }
 
         if (!USE_BACKEND_API) {
-          setTimeout(() => {
+          setProgressStep(totalSteps - 1);
+          setTimeout(function () {
             renderFallbackReport(msgs, text);
             done();
           }, 1800);
           return;
         }
 
-        // Colab Independence Review 흐름: POST /independence/review → 관계 추출 → 독립성 분석 → 리포트
-        const url = (API_BASE_URL || '').replace(/\/$/, '') + '/independence/review';
-        fetch(url, {
+        // 단계별 API 호출 — 각 단계 완료 시점에 setProgressStep 호출 (실제 진행률 연동)
+        var baseUrl = (API_BASE_URL || '').replace(/\/$/, '');
+        function toJson(res) {
+          if (!res.ok) {
+            return res.json().catch(function () { return {}; }).then(function (body) {
+              var detail = (body && body.detail) ? body.detail : (res.status + ' ' + res.statusText);
+              throw new Error(detail);
+            });
+          }
+          return res.json();
+        }
+        var extractData;
+        fetch(baseUrl + '/independence/extract', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ scenario: text })
         })
-          .then(function (res) {
-            if (!res.ok) {
-              return res.json().catch(function () { return {}; }).then(function (body) {
-                var detail = (body && body.detail) ? body.detail : (res.status + ' ' + res.statusText);
-                throw new Error(detail);
-              });
-            }
-            return res.json();
-          })
+          .then(toJson)
           .then(function (data) {
-            var reportCard = buildIndependenceReportCard(data);
+            extractData = data;
+            setProgressStep(1);
+            return fetch(baseUrl + '/independence/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ scenario: text, rel_map: extractData.rel_map })
+            });
+          })
+          .then(toJson)
+          .then(function (analyzeData) {
+            setProgressStep(2);
+            return fetch(baseUrl + '/independence/report', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                scenario: text,
+                rel_map: extractData.rel_map,
+                analysis: analyzeData.analysis
+              })
+            });
+          })
+          .then(toJson)
+          .then(function (reportData) {
+            var reportCard = buildIndependenceReportCard(reportData);
             msgs.appendChild(reportCard);
-            renderMermaidInCard(reportCard);  // Mermaid 브라우저 렌더링
+            renderMermaidInCard(reportCard);
             msgs.appendChild(buildPostChips());
-            scrollToMessage(reportCard);  // 카드 상단으로 스크롤
-            done(true);  // skipScroll: 이미 scrollToMessage로 처리
+            scrollToMessage(reportCard);
+            done(true);
           })
           .catch(function (err) {
-            const bubble = document.createElement('div');
+            var bubble = document.createElement('div');
             bubble.className = 'assistant-bubble error';
             bubble.textContent = '검토 요청 연결에 실패했습니다. 예시 기준 결과를 표시합니다.\n' + (err && err.message ? err.message : String(err));
             msgs.appendChild(bubble);

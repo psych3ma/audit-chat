@@ -1,8 +1,19 @@
-"""독립성 검토 API (감사 수임 독립성)."""
+"""독립성 검토 API (감사 수임 독립성). 단계별 엔드포인트로 실제 진행률 연동 (docs/WORKFLOW_STEP_CODE_MAPPING.md)."""
 from fastapi import APIRouter, HTTPException
 
-from backend.models.independence import IndependenceReviewRequest
-from backend.services.independence_service import run_independence_review
+from backend.models.independence import (
+    AnalysisResult,
+    IndependenceMap,
+    IndependenceReviewRequest,
+    AnalyzeStepRequest,
+    ReportStepRequest,
+)
+from backend.services.independence_service import (
+    extract_relationships,
+    analyze_independence,
+    build_independence_report,
+    run_independence_review,
+)
 
 router = APIRouter(prefix="/independence", tags=["independence"])
 
@@ -23,9 +34,50 @@ def _normalize_error_detail(e: Exception) -> str:
 
 @router.post("/review")
 async def post_independence_review(body: IndependenceReviewRequest):
-    """감사 시나리오 입력 → 관계 추출(GPT-4o-mini) → 독립성 분석(GPT-4o) → Mermaid + Neo4j 저장."""
+    """감사 시나리오 입력 → 관계 추출(GPT-4o-mini) → 독립성 분석(GPT-4o) → Mermaid + Neo4j 저장. (일괄 호출용)"""
     try:
         result = await run_independence_review(body.scenario.strip(), save_to_neo4j=True)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=_normalize_error_detail(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=_normalize_error_detail(e))
+
+
+@router.post("/extract")
+async def post_extract(body: IndependenceReviewRequest):
+    """1단계: 관계 추출. 프로그레스 1→2 전환은 이 응답 수신 시점에 수행."""
+    try:
+        rel_map = await extract_relationships(body.scenario.strip())
+        return {"rel_map": rel_map.model_dump()}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=_normalize_error_detail(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=_normalize_error_detail(e))
+
+
+@router.post("/analyze")
+async def post_analyze(body: AnalyzeStepRequest):
+    """2단계: 독립성 분석. 프로그레스 2→3 전환은 이 응답 수신 시점에 수행."""
+    try:
+        rel_map = IndependenceMap.model_validate(body.rel_map)
+        analysis = await analyze_independence(body.scenario.strip(), rel_map)
+        return {"analysis": analysis.model_dump()}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=_normalize_error_detail(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=_normalize_error_detail(e))
+
+
+@router.post("/report")
+async def post_report(body: ReportStepRequest):
+    """3단계: 보고서 생성(법령 URL 보강, Mermaid, Neo4j). 완료 시 프론트에서 카드 렌더."""
+    try:
+        rel_map = IndependenceMap.model_validate(body.rel_map)
+        analysis = AnalysisResult.model_validate(body.analysis)
+        result = build_independence_report(
+            body.scenario.strip(), rel_map, analysis, save_to_neo4j=True
+        )
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=_normalize_error_detail(e))
