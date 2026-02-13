@@ -31,12 +31,13 @@
         --gray-100: #f5f5f5;
         --gray-50: #fafafa;
         /* Typography Scale */
+        --fs-micro: 12px;
         --fs-xs: 13px;
         --fs-sm: 14px;
         --fs-base: 15px;
-        --fs-md: 17px;
-        --fs-lg: 18px;
-        --fs-xl: 17px;
+        --fs-md: 16px;
+        --fs-lg: 17px;
+        --fs-xl: 18px;
         --fs-2xl: 26px;
         /* Spacing Scale */
         --space-xs: 4px;
@@ -238,13 +239,13 @@
         text-transform: uppercase;
       }
       .chip-text {
-        font-size: var(--fs-lg);
+        font-size: var(--fs-md);
         color: var(--text);
         line-height: 1.45;
         font-weight: 500;
       }
       .chip-arrow {
-        font-size: var(--fs-base);
+        font-size: var(--fs-micro);
         color: var(--muted);
         margin-top: auto;
         padding-top: var(--space-sm);
@@ -467,8 +468,12 @@
         border-radius: var(--space-xs);
         padding: var(--space-sm) var(--space-md);
       }
-      .issue-box { border-left: 3px solid var(--gray-400); }
-      .safeguard-box { border-left: 3px solid var(--gray-400); }
+      .issue-box {
+        border-left: 3px solid var(--gray-400);
+      }
+      .safeguard-box {
+        border-left: 3px solid var(--gray-400);
+      }
       .law-box {
         font-size: var(--fs-base);
         color: var(--muted);
@@ -516,7 +521,8 @@
         align-self: flex-start;
         background: var(--surface);
         border: 1.5px solid var(--border);
-        border-radius: var(--space-lg) var(--space-lg) var(--space-lg) var(--space-xs);
+        border-radius: var(--space-lg) var(--space-lg) var(--space-lg)
+          var(--space-xs);
         padding: var(--space-md) var(--space-lg);
         display: flex;
         gap: var(--space-xs);
@@ -598,7 +604,7 @@
         font-weight: 600;
       }
       .workflow-progress .progress-desc {
-        font-size: calc(var(--fs-sm) - 1px);
+        font-size: var(--fs-xs);
         line-height: 1.45;
         color: var(--gray-500);
         font-weight: 400;
@@ -616,7 +622,7 @@
         max-width: 1040px;
         margin: 0 auto;
       }
-      
+
       /* 입력 모드 토글 */
       .mode-toggle {
         display: flex;
@@ -652,7 +658,7 @@
         background: var(--red);
       }
       .toggle-switch::after {
-        content: '';
+        content: "";
         position: absolute;
         top: 3px;
         left: 3px;
@@ -660,7 +666,7 @@
         height: 18px;
         background: #fff;
         border-radius: 50%;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         transition: transform 0.2s;
       }
       .toggle-switch.active::after {
@@ -801,7 +807,7 @@
         border-radius: 12px;
         overflow: hidden;
         color: var(--text);
-        scroll-margin-top: 20px;  /* 스크롤 시 상단 여백 */
+        scroll-margin-top: 20px; /* 스크롤 시 상단 여백 */
         margin-top: 12px;
         background: var(--surface);
         animation: reportFadeIn 0.5s ease-out;
@@ -858,8 +864,13 @@
         height: auto;
         display: block;
       }
-      .independence-report .viz-wrap img { opacity: 0; transition: opacity 0.4s ease-in-out; }
-      .independence-report .viz-wrap img.loaded { opacity: 1; }
+      .independence-report .viz-wrap img {
+        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
+      }
+      .independence-report .viz-wrap img.loaded {
+        opacity: 1;
+      }
       .independence-report .viz-wrap svg {
         opacity: 1;
         min-height: 200px;
@@ -874,7 +885,12 @@
       .graph-skeleton {
         width: 100%;
         height: 180px;
-        background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+        background: linear-gradient(
+          90deg,
+          #f0f0f0 25%,
+          #e8e8e8 50%,
+          #f0f0f0 75%
+        );
         background-size: 200% 100%;
         animation: skeleton-pulse 1.5s ease-in-out infinite;
         border-radius: 8px;
@@ -885,8 +901,12 @@
         font-size: var(--fs-md);
       }
       @keyframes skeleton-pulse {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
       }
       .graph-skeleton-icon {
         display: flex;
@@ -962,7 +982,7 @@
         text-decoration: underline;
       }
       .independence-report .law-link-icon {
-        font-size: 0.85em;
+        font-size: var(--fs-micro);
         opacity: 0.8;
       }
       ::-webkit-scrollbar {
@@ -985,9 +1005,13 @@
           />
         </div>
         <div class="header-divider"></div>
-        <div class="header-service">감사 독립성 검토 AI <span class="powered-by">Powered by Samil</span></div>
+        <div class="header-service">
+          감사 독립성 검토 AI <span class="powered-by">Powered by Samil</span>
+        </div>
       </div>
-      <div class="header-badge" id="betaBadge" title="실험 단계 서비스입니다">Beta</div>
+      <div class="header-badge" id="betaBadge" title="실험 단계 서비스입니다">
+        Beta
+      </div>
       <button
         class="reset-btn"
         id="resetBtn"
@@ -1002,9 +1026,11 @@
     <div class="chat-area" id="chatArea">
       <!-- EMPTY STATE -->
       <div class="empty-state" id="emptyState">
-        <div class="empty-eyebrow">감사 독립성 검토</div>
-        <div class="empty-title">감사 독립성 시나리오를 AI로 검토해보세요</div>
-        <div class="empty-sub">수임 가능성, 주요 이슈, 권고 안전장치 검토를 지원합니다.</div>
+        <div class="empty-eyebrow">AI 기반 감사 독립성 검토</div>
+        <div class="empty-title">수임 검토 시 복잡한 이해관계 구조를 한눈에 파악하세요</div>
+        <div class="empty-sub">
+          잠재적 독립성 이슈 포인트를 선제적으로 확인할 수 있습니다.
+        </div>
         <!-- 시나리오 칩: SCENARIOS 배열에서 동적 생성 -->
         <div class="suggestion-grid" id="scenarioChips"></div>
       </div>
@@ -1018,9 +1044,23 @@
       <div class="input-inner">
         <!-- 입력 모드 토글 -->
         <div class="mode-toggle">
-          <span class="mode-toggle-label active" id="modeChip" onclick="setInputMode('chip')">예시 선택</span>
-          <div class="toggle-switch" id="modeSwitch" onclick="toggleInputMode()"></div>
-          <span class="mode-toggle-label" id="modeFree" onclick="setInputMode('free')">직접 입력</span>
+          <span
+            class="mode-toggle-label active"
+            id="modeChip"
+            onclick="setInputMode('chip')"
+            >예시 선택</span
+          >
+          <div
+            class="toggle-switch"
+            id="modeSwitch"
+            onclick="toggleInputMode()"
+          ></div>
+          <span
+            class="mode-toggle-label"
+            id="modeFree"
+            onclick="setInputMode('free')"
+            >직접 입력</span
+          >
         </div>
         <div class="input-wrap">
           <textarea
@@ -1030,13 +1070,21 @@
             oninput="autoResize(this)"
             onkeydown="handleKey(event)"
           ></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="검토 요청">
+          <button
+            class="send-btn"
+            id="sendBtn"
+            onclick="sendMessage()"
+            aria-label="검토 요청"
+          >
             <svg viewBox="0 0 24 24">
               <path d="M2 21L23 12 2 3v7l15 2-15 2z" />
             </svg>
           </button>
         </div>
-        <div class="input-hint">*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.</div>
+        <div class="input-hint">
+          *AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종
+          의사결정은 담당자의 전문적 판단에 따릅니다.
+        </div>
       </div>
     </div>
 
@@ -1044,7 +1092,7 @@
     <script>
       /** Mermaid: 브라우저에서 직접 렌더링 (mermaid.ink 의존 제거) */
       if (window.mermaid) {
-        mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+        mermaid.initialize({ startOnLoad: false, securityLevel: "loose" });
       }
 
       /**
@@ -1053,7 +1101,7 @@
        * - USE_BACKEND_API: true 시 단계별 POST /independence/extract → /analyze → /report 호출 (실제 진행률에 맞춰 프로그레스 전환).
        * - 실패 시 로컬 시나리오(내부통제 폴백) 표시.
        */
-      const API_BASE_URL = window.API_BASE_URL ?? '';
+      const API_BASE_URL = window.API_BASE_URL ?? "";
       const USE_BACKEND_API = window.USE_BACKEND_API !== false;
 
       /**
@@ -1061,9 +1109,18 @@
        * 단계 추가/문구 변경 시 여기만 수정. 전환 시점은 백엔드 단계별 API 응답 수신 시(하드코딩 없음).
        */
       const WORKFLOW_STEPS = [
-        { name: '관계 추출', desc: '시나리오에서 인물·회사·관계 구조를 추출하고 있습니다.' },
-        { name: '독립성 분석', desc: '추출된 구조를 바탕으로 수임 가능성과 위험을 판단하고 있습니다.' },
-        { name: '보고서 생성', desc: '결론, 관계도, 법령 링크를 정리해 보고서를 만들고 있습니다.' }
+        {
+          name: "관계 추출",
+          desc: "시나리오에서 인물·회사·관계 구조를 추출하고 있습니다.",
+        },
+        {
+          name: "독립성 분석",
+          desc: "추출된 구조를 바탕으로 수임 가능성과 위험을 판단하고 있습니다.",
+        },
+        {
+          name: "보고서 생성",
+          desc: "결론, 관계도, 법령 링크를 정리해 보고서를 만들고 있습니다.",
+        },
       ];
       /* 단계 전환: 백엔드 단계별 API 응답 수신 시점에 setProgressStep 호출 (하드코딩 타이머 없음, docs/WORKFLOW_STEP_CODE_MAPPING.md) */
 
@@ -1073,210 +1130,332 @@
       // ═══════════════════════════════════════════════════════════════
       const SCENARIOS = [
         {
-          label: '동일 회계법인 내 매수·매각 자문',
-          text: 'X회계법인은 5개의 사업부(1∼5본부)로 구성되어 있으며, 주요 업무영역은 인증업무와 재무자문(deal service)업무이다. 현재 1본부의 파트너(사원)인 김 회계사는 A㈜가 보유중인 비상장주식(C)의 매각자문업무를 수행하고 있다. 한편 최근에 3본부의 파트너(사원)인 박 회계사는 B㈜로부터 A㈜가 매각을 추진하고 있는 C주식을 매수하고 싶다는 의향과 함께 매수자문서비스를 제공해 줄 것을 요청받았다.',
-          shortText: 'X회계법인 1본부 매각자문, 3본부 매수자문 요청',
-          source: '2018_CPA2차_회계감사'
+          label: "동일 회계법인 내 매수·매각 자문",
+          text: "X회계법인은 5개의 사업부(1∼5본부)로 구성되어 있으며, 주요 업무영역은 인증업무와 재무자문(deal service)업무이다. 현재 1본부의 파트너(사원)인 김 회계사는 A㈜가 보유중인 비상장주식(C)의 매각자문업무를 수행하고 있다. 한편 최근에 3본부의 파트너(사원)인 박 회계사는 B㈜로부터 A㈜가 매각을 추진하고 있는 C주식을 매수하고 싶다는 의향과 함께 매수자문서비스를 제공해 줄 것을 요청받았다.",
+          shortText: "X회계법인 1본부 매각자문, 3본부 매수자문 요청",
+          source: "2018_CPA2차_회계감사",
         },
         {
-          label: '자회사 사업부 인수 평가업무',
-          text: '상장회사 ㈜G는 비상장자회사 ㈜H와 ㈜I에 대해 각각 60%와 70%의 지분율을 보유하고 있다. ㈜G는 자회사 ㈜H의 사업부를 인수하고자 하는데, ㈜I의 감사인인 한국회계법인의 사원인 최 회계사가 이에 대한 평가업무를 수임하고자 한다. 단, 한국회계법인은 ㈜G와 ㈜H의 감사인이 아니다.',
-          shortText: '㈜G, 자회사 ㈜H 사업부 인수 시 ㈜I 감사인이 평가업무 수임',
-          source: '2023_CPA2차_회계감사'
+          label: "자회사 사업부 인수 평가업무",
+          text: "상장회사 ㈜G는 비상장자회사 ㈜H와 ㈜I에 대해 각각 60%와 70%의 지분율을 보유하고 있다. ㈜G는 자회사 ㈜H의 사업부를 인수하고자 하는데, ㈜I의 감사인인 한국회계법인의 사원인 최 회계사가 이에 대한 평가업무를 수임하고자 한다. 단, 한국회계법인은 ㈜G와 ㈜H의 감사인이 아니다.",
+          shortText:
+            "㈜G, 자회사 ㈜H 사업부 인수 시 ㈜I 감사인이 평가업무 수임",
+          source: "2023_CPA2차_회계감사",
         },
         {
-          label: '직계비속 사망으로 주식 보유',
-          text: 'B회계법인의 사원인 이영희 공인회계사는 직계비속의 사망으로 인하여 B회계법인의 감사대상회사 주식 0.5%를 소유하게 되었다.',
-          shortText: '이영희 공인회계사, 감사대상회사 주식 0.5% 소유',
-          source: '2019_CPA2차_회계감사'
+          label: "직계비속 사망으로 주식 보유",
+          text: "B회계법인의 사원인 이영희 공인회계사는 직계비속의 사망으로 인하여 B회계법인의 감사대상회사 주식 0.5%를 소유하게 되었다.",
+          shortText: "이영희 공인회계사, 감사대상회사 주식 0.5% 소유",
+          source: "2019_CPA2차_회계감사",
         },
         {
-          label: '부친이 감사대상회사 대표이사',
-          text: '이지수 공인회계사는 B회계법인의 사원으로 근무하고 있으며, B회계법인은 경북㈜를 감사하고 있다. 이지수 공인회계사의 부친은 경북㈜의 대표이사로 재직 중이다.',
-          shortText: '이지수 공인회계사, 부친이 경북㈜ 대표이사',
-          source: '2019_CPA2차_회계감사'
+          label: "부친이 감사대상회사 대표이사",
+          text: "이지수 공인회계사는 B회계법인의 사원으로 근무하고 있으며, B회계법인은 경북㈜를 감사하고 있다. 이지수 공인회계사의 부친은 경북㈜의 대표이사로 재직 중이다.",
+          shortText: "이지수 공인회계사, 부친이 경북㈜ 대표이사",
+          source: "2019_CPA2차_회계감사",
         },
         {
-          label: '감사 종료 후 재무담당이사 합류',
-          text: '부산㈜의 재무제표감사 인증업무팀의 구성원인 이장래 공인회계사는 이번 부산㈜의 감사업무가 종료된 후에 부산㈜의 재무담당이사로 합류할 예정이다.',
-          shortText: '이장래 공인회계사, 부산㈜ 감사 후 재무담당이사 예정',
-          source: '2019_CPA2차_회계감사'
+          label: "감사 종료 후 재무담당이사 합류",
+          text: "부산㈜의 재무제표감사 인증업무팀의 구성원인 이장래 공인회계사는 이번 부산㈜의 감사업무가 종료된 후에 부산㈜의 재무담당이사로 합류할 예정이다.",
+          shortText: "이장래 공인회계사, 부산㈜ 감사 후 재무담당이사 예정",
+          source: "2019_CPA2차_회계감사",
         },
         {
-          label: '채용 참여 후 해당 연도 외부감사',
-          text: '이관상 공인회계사는 전남㈜의 대표이사의 부탁으로 회계부서 직원 채용면접심사에 참여하고 가장 적합한 후보자를 선발하여 추천하였다. 또한, 대표이사와 함께 최종면접에 참석하여 박수리씨를 회계팀장으로 선발하였다. 해당 연도에 이관상 공인회계사는 전남㈜의 재무제표에 대한 외부감사업무를 의뢰받았다.',
-          shortText: '이관상, 전남㈜ 채용 참여·선발 후 같은 연도 외부감사 의뢰',
-          source: '2019_CPA2차_회계감사'
+          label: "채용 참여 후 해당 연도 외부감사",
+          text: "이관상 공인회계사는 전남㈜의 대표이사의 부탁으로 회계부서 직원 채용면접심사에 참여하고 가장 적합한 후보자를 선발하여 추천하였다. 또한, 대표이사와 함께 최종면접에 참석하여 박수리씨를 회계팀장으로 선발하였다. 해당 연도에 이관상 공인회계사는 전남㈜의 재무제표에 대한 외부감사업무를 의뢰받았다.",
+          shortText: "이관상, 전남㈜ 채용 참여·선발 후 같은 연도 외부감사 의뢰",
+          source: "2019_CPA2차_회계감사",
         },
       ];
 
       let isLoading = false;
-      
+
       // 입력 모드: 'chip' (예시 선택) / 'free' (직접 입력)
-      let inputMode = localStorage.getItem('inputMode') || 'chip';
-      
+      let inputMode = localStorage.getItem("inputMode") || "chip";
+
       function initInputMode() {
         setInputMode(inputMode, false);
       }
-      
+
       /** 초기 화면 시나리오 칩 렌더링 (SCENARIOS 기반) */
       function renderScenarioChips() {
-        const grid = document.getElementById('scenarioChips');
+        const grid = document.getElementById("scenarioChips");
         if (!grid) return;
-        grid.innerHTML = '';
+        grid.innerHTML = "";
         SCENARIOS.forEach((d) => {
-          const chip = document.createElement('div');
-          chip.className = 'chip';
+          const chip = document.createElement("div");
+          chip.className = "chip";
           chip.dataset.text = d.text;
-          chip.onclick = function() { fillInput(this.dataset.text); };
-          chip.innerHTML = 
-            '<div class="chip-label">' + d.label + '</div>' +
-            '<div class="chip-text">' + d.shortText + '</div>' +
-            '<div class="chip-arrow">출처: ' + d.source + '</div>';
+          chip.onclick = function () {
+            fillInput(this.dataset.text);
+          };
+          chip.innerHTML =
+            '<div class="chip-label">' +
+            d.label +
+            "</div>" +
+            '<div class="chip-text">' +
+            d.shortText +
+            "</div>" +
+            '<div class="chip-arrow">출처: ' +
+            d.source +
+            "</div>";
           grid.appendChild(chip);
         });
       }
-      
+
       function setInputMode(mode, save = true) {
         inputMode = mode;
-        if (save) localStorage.setItem('inputMode', mode);
-        
-        const inputBox = document.getElementById('inputBox');
-        const modeSwitch = document.getElementById('modeSwitch');
-        const modeChip = document.getElementById('modeChip');
-        const modeFree = document.getElementById('modeFree');
-        const inputHint = document.querySelector('.input-hint');
-        const emptyChips = document.querySelector('.empty-state .card-grid');
-        
-        if (mode === 'free') {
+        if (save) localStorage.setItem("inputMode", mode);
+
+        const inputBox = document.getElementById("inputBox");
+        const modeSwitch = document.getElementById("modeSwitch");
+        const modeChip = document.getElementById("modeChip");
+        const modeFree = document.getElementById("modeFree");
+        const inputHint = document.querySelector(".input-hint");
+        const emptyChips = document.querySelector(".empty-state .card-grid");
+
+        if (mode === "free") {
           // 직접 입력 모드
-          modeSwitch.classList.add('active');
-          modeChip.classList.remove('active');
-          modeFree.classList.add('active');
-          inputBox.removeAttribute('readonly');
-          inputBox.placeholder = '감사 독립성 검토가 필요한 시나리오를 입력하세요';
-          if (inputHint) inputHint.textContent = '*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.';
-          if (emptyChips) emptyChips.style.opacity = '0.5';
+          modeSwitch.classList.add("active");
+          modeChip.classList.remove("active");
+          modeFree.classList.add("active");
+          inputBox.removeAttribute("readonly");
+          inputBox.placeholder =
+            "감사 독립성 검토가 필요한 시나리오를 입력하세요";
+          if (inputHint)
+            inputHint.textContent =
+              "*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.";
+          if (emptyChips) emptyChips.style.opacity = "0.5";
         } else {
           // 예시 선택 모드
-          modeSwitch.classList.remove('active');
-          modeChip.classList.add('active');
-          modeFree.classList.remove('active');
-          inputBox.setAttribute('readonly', '');
-          inputBox.placeholder = '위 예시 시나리오를 선택하세요';
-          if (inputHint) inputHint.textContent = '*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.';
-          if (emptyChips) emptyChips.style.opacity = '1';
+          modeSwitch.classList.remove("active");
+          modeChip.classList.add("active");
+          modeFree.classList.remove("active");
+          inputBox.setAttribute("readonly", "");
+          inputBox.placeholder = "위 예시 시나리오를 선택하세요";
+          if (inputHint)
+            inputHint.textContent =
+              "*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.";
+          if (emptyChips) emptyChips.style.opacity = "1";
         }
       }
-      
+
       function toggleInputMode() {
-        setInputMode(inputMode === 'chip' ? 'free' : 'chip');
+        setInputMode(inputMode === "chip" ? "free" : "chip");
       }
-      
+
       // 페이지 로드 시 초기화
-      document.addEventListener('DOMContentLoaded', function() {
-        renderScenarioChips();  // 시나리오 칩 렌더링
-        initInputMode();        // 입력 모드 초기화
+      document.addEventListener("DOMContentLoaded", function () {
+        renderScenarioChips(); // 시나리오 칩 렌더링
+        initInputMode(); // 입력 모드 초기화
       });
 
       const scenarios = {
         loan: {
-          verdict: '통제 미흡',
-          verdictType: 'denied',
-          risk: 'Medium',
-          riskClass: 'risk-medium',
-          reviewId: 'IC-2401-A1',
-          flowNodes: ['지점장', '전결(3억 이하)', '대출 실행', '본사 승인', '3억 초과'],
-          issues: ['대출 횟수 제한 없는 전결 권한 — 누적 익스포저 통제 부재', '신용조사 주체와 승인 주체 미분리 (자기검토 위험)'],
-          law: '은행업감독규정 제79조 (여신심사), 내부통제기준 모범규준 II-3 (승인 한도)',
-          opinion: '개별 건당 한도 설정은 적절하나, 횟수 제한이 없어 동일 차주에 대한 누적 여신이 한도를 사실상 무력화할 수 있습니다. 또한 지점 자체 신용조사 결과를 지점장이 직접 승인하는 구조는 자기검토 위험을 내포합니다. COSO 프레임워크상 통제 활동(Control Activities) 요소의 보완이 필요합니다.',
-          safeguards: ['동일 차주 누적 한도 별도 설정 및 모니터링', '신용조사와 여신승인 담당 분리 또는 본사 2차 검증 도입', '한도 초과 건 발생 시 자동 경보 시스템 구축']
+          verdict: "통제 미흡",
+          verdictType: "denied",
+          risk: "Medium",
+          riskClass: "risk-medium",
+          reviewId: "IC-2401-A1",
+          flowNodes: [
+            "지점장",
+            "전결(3억 이하)",
+            "대출 실행",
+            "본사 승인",
+            "3억 초과",
+          ],
+          issues: [
+            "대출 횟수 제한 없는 전결 권한 — 누적 익스포저 통제 부재",
+            "신용조사 주체와 승인 주체 미분리 (자기검토 위험)",
+          ],
+          law: "은행업감독규정 제79조 (여신심사), 내부통제기준 모범규준 II-3 (승인 한도)",
+          opinion:
+            "개별 건당 한도 설정은 적절하나, 횟수 제한이 없어 동일 차주에 대한 누적 여신이 한도를 사실상 무력화할 수 있습니다. 또한 지점 자체 신용조사 결과를 지점장이 직접 승인하는 구조는 자기검토 위험을 내포합니다. COSO 프레임워크상 통제 활동(Control Activities) 요소의 보완이 필요합니다.",
+          safeguards: [
+            "동일 차주 누적 한도 별도 설정 및 모니터링",
+            "신용조사와 여신승인 담당 분리 또는 본사 2차 검증 도입",
+            "한도 초과 건 발생 시 자동 경보 시스템 구축",
+          ],
         },
         rotation: {
-          verdict: '통제 미흡',
-          verdictType: 'denied',
-          risk: 'High',
-          riskClass: 'risk-high',
-          reviewId: 'IC-2401-A2',
-          flowNodes: ['직원', '3년 순환', '타 지점', '고향 예외', '장기 근무'],
-          issues: ['고향 예외 조항 — 지인 관계 기반 부정 리스크 구조화', "순환근무 예외 적용 기준 객관성 부재 ('고향' 정의 모호)"],
-          law: '은행법 제23조의3 (내부통제), 금융회사지배구조법 제24조 (준법감시), 바젤위원회 내부통제 원칙 제7원칙',
-          opinion: '순환근무제는 부정행위 적발을 위한 핵심 예방통제(Preventive Control)입니다. 고향 파견 직원에 대한 예외는 오히려 가장 취약한 구간—지인 차주와의 유착, 담보 과대평가 묵인 등—에서 통제를 해제하는 결과를 낳습니다. 이는 부정 리스크(Fraud Risk)를 의도치 않게 제도화하는 구조적 취약점입니다.',
-          safeguards: ['고향 파견 직원의 여신·수신 업무를 본사 주도 교차검증 대상으로 지정', '예외 적용 시 내부감사팀 사전 승인 의무화', "'고향' 정의를 주민등록 기준으로 명확화 및 3년 초과 시 반기 리뷰"]
+          verdict: "통제 미흡",
+          verdictType: "denied",
+          risk: "High",
+          riskClass: "risk-high",
+          reviewId: "IC-2401-A2",
+          flowNodes: ["직원", "3년 순환", "타 지점", "고향 예외", "장기 근무"],
+          issues: [
+            "고향 예외 조항 — 지인 관계 기반 부정 리스크 구조화",
+            "순환근무 예외 적용 기준 객관성 부재 ('고향' 정의 모호)",
+          ],
+          law: "은행법 제23조의3 (내부통제), 금융회사지배구조법 제24조 (준법감시), 바젤위원회 내부통제 원칙 제7원칙",
+          opinion:
+            "순환근무제는 부정행위 적발을 위한 핵심 예방통제(Preventive Control)입니다. 고향 파견 직원에 대한 예외는 오히려 가장 취약한 구간—지인 차주와의 유착, 담보 과대평가 묵인 등—에서 통제를 해제하는 결과를 낳습니다. 이는 부정 리스크(Fraud Risk)를 의도치 않게 제도화하는 구조적 취약점입니다.",
+          safeguards: [
+            "고향 파견 직원의 여신·수신 업무를 본사 주도 교차검증 대상으로 지정",
+            "예외 적용 시 내부감사팀 사전 승인 의무화",
+            "'고향' 정의를 주민등록 기준으로 명확화 및 3년 초과 시 반기 리뷰",
+          ],
         },
         duties: {
-          verdict: '중요한 취약점',
-          verdictType: 'denied',
-          risk: 'High',
-          riskClass: 'risk-high',
-          reviewId: 'IC-2401-A3',
-          flowNodes: ['직원 1인', '거래 승인', '동시 수행', '회계 처리', '소규모 지점'],
-          issues: ['직무분리 원칙 정면 위반 — 승인·실행·기록 3기능 1인 집중', '10년 이상 경력 기준은 역량 요건이지 통제 대체 수단이 아님'],
-          law: '내부회계관리제도 설계·운영 개념체계 문단 54 (직무분리), COSO 2013 원칙 10, 은행업감독규정 제6조',
-          opinion: '직무분리(Segregation of Duties)는 내부통제의 근간입니다. 거래 승인자와 회계 기록자가 동일인인 경우, 오류와 부정을 상호 검증할 수단이 완전히 소멸됩니다. 근속연수는 직무분리의 대체 통제가 될 수 없으며, 오히려 장기 근속자의 권한 남용 리스크를 간과하는 결과입니다. 내부회계관리제도 관점에서 중요한 취약점(Material Weakness)에 해당할 수 있습니다.',
-          safeguards: ['소규모 지점에도 승인·기록 최소 2인 체제 유지 (예: 순회 감독자 주 1회 방문)', '보상통제(Compensating Control)로 본사의 일별 거래 원격 모니터링 도입', '해당 지점 거래 전수에 대한 연 2회 이상 내부감사 실시']
+          verdict: "중요한 취약점",
+          verdictType: "denied",
+          risk: "High",
+          riskClass: "risk-high",
+          reviewId: "IC-2401-A3",
+          flowNodes: [
+            "직원 1인",
+            "거래 승인",
+            "동시 수행",
+            "회계 처리",
+            "소규모 지점",
+          ],
+          issues: [
+            "직무분리 원칙 정면 위반 — 승인·실행·기록 3기능 1인 집중",
+            "10년 이상 경력 기준은 역량 요건이지 통제 대체 수단이 아님",
+          ],
+          law: "내부회계관리제도 설계·운영 개념체계 문단 54 (직무분리), COSO 2013 원칙 10, 은행업감독규정 제6조",
+          opinion:
+            "직무분리(Segregation of Duties)는 내부통제의 근간입니다. 거래 승인자와 회계 기록자가 동일인인 경우, 오류와 부정을 상호 검증할 수단이 완전히 소멸됩니다. 근속연수는 직무분리의 대체 통제가 될 수 없으며, 오히려 장기 근속자의 권한 남용 리스크를 간과하는 결과입니다. 내부회계관리제도 관점에서 중요한 취약점(Material Weakness)에 해당할 수 있습니다.",
+          safeguards: [
+            "소규모 지점에도 승인·기록 최소 2인 체제 유지 (예: 순회 감독자 주 1회 방문)",
+            "보상통제(Compensating Control)로 본사의 일별 거래 원격 모니터링 도입",
+            "해당 지점 거래 전수에 대한 연 2회 이상 내부감사 실시",
+          ],
         },
         hiring: {
-          verdict: '통제 보완 필요',
-          verdictType: 'denied',
-          risk: 'Medium',
-          riskClass: 'risk-medium',
-          reviewId: 'IC-2401-A4',
-          flowNodes: ['신입사원', '인적 보증', '채용', '단체손해보험', '사고 대비'],
-          issues: ['인적 보증은 사후 배상 수단 — 사전 예방통제 효과 제한적', '단체보험 의존은 도덕적 해이(Moral Hazard) 유발 가능'],
-          law: '금융회사지배구조법 제25조 (임직원 겸직 등), 은행업감독규정 제11조 (직원 채용), 금융감독원 내부통제 모범규준',
-          opinion: '인적 보증과 단체손해보험은 금융사고 발생 이후의 손실 보전 수단으로, 사전적 부정 예방 기능은 미약합니다. 특히 손해보험 가입이 알려진 경우 임직원의 주의 의무 해이를 유발할 수 있습니다. 채용 단계의 백그라운드 체크(신용조회, 전직장 조회, 범죄이력 조회)가 더 실효적인 예방통제입니다.',
-          safeguards: ['채용 전 신용정보 조회 및 금융거래 이력 확인 절차 의무화', '전 직장 레퍼런스 체크 공식화 및 기록 보관', '입사 후 최초 1년간 거래 한도 제한 및 모니터링 강화']
+          verdict: "통제 보완 필요",
+          verdictType: "denied",
+          risk: "Medium",
+          riskClass: "risk-medium",
+          reviewId: "IC-2401-A4",
+          flowNodes: [
+            "신입사원",
+            "인적 보증",
+            "채용",
+            "단체손해보험",
+            "사고 대비",
+          ],
+          issues: [
+            "인적 보증은 사후 배상 수단 — 사전 예방통제 효과 제한적",
+            "단체보험 의존은 도덕적 해이(Moral Hazard) 유발 가능",
+          ],
+          law: "금융회사지배구조법 제25조 (임직원 겸직 등), 은행업감독규정 제11조 (직원 채용), 금융감독원 내부통제 모범규준",
+          opinion:
+            "인적 보증과 단체손해보험은 금융사고 발생 이후의 손실 보전 수단으로, 사전적 부정 예방 기능은 미약합니다. 특히 손해보험 가입이 알려진 경우 임직원의 주의 의무 해이를 유발할 수 있습니다. 채용 단계의 백그라운드 체크(신용조회, 전직장 조회, 범죄이력 조회)가 더 실효적인 예방통제입니다.",
+          safeguards: [
+            "채용 전 신용정보 조회 및 금융거래 이력 확인 절차 의무화",
+            "전 직장 레퍼런스 체크 공식화 및 기록 보관",
+            "입사 후 최초 1년간 거래 한도 제한 및 모니터링 강화",
+          ],
         },
         incentive: {
-          verdict: '중요한 취약점',
-          verdictType: 'denied',
-          risk: 'High',
-          riskClass: 'risk-high',
-          reviewId: 'IC-2401-A5',
-          flowNodes: ['모범직원', '미사용 휴가', '수당 전환', '강제휴가 미실시', '부정 은닉 가능'],
-          issues: ['강제휴가제도 사실상 무력화 — 부정행위 은닉 탐지 핵심 통제 상실', '인센티브 명목으로 핵심 탐지통제를 금전으로 대체하는 구조'],
-          law: '은행업감독규정 제79조, 금융감독원 모범규준 III-2 (강제휴가), 미국 FFIEC IT Examination Handbook (Mandatory Vacation)',
-          opinion: '강제휴가(Mandatory Vacation)는 부정행위자가 자리를 비운 동안 대체자가 이상 거래를 발견하도록 설계된 핵심 탐지통제(Detective Control)입니다. 이를 수당으로 대체하는 인센티브는 통제 목적과 정면으로 충돌합니다. 금융감독원 검사에서도 강제휴가 미실시는 주요 지적사항으로 분류됩니다. 모범직원일수록 권한이 크므로, 오히려 더 엄격한 강제휴가 적용이 필요합니다.',
-          safeguards: ['강제휴가 미사용자에 대한 수당 전환 조항 즉시 폐지', '직위별 최소 연속휴가 일수(예: 과장급 이상 연 5영업일) 의무 규정화', '휴가 중 해당 직원의 시스템 접근 권한 자동 차단']
+          verdict: "중요한 취약점",
+          verdictType: "denied",
+          risk: "High",
+          riskClass: "risk-high",
+          reviewId: "IC-2401-A5",
+          flowNodes: [
+            "모범직원",
+            "미사용 휴가",
+            "수당 전환",
+            "강제휴가 미실시",
+            "부정 은닉 가능",
+          ],
+          issues: [
+            "강제휴가제도 사실상 무력화 — 부정행위 은닉 탐지 핵심 통제 상실",
+            "인센티브 명목으로 핵심 탐지통제를 금전으로 대체하는 구조",
+          ],
+          law: "은행업감독규정 제79조, 금융감독원 모범규준 III-2 (강제휴가), 미국 FFIEC IT Examination Handbook (Mandatory Vacation)",
+          opinion:
+            "강제휴가(Mandatory Vacation)는 부정행위자가 자리를 비운 동안 대체자가 이상 거래를 발견하도록 설계된 핵심 탐지통제(Detective Control)입니다. 이를 수당으로 대체하는 인센티브는 통제 목적과 정면으로 충돌합니다. 금융감독원 검사에서도 강제휴가 미실시는 주요 지적사항으로 분류됩니다. 모범직원일수록 권한이 크므로, 오히려 더 엄격한 강제휴가 적용이 필요합니다.",
+          safeguards: [
+            "강제휴가 미사용자에 대한 수당 전환 조항 즉시 폐지",
+            "직위별 최소 연속휴가 일수(예: 과장급 이상 연 5영업일) 의무 규정화",
+            "휴가 중 해당 직원의 시스템 접근 권한 자동 차단",
+          ],
         },
         baddebt: {
-          verdict: '통제 적절',
-          verdictType: 'approved',
-          risk: 'Low',
-          riskClass: 'risk-medium',
-          reviewId: 'IC-2401-A6',
-          flowNodes: ['대손 발생', '지점장 보고', 'CFO·CEO', '내부감사팀', '현장 조사'],
-          issues: ['보고 체계 자체는 적절 — 즉시성·상향 보고·독립 검증 3요소 충족', "다만 '즉각' 의 정의와 보고 기한 미명시로 해석 여지 존재"],
-          law: '은행법 제23조의3, 금융회사지배구조법 제28조 (내부감사), 은행업감독규정 제79조',
-          opinion: "대손 발생 시 즉각 경영진 보고 및 독립적 내부감사팀의 현장 검증은 COSO 프레임워크의 모니터링 활동(Monitoring Activities) 요건을 충족합니다. 특히 CFO와 CEO에게 동시 보고하는 이중 라인은 은폐 가능성을 차단하는 효과적 설계입니다. 다만 보고 기한을 '즉각'이 아닌 '24시간 이내' 등으로 명문화하면 실효성이 더욱 높아집니다.",
-          safeguards: ["보고 기한을 '즉각'에서 '인지 후 24시간 이내'로 명문화", '내부감사 결과 감사위원회 보고 의무 및 보고서 보관 체계 수립', '대손 재발 방지 조치 이행 여부 추적 관리 프로세스 도입']
-        }
+          verdict: "통제 적절",
+          verdictType: "approved",
+          risk: "Low",
+          riskClass: "risk-medium",
+          reviewId: "IC-2401-A6",
+          flowNodes: [
+            "대손 발생",
+            "지점장 보고",
+            "CFO·CEO",
+            "내부감사팀",
+            "현장 조사",
+          ],
+          issues: [
+            "보고 체계 자체는 적절 — 즉시성·상향 보고·독립 검증 3요소 충족",
+            "다만 '즉각' 의 정의와 보고 기한 미명시로 해석 여지 존재",
+          ],
+          law: "은행법 제23조의3, 금융회사지배구조법 제28조 (내부감사), 은행업감독규정 제79조",
+          opinion:
+            "대손 발생 시 즉각 경영진 보고 및 독립적 내부감사팀의 현장 검증은 COSO 프레임워크의 모니터링 활동(Monitoring Activities) 요건을 충족합니다. 특히 CFO와 CEO에게 동시 보고하는 이중 라인은 은폐 가능성을 차단하는 효과적 설계입니다. 다만 보고 기한을 '즉각'이 아닌 '24시간 이내' 등으로 명문화하면 실효성이 더욱 높아집니다.",
+          safeguards: [
+            "보고 기한을 '즉각'에서 '인지 후 24시간 이내'로 명문화",
+            "내부감사 결과 감사위원회 보고 의무 및 보고서 보관 체계 수립",
+            "대손 재발 방지 조치 이행 여부 추적 관리 프로세스 도입",
+          ],
+        },
       };
 
       function detectScenario(text) {
-        if (text.includes('모범') || text.includes('월차') || text.includes('정기휴가') || text.includes('인센티브')) return 'incentive';
-        if (text.includes('대손') || text.includes('CFO') || text.includes('내부감사팀') || text.includes('회수가능성')) return 'baddebt';
-        if (text.includes('겸직') || text.includes('회계업무') || text.includes('직무')) return 'duties';
-        if (text.includes('순환') || text.includes('고향') || text.includes('파견')) return 'rotation';
-        if (text.includes('신입') || text.includes('보증') || text.includes('손해보험')) return 'hiring';
-        return 'loan';
+        if (
+          text.includes("모범") ||
+          text.includes("월차") ||
+          text.includes("정기휴가") ||
+          text.includes("인센티브")
+        )
+          return "incentive";
+        if (
+          text.includes("대손") ||
+          text.includes("CFO") ||
+          text.includes("내부감사팀") ||
+          text.includes("회수가능성")
+        )
+          return "baddebt";
+        if (
+          text.includes("겸직") ||
+          text.includes("회계업무") ||
+          text.includes("직무")
+        )
+          return "duties";
+        if (
+          text.includes("순환") ||
+          text.includes("고향") ||
+          text.includes("파견")
+        )
+          return "rotation";
+        if (
+          text.includes("신입") ||
+          text.includes("보증") ||
+          text.includes("손해보험")
+        )
+          return "hiring";
+        return "loan";
       }
 
       function fillInput(text) {
-        const el = document.getElementById('inputBox');
+        const el = document.getElementById("inputBox");
         el.value = text;
         autoResize(el);
         el.focus();
       }
 
       function autoResize(el) {
-        el.style.height = 'auto';
-        el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        el.style.height = "auto";
+        el.style.height = Math.min(el.scrollHeight, 120) + "px";
       }
 
       function handleKey(e) {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
       }
 
       function renderFallbackReport(msgs, text) {
@@ -1287,39 +1466,42 @@
 
       function sendMessage() {
         if (isLoading) return;
-        const input = document.getElementById('inputBox');
+        const input = document.getElementById("inputBox");
         const text = input.value.trim();
         if (!text) return;
 
-        document.getElementById('emptyState').style.display = 'none';
-        document.getElementById('messages').style.display = 'flex';
-        document.getElementById('resetBtn').style.display = 'flex';
-        document.getElementById('betaBadge').style.display = 'none';
+        document.getElementById("emptyState").style.display = "none";
+        document.getElementById("messages").style.display = "flex";
+        document.getElementById("resetBtn").style.display = "flex";
+        document.getElementById("betaBadge").style.display = "none";
 
-        const msgs = document.getElementById('messages');
+        const msgs = document.getElementById("messages");
 
-        const userDiv = document.createElement('div');
-        userDiv.className = 'user-bubble';
+        const userDiv = document.createElement("div");
+        userDiv.className = "user-bubble";
         userDiv.textContent = text;
         msgs.appendChild(userDiv);
 
-        input.value = '';
-        input.style.height = 'auto';
-        document.getElementById('sendBtn').disabled = true;
+        input.value = "";
+        input.style.height = "auto";
+        document.getElementById("sendBtn").disabled = true;
         isLoading = true;
 
         var totalSteps = WORKFLOW_STEPS.length;
-        var dotsHtml = '';
+        var dotsHtml = "";
         for (var d = 0; d < totalSteps; d++) {
-          dotsHtml += '<span class="dot' + (d === 0 ? ' active' : '') + '"></span>';
+          dotsHtml +=
+            '<span class="dot' + (d === 0 ? " active" : "") + '"></span>';
         }
-        const typing = document.createElement('div');
-        typing.className = 'typing workflow-progress';
-        typing.setAttribute('aria-live', 'polite');
-        typing.setAttribute('aria-atomic', 'true');
-        typing.setAttribute('role', 'status');
+        const typing = document.createElement("div");
+        typing.className = "typing workflow-progress";
+        typing.setAttribute("aria-live", "polite");
+        typing.setAttribute("aria-atomic", "true");
+        typing.setAttribute("role", "status");
         typing.innerHTML =
-          '<div class="progress-dots-row"><div class="progress-dots">' + dotsHtml + '</div></div>' +
+          '<div class="progress-dots-row"><div class="progress-dots">' +
+          dotsHtml +
+          "</div></div>" +
           '<div class="progress-step-line"></div>' +
           '<div class="progress-desc"></div>';
         msgs.appendChild(typing);
@@ -1327,30 +1509,42 @@
         function setProgressStep(stepIndex) {
           var step = WORKFLOW_STEPS[stepIndex];
           if (!step) return;
-          var stepLineEl = typing.querySelector('.progress-step-line');
-          var descEl = typing.querySelector('.progress-desc');
-          var dots = typing.querySelectorAll('.progress-dots .dot');
-          if (stepLineEl) stepLineEl.textContent = '(' + (stepIndex + 1) + '/' + totalSteps + ') ' + step.name;
+          var stepLineEl = typing.querySelector(".progress-step-line");
+          var descEl = typing.querySelector(".progress-desc");
+          var dots = typing.querySelectorAll(".progress-dots .dot");
+          if (stepLineEl)
+            stepLineEl.textContent =
+              "(" + (stepIndex + 1) + "/" + totalSteps + ") " + step.name;
           if (descEl) descEl.textContent = step.desc;
-          typing.setAttribute('aria-label', (stepIndex + 1) + '/' + totalSteps + ' ' + step.name + '. ' + step.desc);
+          typing.setAttribute(
+            "aria-label",
+            stepIndex +
+              1 +
+              "/" +
+              totalSteps +
+              " " +
+              step.name +
+              ". " +
+              step.desc,
+          );
           dots.forEach(function (dot, i) {
-            dot.classList.remove('active', 'done');
-            if (i < stepIndex) dot.classList.add('done');
-            else if (i === stepIndex) dot.classList.add('active');
+            dot.classList.remove("active", "done");
+            if (i < stepIndex) dot.classList.add("done");
+            else if (i === stepIndex) dot.classList.add("active");
           });
         }
         setProgressStep(0);
 
         (function setBubbleWidthFromLongestStep() {
           /* CTO: 설명(3행) 1줄 유지 — 3단계 설명 문구 중 최대 폭으로 너비 설정. 패딩은 computed style 사용. */
-          var descEl = typing.querySelector('.progress-desc');
+          var descEl = typing.querySelector(".progress-desc");
           if (!descEl) return;
           var cs = getComputedStyle(descEl);
-          var measure = document.createElement('span');
-          measure.style.position = 'absolute';
-          measure.style.left = '-9999px';
-          measure.style.visibility = 'hidden';
-          measure.style.whiteSpace = 'nowrap';
+          var measure = document.createElement("span");
+          measure.style.position = "absolute";
+          measure.style.left = "-9999px";
+          measure.style.visibility = "hidden";
+          measure.style.whiteSpace = "nowrap";
           measure.style.fontSize = cs.fontSize;
           measure.style.fontWeight = cs.fontWeight;
           measure.style.fontFamily = cs.fontFamily;
@@ -1362,17 +1556,21 @@
             maxW = Math.max(maxW, measure.offsetWidth);
           }
           measure.parentNode.removeChild(measure);
-          var pad = parseFloat(getComputedStyle(typing).paddingLeft) + parseFloat(getComputedStyle(typing).paddingRight);
+          var pad =
+            parseFloat(getComputedStyle(typing).paddingLeft) +
+            parseFloat(getComputedStyle(typing).paddingRight);
           var totalW = maxW + pad;
-          typing.style.width = totalW + 'px';
-          typing.style.minWidth = totalW + 'px';
+          typing.style.width = totalW + "px";
+          typing.style.minWidth = totalW + "px";
         })();
 
         scrollDown();
 
         function done(skipScroll) {
-          try { msgs.removeChild(typing); } catch (_) {}
-          document.getElementById('sendBtn').disabled = false;
+          try {
+            msgs.removeChild(typing);
+          } catch (_) {}
+          document.getElementById("sendBtn").disabled = false;
           isLoading = false;
           if (!skipScroll) scrollDown();
         }
@@ -1387,43 +1585,54 @@
         }
 
         // 단계별 API 호출 — 각 단계 완료 시점에 setProgressStep 호출 (실제 진행률 연동)
-        var baseUrl = (API_BASE_URL || '').replace(/\/$/, '');
+        var baseUrl = (API_BASE_URL || "").replace(/\/$/, "");
         function toJson(res) {
           if (!res.ok) {
-            return res.json().catch(function () { return {}; }).then(function (body) {
-              var detail = (body && body.detail) ? body.detail : (res.status + ' ' + res.statusText);
-              throw new Error(detail);
-            });
+            return res
+              .json()
+              .catch(function () {
+                return {};
+              })
+              .then(function (body) {
+                var detail =
+                  body && body.detail
+                    ? body.detail
+                    : res.status + " " + res.statusText;
+                throw new Error(detail);
+              });
           }
           return res.json();
         }
         var extractData;
-        fetch(baseUrl + '/independence/extract', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ scenario: text })
+        fetch(baseUrl + "/independence/extract", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scenario: text }),
         })
           .then(toJson)
           .then(function (data) {
             extractData = data;
             setProgressStep(1);
-            return fetch(baseUrl + '/independence/analyze', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ scenario: text, rel_map: extractData.rel_map })
+            return fetch(baseUrl + "/independence/analyze", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                scenario: text,
+                rel_map: extractData.rel_map,
+              }),
             });
           })
           .then(toJson)
           .then(function (analyzeData) {
             setProgressStep(2);
-            return fetch(baseUrl + '/independence/report', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            return fetch(baseUrl + "/independence/report", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 scenario: text,
                 rel_map: extractData.rel_map,
-                analysis: analyzeData.analysis
-              })
+                analysis: analyzeData.analysis,
+              }),
             });
           })
           .then(toJson)
@@ -1436,9 +1645,11 @@
             done(true);
           })
           .catch(function (err) {
-            var bubble = document.createElement('div');
-            bubble.className = 'assistant-bubble error';
-            bubble.textContent = '검토 요청 연결에 실패했습니다. 예시 기준 결과를 표시합니다.\n' + (err && err.message ? err.message : String(err));
+            var bubble = document.createElement("div");
+            bubble.className = "assistant-bubble error";
+            bubble.textContent =
+              "검토 요청 연결에 실패했습니다. 예시 기준 결과를 표시합니다.\n" +
+              (err && err.message ? err.message : String(err));
             msgs.appendChild(bubble);
             renderFallbackReport(msgs, text);
             done();
@@ -1447,73 +1658,136 @@
 
       /** Colab ReportGenerator.render_report 형식의 독립성 검토 리포트 카드 */
       function buildIndependenceReportCard(data) {
-        var status = data.analysis && data.analysis.status ? data.analysis.status : '검토 완료';
-        var riskLevel = (data.analysis && data.analysis.risk_level) ? data.analysis.risk_level : '';
-        var traceId = data.trace_id || '';
-        var statusColors = { '수임 불가': '#d32f2f', '안전장치 적용 시 수임 가능': '#ed6c02', '수임 가능': '#2e7d32' };
-        var color = statusColors[status] || '#455a64';
-        var mermaidCode = data.mermaid_code || '';
-        var issues = (data.analysis && data.analysis.key_issues) ? data.analysis.key_issues : [];
-        var considerations = (data.analysis && data.analysis.considerations) ? data.analysis.considerations : '';
-        var safeguards = (data.analysis && data.analysis.suggested_safeguards) ? data.analysis.suggested_safeguards : [];
-        var legalRefs = (data.analysis && data.analysis.legal_references) ? data.analysis.legal_references : [];
-        function escapeHtml(str) { var div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+        var status =
+          data.analysis && data.analysis.status
+            ? data.analysis.status
+            : "검토 완료";
+        var riskLevel =
+          data.analysis && data.analysis.risk_level
+            ? data.analysis.risk_level
+            : "";
+        var traceId = data.trace_id || "";
+        var statusColors = {
+          "수임 불가": "#d32f2f",
+          "안전장치 적용 시 수임 가능": "#ed6c02",
+          "수임 가능": "#2e7d32",
+        };
+        var color = statusColors[status] || "#455a64";
+        var mermaidCode = data.mermaid_code || "";
+        var issues =
+          data.analysis && data.analysis.key_issues
+            ? data.analysis.key_issues
+            : [];
+        var considerations =
+          data.analysis && data.analysis.considerations
+            ? data.analysis.considerations
+            : "";
+        var safeguards =
+          data.analysis && data.analysis.suggested_safeguards
+            ? data.analysis.suggested_safeguards
+            : [];
+        var legalRefs =
+          data.analysis && data.analysis.legal_references
+            ? data.analysis.legal_references
+            : [];
+        function escapeHtml(str) {
+          var div = document.createElement("div");
+          div.textContent = str;
+          return div.innerHTML;
+        }
         function oneLegalRefHtml(r) {
-          var name = typeof r === 'string' ? r : (r && r.name) ? r.name : '';
-          var url = typeof r === 'object' && r && r.url ? r.url : '';
+          var name = typeof r === "string" ? r : r && r.name ? r.name : "";
+          var url = typeof r === "object" && r && r.url ? r.url : "";
           var safeName = escapeHtml(name);
           if (url && /^https?:\/\//i.test(url)) {
-            return '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer" class="law-link">' + safeName + ' <span class="law-link-icon" aria-hidden="true">↗</span></a>';
+            return (
+              '<a href="' +
+              escapeHtml(url) +
+              '" target="_blank" rel="noopener noreferrer" class="law-link">' +
+              safeName +
+              ' <span class="law-link-icon" aria-hidden="true">↗</span></a>'
+            );
           }
           return safeName;
         }
-        var legalHtml = Array.isArray(legalRefs) && legalRefs.length
-          ? legalRefs.map(oneLegalRefHtml).join(', ')
-          : '';
-        var issuesHtml = issues.length ? issues.map(function (i) { return '<li>' + escapeHtml(i) + '</li>'; }).join('') : '<li>주요 이슈 없음</li>';
-        var safeguardsHtml = safeguards.length ? safeguards.map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('') : '<li>권고 안전장치 없음</li>';
-        var lawBoxHtml = legalHtml ? '<div class="legal-section"><div class="section-title">근거 법령</div><div class="law-box">' + legalHtml + '</div></div>' : '';
-        var card = document.createElement('div');
-        card.className = 'independence-report';
+        var legalHtml =
+          Array.isArray(legalRefs) && legalRefs.length
+            ? legalRefs.map(oneLegalRefHtml).join(", ")
+            : "";
+        var issuesHtml = issues.length
+          ? issues
+              .map(function (i) {
+                return "<li>" + escapeHtml(i) + "</li>";
+              })
+              .join("")
+          : "<li>주요 이슈 없음</li>";
+        var safeguardsHtml = safeguards.length
+          ? safeguards
+              .map(function (s) {
+                return "<li>" + escapeHtml(s) + "</li>";
+              })
+              .join("")
+          : "<li>권고 안전장치 없음</li>";
+        var lawBoxHtml = legalHtml
+          ? '<div class="legal-section"><div class="section-title">근거 법령</div><div class="law-box">' +
+            legalHtml +
+            "</div></div>"
+          : "";
+        var card = document.createElement("div");
+        card.className = "independence-report";
         // 스켈레톤 HTML (로딩 중 표시)
-        var skeletonHtml = '<div class="graph-skeleton"><div class="graph-skeleton-icon">' +
+        var skeletonHtml =
+          '<div class="graph-skeleton"><div class="graph-skeleton-icon">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="10.5" y2="16"/><line x1="15.5" y1="7.5" x2="13.5" y2="16"/></svg>' +
-          '<span>관계도 생성 중...</span></div></div>';
+          "<span>관계도 생성 중...</span></div></div>";
 
         card.innerHTML =
-          '<div class="report-header" style="background:' + color + ';">' +
-            '<h2 style="margin:0;font-size:1rem;font-weight:700;">' + escapeHtml(status) + (riskLevel ? ' (위험도: ' + escapeHtml(riskLevel) + ')' : '') + '</h2>' +
-            '<small>검토 ID: ' + escapeHtml(traceId) + '</small>' +
-          '</div>' +
+          '<div class="report-header" style="background:' +
+          color +
+          ';">' +
+          '<h2 style="margin:0;font-size:var(--fs-md);font-weight:700;">' +
+          escapeHtml(status) +
+          (riskLevel ? " (위험도: " + escapeHtml(riskLevel) + ")" : "") +
+          "</h2>" +
+          "<small>검토 ID: " +
+          escapeHtml(traceId) +
+          "</small>" +
+          "</div>" +
           '<div class="report-body">' +
-            '<div class="conclusion-row">' +
-              '<div class="section-title">검토 결론</div>' +
-              '<div class="opinion-text">' + escapeHtml(considerations) + '</div>' +
-            '</div>' +
-            '<div class="details-row">' +
-              '<div class="report-left report-viz">' +
-                '<div class="section-title">이해관계 구조</div>' +
-                '<div class="viz-wrap">' +
-                  (mermaidCode ? skeletonHtml : '') +
-                '</div>' +
-              '</div>' +
-              '<div class="report-right report-content">' +
-                '<div class="section-title">주요 이슈</div>' +
-                '<div class="issue-box"><ul>' + issuesHtml + '</ul></div>' +
-                '<div class="section-title">권고 안전장치</div>' +
-                '<div class="safeguard-box"><ul>' + safeguardsHtml + '</ul></div>' +
-                lawBoxHtml +
-              '</div>' +
-            '</div>' +
-          '</div>';
+          '<div class="conclusion-row">' +
+          '<div class="section-title">검토 결론</div>' +
+          '<div class="opinion-text">' +
+          escapeHtml(considerations) +
+          "</div>" +
+          "</div>" +
+          '<div class="details-row">' +
+          '<div class="report-left report-viz">' +
+          '<div class="section-title">이해관계 구조</div>' +
+          '<div class="viz-wrap">' +
+          (mermaidCode ? skeletonHtml : "") +
+          "</div>" +
+          "</div>" +
+          '<div class="report-right report-content">' +
+          '<div class="section-title">주요 이슈</div>' +
+          '<div class="issue-box"><ul>' +
+          issuesHtml +
+          "</ul></div>" +
+          '<div class="section-title">권고 안전장치</div>' +
+          '<div class="safeguard-box"><ul>' +
+          safeguardsHtml +
+          "</ul></div>" +
+          lawBoxHtml +
+          "</div>" +
+          "</div>" +
+          "</div>";
 
         // Mermaid: 브라우저에서 직접 렌더링 (외부 서비스 미사용)
         if (mermaidCode) {
-          var vizWrap = card.querySelector('.viz-wrap');
-          var pre = document.createElement('pre');
-          pre.className = 'mermaid';
+          var vizWrap = card.querySelector(".viz-wrap");
+          var pre = document.createElement("pre");
+          pre.className = "mermaid";
           pre.textContent = mermaidCode;
-          vizWrap.innerHTML = '';
+          vizWrap.innerHTML = "";
           vizWrap.appendChild(pre);
         }
 
@@ -1522,39 +1796,50 @@
 
       /** 카드가 DOM에 붙은 뒤 Mermaid 렌더링 실행 */
       function renderMermaidInCard(card) {
-        var wrap = card.querySelector('.viz-wrap');
-        var el = wrap && wrap.querySelector('.mermaid');
+        var wrap = card.querySelector(".viz-wrap");
+        var el = wrap && wrap.querySelector(".mermaid");
         if (!el || !window.mermaid) {
-          if (wrap && wrap.querySelector('.mermaid')) wrap.innerHTML = '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">Mermaid 라이브러리 로드 실패</div>';
+          if (wrap && wrap.querySelector(".mermaid"))
+            wrap.innerHTML =
+              '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">Mermaid 라이브러리 로드 실패</div>';
           return;
         }
-        mermaid.run({ nodes: [el] }).then(function() {
-          var svg = wrap && wrap.querySelector('svg');
-          if (!svg) {
-            wrap.innerHTML = '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">관계도 생성 실패 (SVG 없음)</div>';
-          }
-        }).catch(function(err) {
-          console.error('[Mermaid] Render error:', err);
-          if (wrap) {
-            wrap.innerHTML = '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">' +
-              '<div style="margin-bottom:8px;">관계도 로드 실패</div>' +
-              '<div style="font-size:var(--fs-xs);color:#999;">' + (err.message || '다이어그램 렌더 오류') + '</div>' +
-              '</div>';
-          }
-        });
+        mermaid
+          .run({ nodes: [el] })
+          .then(function () {
+            var svg = wrap && wrap.querySelector("svg");
+            if (!svg) {
+              wrap.innerHTML =
+                '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">관계도 생성 실패 (SVG 없음)</div>';
+            }
+          })
+          .catch(function (err) {
+            console.error("[Mermaid] Render error:", err);
+            if (wrap) {
+              wrap.innerHTML =
+                '<div style="color:var(--muted);font-size:var(--fs-sm);text-align:center;padding:var(--space-xl);">' +
+                '<div style="margin-bottom:8px;">관계도 로드 실패</div>' +
+                '<div style="font-size:var(--fs-xs);color:#999;">' +
+                (err.message || "다이어그램 렌더 오류") +
+                "</div>" +
+                "</div>";
+            }
+          });
       }
 
       function buildReportCard(d) {
-        const card = document.createElement('div');
-        card.className = 'report-card';
+        const card = document.createElement("div");
+        card.className = "report-card";
 
-        const flowHTML = d.flowNodes.map((n, i) => {
-          if (i % 2 === 0) {
-            return `<div class="flow-node">${n}</div>`;
-          } else {
-            return `<div class="flow-arrow-wrap"><div class="flow-arrow">→</div><div class="flow-edge-label">${n}</div></div>`;
-          }
-        }).join('');
+        const flowHTML = d.flowNodes
+          .map((n, i) => {
+            if (i % 2 === 0) {
+              return `<div class="flow-node">${n}</div>`;
+            } else {
+              return `<div class="flow-arrow-wrap"><div class="flow-arrow">→</div><div class="flow-edge-label">${n}</div></div>`;
+            }
+          })
+          .join("");
 
         card.innerHTML = `
           <div class="report-header ${d.verdictType}">
@@ -1582,11 +1867,11 @@
               <div class="report-right">
                 <div class="section-title">주요 이슈</div>
                 <div class="issue-box">
-                  ${d.issues.map(i => `<div class="box-item">${i}</div>`).join('')}
+                  ${d.issues.map((i) => `<div class="box-item">${i}</div>`).join("")}
                 </div>
                 <div class="section-title">권고 안전장치</div>
                 <div class="safeguard-box">
-                  ${d.safeguards.map(s => `<div class="box-item">${s}</div>`).join('')}
+                  ${d.safeguards.map((s) => `<div class="box-item">${s}</div>`).join("")}
                 </div>
               </div>
             </div>
@@ -1596,18 +1881,23 @@
       }
 
       function buildPostChips() {
-        const wrap = document.createElement('div');
-        wrap.className = 'post-chips';
-        const grid = document.createElement('div');
-        const label = document.createElement('div');
-        label.className = 'post-chips-label';
-        label.textContent = '다른 시나리오를 선택하세요';
-        grid.className = 'post-chips-grid';
+        const wrap = document.createElement("div");
+        wrap.className = "post-chips";
+        const grid = document.createElement("div");
+        const label = document.createElement("div");
+        label.className = "post-chips-label";
+        label.textContent = "다른 시나리오를 선택하세요";
+        grid.className = "post-chips-grid";
         SCENARIOS.forEach((d) => {
-          const chip = document.createElement('div');
-          chip.className = 'post-chip';
-          chip.innerHTML = '<div class="post-chip-label">' + d.label + '</div><div class="post-chip-text">' + d.shortText + '</div>';
-          chip.addEventListener('click', () => fillInput(d.text));
+          const chip = document.createElement("div");
+          chip.className = "post-chip";
+          chip.innerHTML =
+            '<div class="post-chip-label">' +
+            d.label +
+            '</div><div class="post-chip-text">' +
+            d.shortText +
+            "</div>";
+          chip.addEventListener("click", () => fillInput(d.text));
           grid.appendChild(chip);
         });
         wrap.appendChild(label);
@@ -1615,27 +1905,26 @@
         return wrap;
       }
 
-
       function resetChat() {
-        document.getElementById('messages').innerHTML = '';
-        document.getElementById('messages').style.display = 'none';
-        document.getElementById('emptyState').style.display = 'flex';
-        document.getElementById('inputBox').value = '';
-        document.getElementById('inputBox').style.height = 'auto';
-        document.getElementById('sendBtn').disabled = false;
-        document.getElementById('resetBtn').style.display = 'none';
-        document.getElementById('betaBadge').style.display = 'block';
+        document.getElementById("messages").innerHTML = "";
+        document.getElementById("messages").style.display = "none";
+        document.getElementById("emptyState").style.display = "flex";
+        document.getElementById("inputBox").value = "";
+        document.getElementById("inputBox").style.height = "auto";
+        document.getElementById("sendBtn").disabled = false;
+        document.getElementById("resetBtn").style.display = "none";
+        document.getElementById("betaBadge").style.display = "block";
         isLoading = false;
       }
       function scrollDown() {
-        const ca = document.getElementById('chatArea');
-        setTimeout(() => ca.scrollTop = ca.scrollHeight, 50);
+        const ca = document.getElementById("chatArea");
+        setTimeout(() => (ca.scrollTop = ca.scrollHeight), 50);
       }
       // 새 메시지 상단으로 부드럽게 스크롤 (응답 카드용)
       function scrollToMessage(element) {
         if (element) {
           requestAnimationFrame(() => {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
           });
         }
       }
