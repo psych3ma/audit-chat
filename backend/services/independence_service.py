@@ -169,6 +169,75 @@ def build_mermaid_graph(
     return "\n".join(lines)
 
 
+def get_independence_map_from_neo4j(trace_id: str) -> IndependenceMap | None:
+    """Neo4j에서 trace_id 기반 엔티티-관계 조회. 없으면 None 반환.
+    
+    Args:
+        trace_id: 시나리오 텍스트의 MD5 해시 (8자리)
+        
+    Returns:
+        IndependenceMap 객체 또는 None (데이터 없음)
+    """
+    from backend.database import get_neo4j_session
+    from backend.models.independence import AuditEntity, Relationship
+
+    try:
+        with get_neo4j_session() as session:
+            # 엔티티 조회
+            entity_result = session.run(
+                """
+                MATCH (n:IndependenceEntity {trace_id: $trace_id})
+                RETURN n.id AS id, n.label AS label, n.name AS name
+                ORDER BY n.id
+                """,
+                trace_id=trace_id,
+            )
+            
+            entities_data = [record.data() for record in entity_result]
+            
+            # 엔티티가 없으면 None 반환
+            if not entities_data:
+                return None
+            
+            # 엔티티 객체 생성
+            entities = [
+                AuditEntity(
+                    id=record["id"],
+                    label=record["label"],
+                    name=record["name"],
+                )
+                for record in entities_data
+            ]
+            
+            # 관계 조회
+            relation_result = session.run(
+                """
+                MATCH (a:IndependenceEntity {trace_id: $trace_id})-[r:RELATION]->(b:IndependenceEntity {trace_id: $trace_id})
+                RETURN a.id AS source_id, b.id AS target_id, r.rel_type AS rel_type
+                ORDER BY a.id, b.id
+                """,
+                trace_id=trace_id,
+            )
+            
+            connections_data = [record.data() for record in relation_result]
+            
+            # 관계 객체 생성
+            connections = [
+                Relationship(
+                    source_id=record["source_id"],
+                    target_id=record["target_id"],
+                    rel_type=record["rel_type"] or "RELATES",
+                )
+                for record in connections_data
+            ]
+            
+            return IndependenceMap(entities=entities, connections=connections)
+            
+    except Exception:
+        # Neo4j 미연결 또는 기타 에러 시 None 반환 (폴백)
+        return None
+
+
 def save_independence_map_to_neo4j(trace_id: str, rel_map: IndependenceMap) -> None:
     """독립성 검토 결과(엔티티·관계)를 Neo4j에 저장. 실행(trace_id)별로 서브그래프 분리."""
     from backend.database import get_neo4j_session

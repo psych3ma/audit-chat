@@ -32,11 +32,11 @@
         --gray-50: #fafafa;
         /* Typography Scale */
         --fs-micro: 12px;
-        --fs-xs: var(--fs-micro);  /* 13px → 12px 통일 (레거시 호환) */
+        --fs-xs: var(--fs-micro); /* 13px → 12px 통일 (레거시 호환) */
         --fs-sm: 14px;
-        --fs-base: 16px;           /* 15px, 16px → 16px 통일 */
-        --fs-md: var(--fs-base);   /* 레거시 호환 */
-        --fs-lg: var(--fs-xl);     /* 17px → 18px 통일 (레거시 호환) */
+        --fs-base: 16px; /* 15px, 16px → 16px 통일 */
+        --fs-md: var(--fs-base); /* 레거시 호환 */
+        --fs-lg: var(--fs-xl); /* 17px → 18px 통일 (레거시 호환) */
         --fs-xl: 18px;
         --fs-2xl: 26px;
         /* Spacing Scale */
@@ -202,8 +202,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;  /* center → flex-start: 레이아웃 고정 */
-        padding: var(--empty-state-padding-top) var(--space-xl) var(--empty-state-padding-bottom);
+        justify-content: flex-start; /* center → flex-start: 레이아웃 고정 */
+        padding: var(--empty-state-padding-top) var(--space-xl)
+          var(--empty-state-padding-bottom);
         text-align: center;
       }
 
@@ -226,7 +227,7 @@
       .empty-sub {
         font-size: var(--fs-xl);
         color: var(--muted);
-        margin-bottom: var(--empty-title-chip-gap);  /* 명시적 간격 설정 */
+        margin-bottom: var(--empty-title-chip-gap); /* 명시적 간격 설정 */
         line-height: 1.7;
       }
 
@@ -237,7 +238,7 @@
         gap: var(--space-md);
         width: 100%;
         max-width: 1040px;
-        margin-top: 0;  /* auto 제거: 제목과 칩 간격은 empty-sub의 margin-bottom으로 관리 */
+        margin-top: 0; /* auto 제거: 제목과 칩 간격은 empty-sub의 margin-bottom으로 관리 */
       }
 
       .chip {
@@ -289,10 +290,10 @@
         color: var(--text);
         line-height: 1.45;
         font-weight: 500;
-        
+
         /* 여러 줄 말줄임 처리: 칩 크기를 고려하여 일정 부분에서 자르고 '...' 표시 */
         display: -webkit-box;
-        -webkit-line-clamp: 3;  /* 3줄까지 표시 후 말줄임 */
+        -webkit-line-clamp: 3; /* 3줄까지 표시 후 말줄임 */
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -310,14 +311,14 @@
       /* CTO 관점: 성능 최적화 (GPU 가속), CSS 변수 활용 */
       .chip-skeleton {
         background: var(--subtle);
-        border: none;  /* 테두리 제거: 미니멀하고 통합된 느낌 */
+        border: none; /* 테두리 제거: 미니멀하고 통합된 느낌 */
         border-radius: var(--space-md);
         padding: var(--space-lg) var(--space-xl);
         min-height: var(--chip-min-height);
         position: relative;
         overflow: hidden;
-        pointer-events: none;  /* 클릭 방지 */
-        
+        pointer-events: none; /* 클릭 방지 */
+
         /* Shimmer 효과: 진행 중임을 명확히 전달 */
         background-image: linear-gradient(
           90deg,
@@ -328,36 +329,37 @@
           var(--subtle) 100%
         );
         background-size: 200% 100%;
-        animation: skeleton-shimmer var(--skeleton-animation-duration) ease-in-out infinite;
-        will-change: background-position;  /* 성능 최적화: 브라우저 최적화 힌트 */
+        animation: skeleton-shimmer var(--skeleton-animation-duration)
+          ease-in-out infinite;
+        will-change: background-position; /* 성능 최적화: 브라우저 최적화 힌트 */
       }
-      
+
       /* 칩 내부 구조 반영: 라벨 영역 (상단) - 정적 요소 */
       .chip-skeleton::before {
-        content: '';
+        content: "";
         position: absolute;
         top: var(--space-lg);
         left: var(--space-xl);
         width: 60px;
         height: 12px;
-        background: var(--skeleton-shimmer-label-bg);  /* CSS 변수 활용 */
+        background: var(--skeleton-shimmer-label-bg); /* CSS 변수 활용 */
         border-radius: var(--space-xs);
         /* Shimmer 효과는 배경에만 적용, 내부 구조는 정적 */
       }
-      
+
       /* 칩 내부 구조 반영: 텍스트 영역 (중간) - 정적 요소 */
       .chip-skeleton::after {
-        content: '';
+        content: "";
         position: absolute;
         top: calc(var(--space-lg) + 20px);
         left: var(--space-xl);
         right: var(--space-xl);
         height: 16px;
-        background: var(--skeleton-shimmer-text-bg);  /* CSS 변수 활용 */
+        background: var(--skeleton-shimmer-text-bg); /* CSS 변수 활용 */
         border-radius: var(--space-xs);
         /* Shimmer 효과는 배경에만 적용, 내부 구조는 정적 */
       }
-      
+
       /* Shimmer 애니메이션: 좌에서 우로 움직이는 그라데이션 */
       @keyframes skeleton-shimmer {
         0% {
@@ -367,7 +369,7 @@
           background-position: 200% 0;
         }
       }
-      
+
       /* 접근성: 애니메이션 감소 선호 사용자 지원 (CTO 관점) */
       @media (prefers-reduced-motion: reduce) {
         .chip-skeleton,
@@ -378,7 +380,7 @@
         }
         /* 내부 구조(::before, ::after)는 유지하되 애니메이션만 제거 */
       }
-      
+
       /* 텍스트 스켈레톤 (타이틀, 서브타이틀용) - Shimmer 효과 적용 */
       /* CTO 관점: CSS 변수 활용, 성능 최적화 */
       .text-skeleton {
@@ -387,7 +389,7 @@
         position: relative;
         overflow: hidden;
         pointer-events: none;
-        
+
         /* Shimmer 효과: 진행 중임을 명확히 전달 */
         background-image: linear-gradient(
           90deg,
@@ -398,28 +400,29 @@
           var(--subtle) 100%
         );
         background-size: 200% 100%;
-        animation: skeleton-shimmer var(--skeleton-animation-duration) ease-in-out infinite;
-        will-change: background-position;  /* 성능 최적화: 브라우저 최적화 힌트 */
+        animation: skeleton-shimmer var(--skeleton-animation-duration)
+          ease-in-out infinite;
+        will-change: background-position; /* 성능 최적화: 브라우저 최적화 힌트 */
       }
-      
+
       .text-skeleton.title {
         height: 1.5em;
         width: 60%;
         margin: 0 auto var(--space-md);
       }
-      
+
       .text-skeleton.subtitle {
         height: 1.3em;
         width: 80%;
         margin: 0 auto var(--empty-title-chip-gap);
       }
-      
+
       .text-skeleton.eyebrow {
         height: 1em;
         width: 200px;
         margin: 0 auto var(--space-md);
       }
-      
+
       /* 스켈레톤 컨테이너 (레거시 호환성 - 현재 사용 안 함) */
       .empty-state-skeleton {
         display: flex;
@@ -427,30 +430,31 @@
         align-items: center;
         width: 100%;
       }
-      
+
       /* 점진적 렌더링: 칩 컨테이너 (스켈레톤과 실제 칩이 같은 위치에 겹침) */
       .suggestion-grid-container {
         position: relative;
         width: 100%;
         max-width: 1040px;
       }
-      
+
       .suggestion-grid-container .suggestion-grid {
         width: 100%;
       }
-      
+
       /* 점진적 렌더링: 초기 상태 설정 */
       #scenarioChipsSkeleton {
         display: grid; /* 초기에는 스켈레톤 표시 */
       }
-      
+
       #scenarioChips {
         display: none; /* 초기에는 실제 칩 숨김 */
       }
-      
+
       /* 레거시 호환성: skeleton-pulse 애니메이션 (현재 사용 안 함, Shimmer로 대체) */
       @keyframes skeleton-pulse {
-        0%, 100% {
+        0%,
+        100% {
           opacity: var(--skeleton-opacity-min);
         }
         50% {
@@ -806,16 +810,16 @@
       }
       /* 진행중 버블 텍스트 스타일 (CTO 관점: CSS 변수 활용, 일관성) */
       .workflow-progress .progress-step-line {
-        font-size: var(--fs-base);  /* 14px → 16px */
+        font-size: var(--fs-base); /* 14px → 16px */
         line-height: 1.4;
         color: var(--gray-500);
-        font-weight: 700;  /* 600 → 700 (bold) */
+        font-weight: 700; /* 600 → 700 (bold) */
       }
       .workflow-progress .progress-desc {
-        font-size: var(--fs-base);  /* 12px → 16px */
+        font-size: var(--fs-base); /* 12px → 16px */
         line-height: 1.45;
         color: var(--gray-500);
-        font-weight: 400;  /* regular 유지 */
+        font-weight: 400; /* regular 유지 */
         white-space: nowrap;
       }
 
@@ -974,6 +978,9 @@
         transition: all 0.15s;
         position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: var(--chip-min-height);
       }
       .post-chip::before {
         content: "";
@@ -1001,10 +1008,19 @@
         text-transform: uppercase;
         margin-bottom: 3px;
       }
+      /* 채팅 중 시나리오 칩 텍스트: 원문 표시 + 말줄임 처리 (홈 화면과 일관성) */
       .post-chip-text {
         font-size: var(--fs-md);
         color: var(--text);
-        line-height: 1.4;
+        line-height: 1.45;
+        font-weight: 500;
+
+        /* 여러 줄 말줄임 처리: 홈 화면과 동일하게 3줄까지 표시 후 말줄임 */
+        display: -webkit-box;
+        -webkit-line-clamp: 3; /* 3줄까지 표시 후 말줄임 */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       /* Colab 독립성 검토 리포트 (ReportGenerator 스타일) */
@@ -1241,15 +1257,22 @@
       <div class="empty-state" id="emptyState">
         <!-- 정적 콘텐츠: 즉시 표시 (점진적 렌더링) -->
         <div class="empty-eyebrow">AI 기반 감사 독립성 검토</div>
-        <div class="empty-title">수임 검토 시 복잡한 이해관계 구조를 한눈에 파악하세요</div>
+        <div class="empty-title">
+          수임 검토 시 복잡한 이해관계 구조를 한눈에 파악하세요
+        </div>
         <div class="empty-sub">
           잠재적 독립성 이슈 포인트를 선제적으로 확인할 수 있습니다.
         </div>
-        
+
         <!-- 동적 콘텐츠: 스켈레톤 → 실제 콘텐츠 (점진적 렌더링) -->
         <div class="suggestion-grid-container">
           <!-- 스켈레톤 (초기 로딩 상태) - CSS에서 display: grid로 초기 설정 -->
-          <div class="suggestion-grid" id="scenarioChipsSkeleton" aria-busy="true" aria-label="시나리오 칩 로딩 중"></div>
+          <div
+            class="suggestion-grid"
+            id="scenarioChipsSkeleton"
+            aria-busy="true"
+            aria-label="시나리오 칩 로딩 중"
+          ></div>
           <!-- 실제 칩 (로딩 완료 후 표시) - CSS에서 display: none으로 초기 설정 -->
           <div class="suggestion-grid" id="scenarioChips"></div>
         </div>
@@ -1350,41 +1373,40 @@
       // ═══════════════════════════════════════════════════════════════
       const SCENARIOS = [
         {
-          label: "동일 회계법인 내 매수·매각 자문",
-          text: "X회계법인은 5개의 사업부(1∼5본부)로 구성되어 있으며, 주요 업무영역은 인증업무와 재무자문(deal service)업무이다. 현재 1본부의 파트너(사원)인 김 회계사는 A㈜가 보유중인 비상장주식(C)의 매각자문업무를 수행하고 있다. 한편 최근에 3본부의 파트너(사원)인 박 회계사는 B㈜로부터 A㈜가 매각을 추진하고 있는 C주식을 매수하고 싶다는 의향과 함께 매수자문서비스를 제공해 줄 것을 요청받았다.",
-          shortText: "X회계법인 1본부 매각자문, 3본부 매수자문 요청",
-          source: "2018_CPA2차_회계감사",
+          label: "흡수합병 후 감사계약·피합병법인 지분 보유",
+          text: "민국회계법인은 주권상장법인 감사인으로 등록되지 않은 법인이었는데, 최근에 대한회계법인을 흡수합병하여 주권상장법인 감사인으로 등록하였다. 합병 후, 민국회계법인의 계속감사거래처였던 ㈜E와 감사계약을 체결하려고 한다. 그런데 대한회계법인이 ㈜E의 지분 10%를 보유하고 있음이 확인되었다.",
+          shortText: "민국회계법인 흡수합병 후 ㈜E 감사계약, 대한회계법인 ㈜E 지분 10%",
+          source: "2025_CPA2차_회계감사",
         },
         {
-          label: "자회사 사업부 인수 평가업무",
+          label: "자회사 사업부 인수 평가업무(타사 감사인)",
           text: "상장회사 ㈜G는 비상장자회사 ㈜H와 ㈜I에 대해 각각 60%와 70%의 지분율을 보유하고 있다. ㈜G는 자회사 ㈜H의 사업부를 인수하고자 하는데, ㈜I의 감사인인 한국회계법인의 사원인 최 회계사가 이에 대한 평가업무를 수임하고자 한다. 단, 한국회계법인은 ㈜G와 ㈜H의 감사인이 아니다.",
-          shortText:
-            "㈜G, 자회사 ㈜H 사업부 인수 시 ㈜I 감사인이 평가업무 수임",
+          shortText: "㈜G·㈜H 사업부 인수 시 ㈜I 감사인(한국회계법인 최 회계사) 평가업무 수임",
           source: "2023_CPA2차_회계감사",
         },
         {
-          label: "직계비속 사망으로 주식 보유",
-          text: "B회계법인의 사원인 이영희 공인회계사는 직계비속의 사망으로 인하여 B회계법인의 감사대상회사 주식 0.5%를 소유하게 되었다.",
-          shortText: "이영희 공인회계사, 감사대상회사 주식 0.5% 소유",
-          source: "2019_CPA2차_회계감사",
-        },
-        {
-          label: "부친이 감사대상회사 대표이사",
-          text: "이지수 공인회계사는 B회계법인의 사원으로 근무하고 있으며, B회계법인은 경북㈜를 감사하고 있다. 이지수 공인회계사의 부친은 경북㈜의 대표이사로 재직 중이다.",
-          shortText: "이지수 공인회계사, 부친이 경북㈜ 대표이사",
-          source: "2019_CPA2차_회계감사",
-        },
-        {
-          label: "감사 종료 후 재무담당이사 합류",
-          text: "부산㈜의 재무제표감사 인증업무팀의 구성원인 이장래 공인회계사는 이번 부산㈜의 감사업무가 종료된 후에 부산㈜의 재무담당이사로 합류할 예정이다.",
-          shortText: "이장래 공인회계사, 부산㈜ 감사 후 재무담당이사 예정",
-          source: "2019_CPA2차_회계감사",
-        },
-        {
-          label: "채용 참여 후 해당 연도 외부감사",
+          label: "채용 참여·선발 후 해당 연도 외부감사",
           text: "이관상 공인회계사는 전남㈜의 대표이사의 부탁으로 회계부서 직원 채용면접심사에 참여하고 가장 적합한 후보자를 선발하여 추천하였다. 또한, 대표이사와 함께 최종면접에 참석하여 박수리씨를 회계팀장으로 선발하였다. 해당 연도에 이관상 공인회계사는 전남㈜의 재무제표에 대한 외부감사업무를 의뢰받았다.",
-          shortText: "이관상, 전남㈜ 채용 참여·선발 후 같은 연도 외부감사 의뢰",
+          shortText: "이관상, 전남㈜ 채용·박수리 회계팀장 선발 후 같은 연도 외부감사 의뢰",
           source: "2019_CPA2차_회계감사",
+        },
+        {
+          label: "감사인이 손해배상소송에서 회사 입장 대변",
+          text: "전북㈜의 외부감사인인 이언변 공인회계사는 전북㈜가 주주들로부터 손해배상청구소송을 제기 받음에 따라 회사의 입장을 대변하기 위하여 동 소송사건에 관여하였다.",
+          shortText: "전북㈜ 감사인 이언변, 손해배상청구소송 회사 입장 대변 관여",
+          source: "2019_CPA2차_회계감사",
+        },
+        {
+          label: "비영리 감사 수임·감사대상 CFO가 사원 친형",
+          text: "한국회계법인은 비영리법인인 희망재단의 감사업무를 수임하고자 한다. 한국회계법인 소속 사원인 김누리 회계사만 비영리법인에 대한 감사경험이 있다. 그런데 희망재단의 재무담당이사(CFO)가 김누리 회계사의 친형임을 확인하였다. 김누리 회계사와 친형은 한집에 거주하지 않으며 생계를 같이 하지 않는 것으로 파악되었다.",
+          shortText: "한국회계법인 희망재단 감사, 김누리 회계사·희망재단 CFO 친형",
+          source: "2025_CPA2차_회계감사",
+        },
+        {
+          label: "감사보수 비중(연매출 대비 30%)",
+          text: "B회계법인의 사원인 김한국 회계사는 ㈜대한그룹의 재무제표감사를 수행하고 있다. ㈜대한그룹으로부터 받은 감사보수 총액이 B회계법인의 연간 전체 매출액의 30%에 달한다.",
+          shortText: "B회계법인 김한국 ㈜대한그룹 감사, 감사보수 연매출 30%",
+          source: "2024_CPA2차_회계감사",
         },
       ];
 
@@ -1403,11 +1425,11 @@
        * @returns {string} CSS grid-template-columns 값
        */
       function calculateGridColumns(itemCount) {
-        if (itemCount <= 1) return '1fr';
-        if (itemCount <= 2) return 'repeat(2, 1fr)';
-        if (itemCount <= 3) return 'repeat(3, 1fr)';
+        if (itemCount <= 1) return "1fr";
+        if (itemCount <= 2) return "repeat(2, 1fr)";
+        if (itemCount <= 3) return "repeat(3, 1fr)";
         // 4개 이상일 경우 기본값 (반응형은 미디어 쿼리에서 처리)
-        return 'repeat(3, 1fr)';
+        return "repeat(3, 1fr)";
       }
 
       /**
@@ -1417,15 +1439,15 @@
        */
       function showSkeletonChips(grid, count) {
         if (!grid) return;
-        
-        grid.innerHTML = '';
+
+        grid.innerHTML = "";
         for (let i = 0; i < count; i++) {
-          const skeleton = document.createElement('div');
-          skeleton.className = 'chip-skeleton';
-          skeleton.setAttribute('aria-hidden', 'true');  // 접근성
+          const skeleton = document.createElement("div");
+          skeleton.className = "chip-skeleton";
+          skeleton.setAttribute("aria-hidden", "true"); // 접근성
           grid.appendChild(skeleton);
         }
-        
+
         // 그리드 컬럼 수 동적 설정
         grid.style.gridTemplateColumns = calculateGridColumns(count);
       }
@@ -1447,14 +1469,14 @@
             d.label +
             "</div>" +
             '<div class="chip-text">' +
-            d.text +  /* shortText → text: 원문 표시 */
+            d.text /* shortText → text: 원문 표시 */ +
             "</div>" +
             '<div class="chip-arrow">출처: ' +
             d.source +
             "</div>";
           grid.appendChild(chip);
         });
-        
+
         // 그리드 컬럼 수 동적 설정 (SCENARIOS.length 기반)
         grid.style.gridTemplateColumns = calculateGridColumns(SCENARIOS.length);
       }
@@ -1466,20 +1488,20 @@
       function initScenarioChips() {
         const grid = document.getElementById("scenarioChips");
         if (!grid) return;
-        
+
         // 실제 칩 렌더링 (스켈레톤은 전체 로딩 시퀀스에서 관리)
         renderScenarioChips();
       }
-      
+
       /**
        * 로딩 관련 설정 상수 (CTO 관점: 확장성/유지보수성)
        */
       const LOADING_CONFIG = {
-        MIN_LOAD_TIME: 400,        // 초기 로딩 최소 시간 (ms)
-        RESET_LOAD_TIME: 300,      // 리셋 시 최소 시간 (ms)
-        ANIMATION_FRAMES: 1        // requestAnimationFrame 중첩 횟수 (성능 최적화)
+        MIN_LOAD_TIME: 400, // 초기 로딩 최소 시간 (ms)
+        RESET_LOAD_TIME: 300, // 리셋 시 최소 시간 (ms)
+        ANIMATION_FRAMES: 1, // requestAnimationFrame 중첩 횟수 (성능 최적화)
       };
-      
+
       /**
        * 스켈레톤 표시 후 콘텐츠 전환 (공통 로직)
        * CTO 관점: 코드 재사용성 향상, 중복 제거, 점진적 렌더링
@@ -1488,24 +1510,24 @@
        */
       function transitionFromSkeleton(minLoadTime, contentRenderer) {
         const startTime = performance.now();
-        
+
         // 콘텐츠 렌더링
-        if (typeof contentRenderer === 'function') {
+        if (typeof contentRenderer === "function") {
           contentRenderer();
         }
-        
+
         // 최소 로딩 시간 확인 후 전환 (성능 최적화: 단일 requestAnimationFrame)
         requestAnimationFrame(() => {
           const elapsed = performance.now() - startTime;
           const remainingTime = Math.max(0, minLoadTime - elapsed);
-          
+
           setTimeout(() => {
             // 점진적 렌더링: 칩 스켈레톤만 제거
             hideChipSkeleton();
           }, remainingTime);
         });
       }
-      
+
       /**
        * 점진적 렌더링 초기화
        * CTO 관점: 정적 콘텐츠는 즉시 표시, 동적 콘텐츠만 스켈레톤 처리
@@ -1513,62 +1535,59 @@
        */
       function initPageLoad() {
         // 정적 콘텐츠(타이틀, 서브타이틀)는 이미 HTML에 표시되어 있음
-        
+
         // 동적 콘텐츠(시나리오 칩)만 스켈레톤 처리
         showChipSkeleton();
-        
+
         // 시나리오 칩 렌더링 및 전환
-        transitionFromSkeleton(
-          LOADING_CONFIG.MIN_LOAD_TIME,
-          () => {
-            initScenarioChips();
-          }
-        );
+        transitionFromSkeleton(LOADING_CONFIG.MIN_LOAD_TIME, () => {
+          initScenarioChips();
+        });
       }
-      
+
       /**
        * 시나리오 칩 스켈레톤 표시
        * CTO 관점: 동적 콘텐츠만 스켈레톤 처리
        */
       function showChipSkeleton() {
-        const skeletonGrid = document.getElementById('scenarioChipsSkeleton');
-        const chipGrid = document.getElementById('scenarioChips');
-        
+        const skeletonGrid = document.getElementById("scenarioChipsSkeleton");
+        const chipGrid = document.getElementById("scenarioChips");
+
         if (!skeletonGrid) {
-          console.warn('[showChipSkeleton] scenarioChipsSkeleton not found');
+          console.warn("[showChipSkeleton] scenarioChipsSkeleton not found");
           return;
         }
-        
+
         // 스켈레톤 표시
-        skeletonGrid.style.display = 'grid';
+        skeletonGrid.style.display = "grid";
         if (chipGrid) {
-          chipGrid.style.display = 'none';
+          chipGrid.style.display = "none";
         }
-        
+
         // 스켈레톤 칩 생성
         if (SCENARIOS && Array.isArray(SCENARIOS) && SCENARIOS.length > 0) {
           showSkeletonChips(skeletonGrid, SCENARIOS.length);
         }
       }
-      
+
       /**
        * 시나리오 칩 스켈레톤 제거 및 실제 칩 표시
        * CTO 관점: 점진적 전환
        */
       function hideChipSkeleton() {
-        const skeletonGrid = document.getElementById('scenarioChipsSkeleton');
-        const chipGrid = document.getElementById('scenarioChips');
-        
+        const skeletonGrid = document.getElementById("scenarioChipsSkeleton");
+        const chipGrid = document.getElementById("scenarioChips");
+
         if (skeletonGrid) {
-          skeletonGrid.style.display = 'none';
-          skeletonGrid.setAttribute('aria-busy', 'false');
+          skeletonGrid.style.display = "none";
+          skeletonGrid.setAttribute("aria-busy", "false");
         }
-        
+
         if (chipGrid) {
-          chipGrid.style.display = 'grid';
+          chipGrid.style.display = "grid";
         }
       }
-      
+
       /**
        * 모든 스켈레톤 표시 (레거시 호환성 - resetChat에서 사용)
        * CTO 관점: 점진적 렌더링으로 변경되었으나 resetChat 호환성 유지
@@ -1578,7 +1597,7 @@
         // 점진적 렌더링: 칩 스켈레톤만 표시
         showChipSkeleton();
       }
-      
+
       /**
        * 모든 스켈레톤 제거 (레거시 호환성 - resetChat에서 사용)
        * CTO 관점: 점진적 렌더링으로 변경되었으나 resetChat 호환성 유지
@@ -1588,7 +1607,7 @@
         // 점진적 렌더링: 칩 스켈레톤만 제거
         hideChipSkeleton();
       }
-      
+
       /**
        * 모든 콘텐츠 표시 (레거시 호환성)
        * CTO 관점: 점진적 렌더링으로 변경되어 더 이상 필요 없음
@@ -1644,14 +1663,14 @@
       document.addEventListener("DOMContentLoaded", function () {
         // 전체 페이지 로딩 시퀀스 (스켈레톤 → 실제 콘텐츠)
         initPageLoad();
-        
+
         // 입력 모드 초기화
         initInputMode();
-        
+
         // 로고 클릭 이벤트 중앙화 (유지보수성 향상)
         const headerHomeTrigger = document.getElementById("headerHomeTrigger");
         if (headerHomeTrigger) {
-          headerHomeTrigger.addEventListener("click", function(e) {
+          headerHomeTrigger.addEventListener("click", function (e) {
             e.preventDefault();
             resetChat();
           });
@@ -2303,7 +2322,7 @@
             '<div class="post-chip-label">' +
             d.label +
             '</div><div class="post-chip-text">' +
-            d.shortText +
+            d.text /* shortText → text: 원문 표시 (홈 화면과 일관성) */ +
             "</div>";
           chip.addEventListener("click", () => fillInput(d.text));
           grid.appendChild(chip);
@@ -2317,17 +2336,14 @@
         document.getElementById("messages").innerHTML = "";
         document.getElementById("messages").style.display = "none";
         document.getElementById("emptyState").style.display = "flex";
-        
+
         // 홈 화면으로 돌아갈 때도 점진적 렌더링 적용
         // CTO 관점: 정적 콘텐츠는 이미 표시되어 있으므로 칩만 스켈레톤 처리
         showChipSkeleton();
-        transitionFromSkeleton(
-          LOADING_CONFIG.RESET_LOAD_TIME,
-          () => {
-            initScenarioChips();
-          }
-        );
-        
+        transitionFromSkeleton(LOADING_CONFIG.RESET_LOAD_TIME, () => {
+          initScenarioChips();
+        });
+
         document.getElementById("inputBox").value = "";
         document.getElementById("inputBox").style.height = "auto";
         document.getElementById("sendBtn").disabled = false;
