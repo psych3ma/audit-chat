@@ -32,7 +32,7 @@ flowchart LR
         B[HTML/Streamlit]
     end
     subgraph Back["백엔드 API"]
-        C[추출/캐시]
+        C[캐시 조회·추출]
         D[분석]
         E[보고서]
     end
@@ -44,11 +44,13 @@ flowchart LR
     B --> C
     C --> D
     D --> E
-    C -.-> F
+    C -.->|캐시 hit| G
+    C -.->|캐시 miss| F
     D -.-> F
-    E -.-> G
+    E -.->|저장| G
     E --> B
 ```
+*캐시 조회·추출: `get_trace_id` → Neo4j 조회 → 있으면 재사용, 없으면 LLM 추출 후 저장.*
 
 ---
 
@@ -68,8 +70,8 @@ flowchart TB
         API --> R4["/health"]
     end
     subgraph Services["처리 로직"]
-        Indep["독립성 검토<br/>추출→분석→보고서"]
-        Chat["일반 채팅"]
+        Indep["독립성 검토<br/>캐시 조회→추출→분석→보고서"]
+        Chat["채팅<br/>rel_map 캐시·context"]
         Law["법령 URL"]
     end
     subgraph External["외부"]
@@ -81,10 +83,12 @@ flowchart TB
     R1 --> Indep
     R2 --> Chat
     R3 --> Neo4j
+    Indep -->|캐시 조회·저장| Neo4j
     Indep --> OpenAI
     Indep --> Law
-    Indep --> Neo4j
+    Chat -->|캐시 조회·저장| Neo4j
 ```
+*캐시: `get_trace_id(scenario)`로 Neo4j에서 rel_map 조회; 있으면 추출 LLM 생략.*
 
 ---
 
