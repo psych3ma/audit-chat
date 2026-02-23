@@ -1347,6 +1347,13 @@
       const API_BASE_URL = window.API_BASE_URL ?? "";
       const USE_BACKEND_API = window.USE_BACKEND_API !== false;
 
+      /** API 실패 시 사용자 메시지 SSOT (유지보수: 문구 변경 시 여기만 수정) */
+      const API_CONNECTION_FAILED_MSG =
+        "검토 요청 연결에 실패했습니다. 예시 기준 결과를 표시합니다.";
+      /** 404 시 운영자/개발자 안내 (정적 전용 서버 접속 시 원인 파악용) */
+      const API_404_HINT =
+        "이 서버에는 검토 API가 없습니다. 전체 앱은 run.sh로 실행하세요.";
+
       /**
        * 프로그레스 UI SSOT (docs: DESIGN_PROGRESS_HANDOFF.md, WORKFLOW_3STEPS.md)
        * 단계 추가/문구 변경 시 여기만 수정. 전환 시점은 백엔드 단계별 API 응답 수신 시(하드코딩 없음).
@@ -2074,9 +2081,11 @@
           .catch(function (err) {
             var bubble = document.createElement("div");
             bubble.className = "assistant-bubble error";
+            var msg = err && err.message ? err.message : String(err);
+            var hint =
+              msg && msg.indexOf("404") !== -1 ? "\n" + API_404_HINT : "";
             bubble.textContent =
-              "검토 요청 연결에 실패했습니다. 예시 기준 결과를 표시합니다.\n" +
-              (err && err.message ? err.message : String(err));
+              API_CONNECTION_FAILED_MSG + "\n" + msg + hint;
             msgs.appendChild(bubble);
             renderFallbackReport(msgs, text);
             done();

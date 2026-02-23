@@ -1,74 +1,40 @@
 # 문서 인덱스 (Documentation Index)
 
----
-
-## 📋 문서 현황
-
-| 문서 | 설명 | 대상 |
-|------|------|------|
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | 시스템 아키텍처, Mermaid 다이어그램 | 개발자/CTO |
-| [CTO_REVIEW.md](./CTO_REVIEW.md) | CTO 관점 종합 리뷰 | CTO |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | 기여 가이드, Git 운영 | 개발자 |
-| [DESIGN_QA_회계법인제출용.md](./DESIGN_QA_회계법인제출용.md) | 디자인 QA (제출용) | 디자이너 |
+포트폴리오·협업용 공식 문서 위주 구성. 내부 검토 문서는 `archive/`에 보관.
 
 ---
 
-## 📁 기능 문서
+## 공식 문서
 
 | 문서 | 설명 |
 |------|------|
-| [GENAI_INDEPENDENCE_REVIEW.md](./GENAI_INDEPENDENCE_REVIEW.md) | 독립성 검토 기능 (GenAI) |
-| [AI_EXPERT_ARCHITECTURE_REVIEW.md](./AI_EXPERT_ARCHITECTURE_REVIEW.md) | AI 전문가 아키텍처 리뷰 |
-| [법령검색목록-URL-검토.md](./법령검색목록-URL-검토.md) | 법령 URL 생성 로직 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 시스템 아키텍처, 기술 스택, Mermaid 다이어그램 |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | 기여 가이드, Git·커밋 규칙 |
+| [WORKFLOW_STEP_CODE_MAPPING.md](./WORKFLOW_STEP_CODE_MAPPING.md) | 독립성 검토 단계별 API·코드 매핑 (코드 참조용) |
+| [WORKFLOW_3STEPS.md](./WORKFLOW_3STEPS.md) | 3단계 워크플로우 개요 |
+| [DESIGN_PROGRESS_HANDOFF.md](./DESIGN_PROGRESS_HANDOFF.md) | 프로그레스 UI·handoff 정의 |
+| [PORTFOLIO_CLEANUP.md](./PORTFOLIO_CLEANUP.md) | 포트폴리오용 정리 기준 (실행 불필요 파일·주석 리스트) |
 
 ---
 
-## 📁 기타
+## 기술 참고
 
-| 문서 | 설명 | 상태 |
-|------|------|------|
-| [UI_PROTOTYPE_REVIEW.md](./UI_PROTOTYPE_REVIEW.md) | UI 프로토타입 검토 | 참조용 |
-| [UX-copy-review-request.md](./UX-copy-review-request.md) | UX 카피 수정 요청 | 참조용 |
-
----
-
-## 📊 제출용 필수 문서
-
-회계법인 포트폴리오 제출 시:
-
-| 문서 | 이유 |
+| 문서 | 설명 |
 |------|------|
-| `README.md` (루트) | 프로젝트 개요 |
-| `docs/ARCHITECTURE.md` | 기술 아키텍처 |
-| `docs/DESIGN_QA_회계법인제출용.md` | 디자인 품질 |
+| [RELATIONSHIP_PROPERTIES_METADATA.md](./RELATIONSHIP_PROPERTIES_METADATA.md) | 관계·메타데이터 (Neo4j/독립성 검토) |
+| [STEP1_STEP2_STATUS.md](./STEP1_STEP2_STATUS.md) | Step1/Step2 구현 상태 |
+| [NEO4J_FALLBACK_EXPLANATION.md](./NEO4J_FALLBACK_EXPLANATION.md) | Neo4j 폴백 동작 |
+| [TEST_RESULTS_NEO4J_QUERY.md](./TEST_RESULTS_NEO4J_QUERY.md) | Neo4j 쿼리 테스트 결과 |
+| [NEO4J_USAGE_ANALYSIS.md](./NEO4J_USAGE_ANALYSIS.md) | Neo4j 사용 분석 |
+| [CHAT_CONTEXT_INTEGRATION.md](./CHAT_CONTEXT_INTEGRATION.md) | 채팅 컨텍스트 연동 |
+| [LAW_HTML_INTEGRATION_REVIEW.md](./LAW_HTML_INTEGRATION_REVIEW.md) | 법령 HTML 연동 |
+| [ERExtractionTemplate_VS_EntityRelationExtractor.md](./ERExtractionTemplate_VS_EntityRelationExtractor.md) | 추출 템플릿 비교 |
+| [TYPOGRAPHY_STANDARDIZATION.md](./TYPOGRAPHY_STANDARDIZATION.md) | 타이포그래피 표준 |
 
 ---
 
-## 🗂️ 최종 구조
+## archive/
 
-```
-docs/
-├── README.md                       # 이 인덱스
-├── ARCHITECTURE.md                 # 아키텍처 (필수)
-├── CTO_REVIEW.md                   # CTO 리뷰 (통합)
-├── CONTRIBUTING.md                 # 기여 가이드 (통합)
-├── DESIGN_QA_회계법인제출용.md      # 디자인 QA
-├── GENAI_INDEPENDENCE_REVIEW.md    # 독립성 검토 기능
-├── AI_EXPERT_ARCHITECTURE_REVIEW.md # AI 아키텍처 리뷰
-├── 법령검색목록-URL-검토.md         # 법령 URL 로직
-├── UI_PROTOTYPE_REVIEW.md          # UI 검토 (참조)
-└── UX-copy-review-request.md       # UX 카피 (참조)
-```
-
----
-
-## 🔄 정리 결과
-
-| 액션 | 대상 | 결과 |
-|------|------|------|
-| ✅ 삭제 | `LEGACY-internal-control.md` | 레거시 |
-| ✅ 삭제 | `CTO_UNUSED_FILES_REVIEW.md` | 일회성 |
-| ✅ 통합 | CTO 문서 4개 → `CTO_REVIEW.md` | 중복 제거 |
-| ✅ 통합 | Git 가이드 2개 → `CONTRIBUTING.md` | 중복 제거 |
-
-**15개 → 10개** (5개 정리)
+내부 검토·일회성 리뷰 문서(CTO_*, UX_*, DESIGN_*, GENAI_* 등)는 `docs/archive/`로 이동해 두었습니다.  
+코드 실행과 무관하며, 필요 시 참조용으로만 사용하면 됩니다.  
+목록·정리 기준은 [PORTFOLIO_CLEANUP.md](./PORTFOLIO_CLEANUP.md) 참고.
