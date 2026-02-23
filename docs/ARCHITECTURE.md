@@ -5,13 +5,23 @@
 
 ---
 
+## 0. 아키텍처 원칙 (CTO 요약)
+
+| 원칙 | 내용 |
+|------|------|
+| **역할 분리** | 화면(프론트) / API·비즈니스 로직(백엔드) / 관계 저장·캐시(Neo4j) 분리. 화면·로직 변경이 서로 영향을 최소화하도록 구성. |
+| **데이터 흐름** | 시나리오 → 추출(또는 Neo4j 캐시) → 분석(LLM) → 보고서(Mermaid·법령 URL·Neo4j 저장). 채팅은 동일 캐시 정책으로 rel_map을 context에 활용. |
+| **캐시 정책** | `get_trace_id(scenario)`로 동일 시나리오 판별. Neo4j에 rel_map이 있으면 추출 LLM 생략(채팅·독립성 공통). 분석은 매 요청마다 수행. |
+| **API 설계** | 독립성 검토는 단계별(/extract, /analyze, /report)로 진행률 노출·디버깅 용이. 일괄 호출(/review)도 동일 로직 사용. |
+| **설정·URL** | `.env`·`config` 일원화. 프론트 API 베이스는 `API_BASE_URL`/`API_PORT`로 주입(run.sh에서 설정). |
+
+---
+
 ## 1. 한눈에 보기
 
 - **사용자**가 시나리오를 입력하면 **화면(프론트)** 이 **백엔드 API**로 보냅니다.
-- **백엔드**는 **관계 추출 → 독립성 분석 → 보고서 생성** 순서로 진행하고, 그 과정에서 **LLM(OpenAI)** 과 **관계 DB(Neo4j)** 를 사용합니다.
+- **백엔드**는 **관계 추출**(동일 시나리오면 Neo4j 캐시 재사용) **→ 독립성 분석(LLM) → 보고서 생성** 순서로 진행하며, **LLM(OpenAI)** 과 **Neo4j(캐시·저장)** 를 사용합니다.
 - 결과는 **결론·관계도(Mermaid)·법령 링크**로 돌려주고, **화면**에서 카드 형태로 보여 줍니다.
-
-아래 다이어그램은 이 흐름을 블록 단위로 나타낸 것입니다.
 
 ```mermaid
 flowchart LR
@@ -22,7 +32,7 @@ flowchart LR
         B[HTML/Streamlit]
     end
     subgraph Back["백엔드 API"]
-        C[추출]
+        C[추출/캐시]
         D[분석]
         E[보고서]
     end
@@ -84,11 +94,11 @@ flowchart TB
 |------|-------------|------|
 | 준비 확인 | `GET /ready` | 서버 기동 대기용 (바로 200 반환) |
 | 헬스체크 | `GET /health` | 서버·Neo4j 연결 상태 |
-| 독립성 검토 (한 번에) | `POST /independence/review` | 시나리오 → 추출·분석·보고서 일괄 |
-| 독립성 검토 (단계별) | `POST /independence/extract` | 1단계: 관계 추출 |
+| 독립성 검토 (한 번에) | `POST /independence/review` | 시나리오 → 추출(캐시 우선)·분석·보고서 일괄 |
+| 독립성 검토 (단계별) | `POST /independence/extract` | 1단계: 관계 추출 (Neo4j 캐시 있으면 재사용) |
 | | `POST /independence/analyze` | 2단계: 독립성 분석 |
 | | `POST /independence/report` | 3단계: 보고서 생성(법령 URL, Mermaid, Neo4j 저장) |
-| 채팅 | `POST /chat/completions` | 일반 대화형 채팅 |
+| 채팅 | `POST /chat/completions` | 일반 대화형 채팅 (동일 시나리오면 Neo4j rel_map 재사용) |
 | 그래프 | `GET /graph/mermaid` | Neo4j 데이터를 Mermaid로 반환 |
 | 화면 | `GET /`, `GET /pwc` | 감사 독립성 UI로 리다이렉트 |
 
@@ -100,15 +110,16 @@ flowchart TB
 
 ```
 시나리오 입력
-    → POST /independence/extract   (관계 추출, GPT-4o-mini)
-    → POST /independence/analyze  (독립성 분석, GPT-4o)
-    → POST /independence/report   (법령 URL 보강, Mermaid 생성, Neo4j 저장)
+    → get_trace_id(scenario) → Neo4j 조회
+    → 캐시 있음: rel_map 재사용 / 없음: POST /independence/extract (관계 추출, GPT-4o-mini)
+    → POST /independence/analyze (독립성 분석, GPT-4o)
+    → POST /independence/report (법령 URL 보강, Mermaid 생성, Neo4j 저장)
     → 화면에 리포트 카드 표시 (관계도·결론·법령 링크)
 ```
 
-- **추출**: 시나리오에서 인물·회사·관계를 구조화해 뽑습니다.
+- **추출**: 시나리오에서 인물·회사·관계를 구조화해 뽑습니다. 동일 시나리오면 Neo4j에서 rel_map을 먼저 조회해 추출 LLM 생략.
 - **분석**: 그 구조를 바탕으로 수임 가능 여부·위험도·이슈를 판단합니다.
-- **보고서**: 분석 결과에 법령 링크를 붙이고, 관계도를 Mermaid로 만들며, 필요 시 Neo4j에 저장합니다.
+- **보고서**: 분석 결과에 법령 링크를 붙이고, 관계도를 Mermaid로 만들며, Neo4j에 저장합니다.
 
 ---
 
@@ -127,13 +138,20 @@ audit-chat/
 │       └── law_registry.py   # 법령 URL 생성 (CSV 기반)
 ├── frontend/             # Streamlit 앱 (app.py, pages/, api_client)
 ├── static/
-│   └── audit-chat-pwc.html   # 감사 독립성 UI (단일 페이지)
-├── docs/                 # 문서 (본 파일, WORKFLOW_* 등)
+│   └── audit-chat-pwc.html   # 감사 독립성 UI (단일 페이지, 백엔드가 서빙)
+├── docs/
+│   ├── ARCHITECTURE.md   # 본 문서 (유일하게 버전 관리)
+│   └── archive/          # 과거 검토·설계 문서 (git 제외)
 ├── run.sh                # 백엔드 + Streamlit 동시 실행
 ├── run_static_only.py    # Neo4j 없이 HTML만 서빙 (선택)
 ├── requirements.txt
 └── .env.example          # 환경 변수 예시 (.env는 미커밋)
 ```
+
+### 5.1 정적 파일 위치 (CTO 검토)
+
+- **현재**: 루트 `static/`. `backend/main.py`는 `Path(__file__).resolve().parent.parent / "static"`으로 참조.
+- **선택**: 배포 단위 일원화를 위해 `backend/static/`으로 이전 가능. 이전 시 `main.py`의 `STATIC_DIR`, `run_static_only.py`의 `STATIC_DIR`만 수정. URL(`/static/...`)은 동일 유지.
 
 ---
 
@@ -150,11 +168,29 @@ audit-chat/
 
 ---
 
-## 7. 확장·유지보수·협업 관점
+## 7. Neo4j ↔ LLM·캐시 정책
 
-- **확장성**: 새 기능은 라우터·서비스만 추가하면 되고, 화면·백엔드·DB를 역할별로 나눠 두어 부담을 분산할 수 있습니다.
-- **유지보수성**: 설정은 `.env`·`config`로 일원화하고, API·워크플로우는 `docs/WORKFLOW_STEP_CODE_MAPPING.md` 등에 맞춰 두었습니다.
+| 경로 | Neo4j를 LLM 입력으로 쓰는가? | 설명 |
+|------|------------------------------|------|
+| **`/chat/completions`** | ✅ 사용 | `get_trace_id(scenario)`로 Neo4j에서 rel_map 조회 → 있으면 context에 넣어 LLM 호출(추출 생략). 없으면 추출 후 저장·context 사용. |
+| **`/independence/*`** (extract / review) | ✅ 사용 | 동일: `get_trace_id(scenario)`로 Neo4j 조회 → 있으면 추출 LLM 생략 후 분석으로 진행. 없으면 추출 후 분석·보고서. report 단계에서 저장. |
+
+- **공통**: `get_trace_id(scenario)`로 캐시 키 통일. 채팅·독립성 검토 모두 "같은 시나리오면 추출 1회만" 정책으로 확장·유지보수·협업 시 일관됨.
+
+---
+
+## 8. 확장·유지보수·협업 관점
+
+- **확장성**: 새 기능은 라우터·서비스만 추가하면 되고, 화면·백엔드·DB를 역할별로 나눠 두어 부담을 분산할 수 있습니다. 캐시 키(`get_trace_id`)와 Neo4j 스키마를 공통으로 두어 채팅·독립성 검토가 같은 정책을 공유합니다.
+- **유지보수성**: 설정은 `.env`·`config`로 일원화하고, 비즈니스 로직은 `independence_service`에 집중되어 라우터는 얇게 유지됩니다.
 - **협업**: 프론트/백엔드/데이터를 팀 단위로 나눠 담당하기 쉽고, 단계별 API로 진행률·디버깅을 맞추기 좋습니다.
+
+---
+
+## 9. 문서 정책
+
+- **버전 관리**: `docs/`에서는 **본 문서(ARCHITECTURE.md)** 만 Git으로 관리합니다.
+- **archive**: `docs/archive/`는 **개인·내부 작업용** 보관함이며, 포트폴리오·공유용이 아닙니다. **.gitignore로 제외**되어 원격 저장소에 올라가지 않습니다.
 
 ---
 

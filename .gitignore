@@ -49,3 +49,6 @@ neo4j_data/
 tmp/
 temp/
 *.tmp
+
+# Docs archive (개인·내부 작업용, 포트폴리오 공유 제외)
+docs/archive/
