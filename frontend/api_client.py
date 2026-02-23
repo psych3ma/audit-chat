@@ -16,10 +16,11 @@ try:
 except Exception:
     pass
 
-_api_port = os.getenv("API_PORT", "8000")
-API_BASE = os.getenv("API_BASE_URL") or f"http://localhost:{_api_port}"
-TIMEOUT = 30.0
+# _api_port = os.getenv("API_PORT", "8000")
+# API_BASE = os.getenv("API_BASE_URL") or f"http://localhost:{_api_port}"
+# TIMEOUT = 30.0
 
+API_BASE = "https://https://audit-chat-6acd.onrender.com"
 
 def _url(path: str) -> str:
     return f"{API_BASE.rstrip('/')}{path}"
