@@ -7,7 +7,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from frontend.api_client import get_health
+from frontend.api_client import get_health, API_BASE
 from frontend.pages import chat, graph, independence
 
 
@@ -44,6 +44,9 @@ if page == "홈":
     - **그래프 (Mermaid)**: Neo4j 그래프를 Mermaid로 확인합니다.
     """)
     st.info("먼저 터미널에서 `./run.sh` 또는 백엔드(uvicorn)를 실행하세요.")
+    st.markdown("---")
+    st.markdown("**PwC 감사 독립성 UI** (단일 페이지)는 **백엔드**에서 제공됩니다. 포트 8502는 Streamlit 전용이라 `/static/audit-chat-pwc.html` 경로가 없습니다.")
+    st.markdown(f"[감사 독립성 UI 열기]({API_BASE}/)")
 elif page == "독립성 검토":
     independence.render()
 elif page == "채팅 (LLM)":

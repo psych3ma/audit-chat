@@ -8,7 +8,8 @@
 ## 이 앱으로 할 수 있는 것
 
 - 시나리오 텍스트 입력 → 관계 추출 → 독립성 분석 → **결론·관계도·법령 링크**가 담긴 리포트 확인
-- PwC 스타일 UI(`/` 또는 `/static/audit-chat-pwc.html`)에서 예시 시나리오로 바로 체험 가능
+- PwC 스타일 UI(`/` 또는 `/static/audit-chat-pwc.html`)에서 예시 시나리오로 바로 체험 가능  
+  (이 UI는 **백엔드(예: 8001)** 에서만 제공됩니다. Streamlit(8502)에서는 안 뜨므로, Streamlit 홈의 "감사 독립성 UI 열기" 링크나 `http://localhost:8001/` 로 접속하세요.)
 
 ---
 
@@ -29,6 +30,10 @@
    (Streamlit 프론트는 `http://localhost:8501` 등으로 안내됨)
 
 **Neo4j 없이 화면만 보고 싶을 때**: `python run_static_only.py` → 동일 포트로 HTML만 제공 (검토 API는 동작하지 않음).
+
+**"검토 요청 연결에 실패했습니다. Not Found"가 나올 때**: 지금 연 페이지가 **정적 전용 서버**라서 검토 API가 없음.  
+→ **해결 1**: `./run.sh` 실행 후 **http://localhost:8001** (또는 `.env`의 `API_PORT`) 로 접속.  
+→ **해결 2**: 백엔드를 8001에서 따로 띄운 뒤, 정적 서버로 연 경우 주소에 **`?api=http://localhost:8001`** 를 붙여서 다시 열기 (예: `http://localhost:9090?api=http://localhost:8001`).
 
 ---
 

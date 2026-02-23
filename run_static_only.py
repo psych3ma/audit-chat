@@ -18,9 +18,13 @@ if STATIC_DIR.is_dir():
 @app.get("/")
 def root():
     pwc = STATIC_DIR / "audit-chat-pwc.html"
-    if pwc.is_file():
-        return RedirectResponse(url="/static/audit-chat-pwc.html", status_code=302)
-    return {"message": "static/audit-chat-pwc.html not found"}
+    if not pwc.is_file():
+        return {"message": "static/audit-chat-pwc.html not found"}
+    url = "/static/audit-chat-pwc.html"
+    backend_url = __import__("os").environ.get("BACKEND_URL", "").strip().rstrip("/")
+    if backend_url:
+        url = url + "?api=" + backend_url
+    return RedirectResponse(url=url, status_code=302)
 
 @app.get("/ready")
 def ready():

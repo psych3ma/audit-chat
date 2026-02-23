@@ -1,11 +1,11 @@
 """Chat / LLM endpoints."""
-import hashlib
 from fastapi import APIRouter, HTTPException
 from backend.models.schemas import ChatMessage, ChatRequest
 from backend.services.llm_service import get_llm_response
 from backend.services.independence_service import (
     extract_relationships,
     get_independence_map_from_neo4j,
+    get_trace_id,
     save_independence_map_to_neo4j,
 )
 
@@ -34,8 +34,8 @@ async def chat_completion(request: ChatRequest):
         
         scenario_text = user_messages[-1].content.strip()
         
-        # 1. trace_id 생성
-        trace_id = hashlib.md5(scenario_text.encode()).hexdigest()[:8].upper()
+        # 1. trace_id 생성 (채팅·독립성 검토 공통 키)
+        trace_id = get_trace_id(scenario_text)
         
         # 2. Neo4j 조회 시도 (중복 추출 방지)
         rel_map = get_independence_map_from_neo4j(trace_id)

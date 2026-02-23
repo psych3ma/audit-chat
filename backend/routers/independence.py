@@ -12,6 +12,8 @@ from backend.services.independence_service import (
     extract_relationships,
     analyze_independence,
     build_independence_report,
+    get_independence_map_from_neo4j,
+    get_trace_id,
     run_independence_review,
 )
 
@@ -46,9 +48,13 @@ async def post_independence_review(body: IndependenceReviewRequest):
 
 @router.post("/extract")
 async def post_extract(body: IndependenceReviewRequest):
-    """1단계: 관계 추출. 프로그레스 1→2 전환은 이 응답 수신 시점에 수행."""
+    """1단계: 관계 추출. Neo4j 캐시 있으면 재사용, 없으면 LLM 추출. 프로그레스 1→2 전환은 이 응답 수신 시점에 수행."""
     try:
-        rel_map = await extract_relationships(body.scenario.strip())
+        scenario_stripped = body.scenario.strip()
+        trace_id = get_trace_id(scenario_stripped)
+        rel_map = get_independence_map_from_neo4j(trace_id)
+        if rel_map is None:
+            rel_map = await extract_relationships(scenario_stripped)
         return {"rel_map": rel_map.model_dump()}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=_normalize_error_detail(e))

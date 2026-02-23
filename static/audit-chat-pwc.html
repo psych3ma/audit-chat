@@ -1341,9 +1341,14 @@
       /**
        * CTO 검토 — 설정 및 운영 (Colab Independence Review 흐름 적용)
        * - API_BASE_URL: 백엔드 주소. 빈 문자열이면 현재 페이지와 동일 오리진 사용 (권장).
-       * - USE_BACKEND_API: true 시 단계별 POST /independence/extract → /analyze → /report 호출 (실제 진행률에 맞춰 프로그레스 전환).
+       * - URL에 ?api=http://localhost:8001 있으면 해당 주소로 API 호출 (정적 전용 서버에서 전체 백엔드 연결용).
+       * - USE_BACKEND_API: true 시 단계별 POST /independence/extract → /analyze → /report 호출.
        * - 실패 시 로컬 시나리오(내부통제 폴백) 표시.
        */
+      (function () {
+        var p = new URLSearchParams(window.location.search);
+        if (p.has("api")) window.API_BASE_URL = p.get("api").replace(/\/$/, "");
+      })();
       const API_BASE_URL = window.API_BASE_URL ?? "";
       const USE_BACKEND_API = window.USE_BACKEND_API !== false;
 
@@ -1352,7 +1357,7 @@
         "검토 요청 연결에 실패했습니다. 예시 기준 결과를 표시합니다.";
       /** 404 시 운영자/개발자 안내 (정적 전용 서버 접속 시 원인 파악용) */
       const API_404_HINT =
-        "이 서버에는 검토 API가 없습니다. 전체 앱은 run.sh로 실행하세요.";
+        "이 서버에는 검토 API가 없습니다. 해결: run.sh로 전체 실행 후 http://localhost:8001 로 열기. 또는 백엔드가 8001에서 떠 있으면 주소에 ?api=http://localhost:8001 를 붙여 열기.";
 
       /**
        * 프로그레스 UI SSOT (docs: DESIGN_PROGRESS_HANDOFF.md, WORKFLOW_3STEPS.md)

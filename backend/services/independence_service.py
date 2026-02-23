@@ -14,6 +14,11 @@ from backend.utils.law_registry import get_law_url, is_valid_law
 logger = logging.getLogger(__name__)
 
 
+def get_trace_id(scenario: str) -> str:
+    """시나리오 텍스트의 MD5 해시 8자리. Neo4j 캐시 키·trace_id로 사용 (채팅·독립성 검토 공통)."""
+    return hashlib.md5(scenario.encode()).hexdigest()[:8].upper()
+
+
 def _enrich_legal_ref_urls(analysis: AnalysisResult) -> AnalysisResult:
     """legal_references에 url이 없으면 법령 레지스트리(CSV 기반)로 URL 보강.
     CSV에 없는 항목(자율규정, 윤리기준 등)은 텍스트만 표시 (URL 없음)."""
@@ -274,7 +279,7 @@ def build_independence_report(
     save_to_neo4j: bool = True,
 ) -> dict:
     """3단계: 법령 URL 보강, Mermaid 생성, Neo4j 저장. (실제 진행률 연동용 — docs/WORKFLOW_STEP_CODE_MAPPING.md)"""
-    trace_id = hashlib.md5(scenario.encode()).hexdigest()[:8].upper()
+    trace_id = get_trace_id(scenario)
     analysis = _enrich_legal_ref_urls(analysis)
     mermaid_code = build_mermaid_graph(rel_map, analysis.vulnerable_connections)
     if save_to_neo4j:
@@ -291,7 +296,11 @@ def build_independence_report(
 
 
 async def run_independence_review(scenario: str, save_to_neo4j: bool = True) -> dict:
-    """추출 → 분석 → Mermaid 생성 (취약 관계 하이라이트). 선택 시 Neo4j 저장."""
-    rel_map = await extract_relationships(scenario)
-    analysis = await analyze_independence(scenario, rel_map)
-    return build_independence_report(scenario, rel_map, analysis, save_to_neo4j=save_to_neo4j)
+    """추출(Neo4j 캐시 있으면 재사용) → 분석 → Mermaid 생성. 선택 시 Neo4j 저장."""
+    scenario_stripped = scenario.strip()
+    trace_id = get_trace_id(scenario_stripped)
+    rel_map = get_independence_map_from_neo4j(trace_id)
+    if rel_map is None:
+        rel_map = await extract_relationships(scenario_stripped)
+    analysis = await analyze_independence(scenario_stripped, rel_map)
+    return build_independence_report(scenario_stripped, rel_map, analysis, save_to_neo4j=save_to_neo4j)
