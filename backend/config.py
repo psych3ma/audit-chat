@@ -16,18 +16,18 @@ class Settings(BaseSettings):
     api_port: int = 8000
     api_reload: bool = True
 
-    # Streamlit (for CORS / URL building)
+    # Streamlit
     streamlit_port: int = 8501
     streamlit_host: str = "0.0.0.0"
 
-    # CORS: 허용할 프론트엔드 오리진 (쉼표 구분). 비우면 로컬만 허용
+    # CORS: 허용 오리진 (쉼표 구분)
     cors_origins: str = "http://localhost:8501,http://127.0.0.1:8501"
 
     # LLM
     openai_api_key: str = ""
     llm_model: str = "gpt-4-turbo-preview"
     llm_temperature: float = 0.7
-    # 독립성 검토 전용 (Colab ModelConfig와 동일)
+    # 독립성 검토용 모델
     independence_extraction_model: str = "gpt-4o-mini"
     independence_analysis_model: str = "gpt-4o"
     independence_temperature_structured: float = 0.0
@@ -37,9 +37,9 @@ class Settings(BaseSettings):
     debug: bool = False
     log_level: str = "INFO"
 
-    # 법령 URL: 공식 목록 CSV 경로. 비우면 프로젝트 루트 법령검색목록.csv 사용
+    # 법령 CSV 경로 (비우면 루트 기본)
     law_csv_path: str = ""
-    # 국가법령정보센터 API: OC=본인ID 형식 키. API 호출 시 파라미터로 사용 (예: lawSearch.do?OC=...)
+    # 국가법령정보센터 API 키 (OC 파라미터)
     law_go_kr_oc: str = ""
 
     class Config:

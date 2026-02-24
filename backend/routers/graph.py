@@ -15,10 +15,7 @@ def _mermaid_safe_id(label: str) -> str:
 
 @router.get("/mermaid", response_model=MermaidResponse)
 def get_graph_as_mermaid():
-    """
-    Neo4j 그래프를 Mermaid 형식으로 반환.
-    실제 스키마에 맞게 Cypher 및 Mermaid 변환 로직 확장 필요.
-    """
+    """Neo4j 그래프를 Mermaid 형식으로 반환."""
     try:
         with get_neo4j_session() as session:
             result = session.run(

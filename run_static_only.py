@@ -1,8 +1,4 @@
-"""
-Neo4j 없이 정적 파일만 서빙 (neo4j import 시 segfault 등 환경 이슈 회피).
-웹앱 UI만 확인할 때 사용: python run_static_only.py
-API(/independence/*, /chat/* 등)는 이 서버에서는 동작하지 않습니다.
-"""
+"""Neo4j 없이 정적 파일만 서빙. UI 확인용. API는 미동작."""
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse

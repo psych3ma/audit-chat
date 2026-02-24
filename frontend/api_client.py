@@ -1,14 +1,11 @@
-"""
-FastAPI 백엔드 호출용 클라이언트.
-환경 변수 또는 .env 기반으로 API URL 사용.
-"""
+"""API 서버 호출 클라이언트. .env 기반 URL."""
 import os
 from pathlib import Path
 from typing import Any
 
 import httpx
 
-# 프로젝트 루트 .env 로드 (Streamlit 단독 실행 시에도 포트 일치)
+# .env 로드
 try:
     from dotenv import load_dotenv
     _root = Path(__file__).resolve().parent.parent

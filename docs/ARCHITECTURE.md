@@ -157,6 +157,16 @@ audit-chat/
 - **현재**: 루트 `static/`. `backend/main.py`는 `Path(__file__).resolve().parent.parent / "static"`으로 참조.
 - **선택**: 배포 단위 일원화를 위해 `backend/static/`으로 이전 가능. 이전 시 `main.py`의 `STATIC_DIR`, `run_static_only.py`의 `STATIC_DIR`만 수정. URL(`/static/...`)은 동일 유지.
 
+### 5.2 모듈 구성 (비개발자용)
+
+| 모듈 | 하는 일 |
+|------|---------|
+| **backend** | 사용자 입력을 받아, 관계 추출·독립성 분석·보고서를 만드는 **서버**입니다. API·DB·분석 로직이 들어 있습니다. |
+| **frontend** | 사용자가 보는 **Streamlit 화면**(홈, 독립성 검토, 채팅, 그래프)과, 백엔드 호출용 **api_client**입니다. |
+| **static** | 브라우저에서 바로 여는 **감사 독립성 UI** 한 페이지(HTML). 백엔드가 제공합니다. |
+| **run.sh** | 백엔드와 Streamlit을 **한 번에 실행**할 때 사용합니다. |
+| **run_static_only.py** | Neo4j 없이 **HTML 화면만** 띄울 때 사용합니다. 검토 API는 동작하지 않습니다. |
+
 ---
 
 ## 6. 기술 스택
@@ -195,6 +205,7 @@ audit-chat/
 
 - **버전 관리**: `docs/`에서는 **본 문서(ARCHITECTURE.md)** 만 Git으로 관리합니다.
 - **archive**: `docs/archive/`는 **개인·내부 작업용** 보관함이며, 포트폴리오·공유용이 아닙니다. **.gitignore로 제외**되어 원격 저장소에 올라가지 않습니다.
+- **서비스 콘텐츠**: 감사 시나리오 텍스트, LLM 시스템 메시지·프롬프트 등 **서비스 내용**에는 '전문가', 'Senior Partner' 등 직급·역할 표현을 그대로 둡니다. (주석이 아닌 서비스 정의이므로.)
 
 ---
 

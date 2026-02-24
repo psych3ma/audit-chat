@@ -1,4 +1,4 @@
-"""독립성 검토 API (감사 수임 독립성). 단계별 엔드포인트로 실제 진행률 연동 (docs/WORKFLOW_STEP_CODE_MAPPING.md)."""
+"""독립성 검토 API (감사 수임 독립성). 단계별 엔드포인트(extract → analyze → report)로 진행률 연동."""
 from fastapi import APIRouter, HTTPException
 
 from backend.models.independence import (
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/independence", tags=["independence"])
 
 
 def _normalize_error_detail(e: Exception) -> str:
-    """사용자에게 보여줄 에러 메시지 정리 (API 키/OpenAI/파싱 구분)."""
+    """에러 메시지 정리 (API 키·파싱 등 구분)."""
     msg = str(e).strip()
     if not msg:
         return "서버 오류가 발생했습니다."
@@ -36,7 +36,7 @@ def _normalize_error_detail(e: Exception) -> str:
 
 @router.post("/review")
 async def post_independence_review(body: IndependenceReviewRequest):
-    """감사 시나리오 입력 → 관계 추출(GPT-4o-mini) → 독립성 분석(GPT-4o) → Mermaid + Neo4j 저장. (일괄 호출용)"""
+    """시나리오 → 추출 → 분석 → Mermaid·Neo4j 저장 (일괄)."""
     try:
         result = await run_independence_review(body.scenario.strip(), save_to_neo4j=True)
         return result
@@ -48,7 +48,7 @@ async def post_independence_review(body: IndependenceReviewRequest):
 
 @router.post("/extract")
 async def post_extract(body: IndependenceReviewRequest):
-    """1단계: 관계 추출. Neo4j 캐시 있으면 재사용, 없으면 LLM 추출. 프로그레스 1→2 전환은 이 응답 수신 시점에 수행."""
+    """1단계: 관계 추출 (캐시 우선)."""
     try:
         scenario_stripped = body.scenario.strip()
         trace_id = get_trace_id(scenario_stripped)
@@ -64,7 +64,7 @@ async def post_extract(body: IndependenceReviewRequest):
 
 @router.post("/analyze")
 async def post_analyze(body: AnalyzeStepRequest):
-    """2단계: 독립성 분석. 프로그레스 2→3 전환은 이 응답 수신 시점에 수행."""
+    """2단계: 독립성 분석."""
     try:
         rel_map = IndependenceMap.model_validate(body.rel_map)
         analysis = await analyze_independence(body.scenario.strip(), rel_map)
@@ -77,7 +77,7 @@ async def post_analyze(body: AnalyzeStepRequest):
 
 @router.post("/report")
 async def post_report(body: ReportStepRequest):
-    """3단계: 보고서 생성(법령 URL 보강, Mermaid, Neo4j). 완료 시 프론트에서 카드 렌더."""
+    """3단계: 보고서 생성 (법령 URL, Mermaid, Neo4j)."""
     try:
         rel_map = IndependenceMap.model_validate(body.rel_map)
         analysis = AnalysisResult.model_validate(body.analysis)

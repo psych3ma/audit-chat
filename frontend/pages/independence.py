@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 from frontend.api_client import post_independence_review
 from frontend.components.mermaid_chart import render_mermaid
 
-# 시나리오 6선 (감사 독립성 — PwC 정적 UI audit-chat-pwc.html 칩과 동일)
+# 예시 시나리오 6선
 SCENARIOS = [
     "B회계법인 소속 이유명 공인회계사는 회계법인 퇴직 후 10개월 뒤에 B회계법인의 감사대상회사인 서울㈜의 재무담당임원으로 취임하였다. 이유명 공인회계사는 B회계법인 재직 당시 서울㈜의 재무제표 감사업무에 관여하지 않았다.",
     "공인회계사 자격증 소지자인 이대한씨는 경기㈜에서 경리과장으로 근무하던 중 20x8년 11월에 B회계법인 소속 공인회계사로 입사하였다. 20x9년 1월에 B회계법인과 경기㈜는 재무제표 감사계약을 체결하였다.",
@@ -25,7 +25,7 @@ SCENARIO_LABELS = [
     "채용 참여 후 해당 연도 외부감사",
 ]
 
-# Colab과 동일한 상태별 색상
+# 상태별 색상
 STATUS_COLORS = {
     "수임 불가": "#d32f2f",
     "안전장치 적용 시 수임 가능": "#ed6c02",

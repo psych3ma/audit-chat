@@ -1,6 +1,4 @@
-"""독립성 검토 엔진: 관계 추출, 독립성 분석, Mermaid 생성, Neo4j 저장.
-
-Colab과 동일한 2단계(관계 추출 → 독립성 분석). 구조적 출력은 llm_structured 공통 레이어 사용."""
+"""독립성 검토: 관계 추출, 독립성 분석, Mermaid 생성, Neo4j 저장. 구조적 출력은 llm_structured 사용."""
 import hashlib
 import logging
 import re
@@ -15,25 +13,24 @@ logger = logging.getLogger(__name__)
 
 
 def get_trace_id(scenario: str) -> str:
-    """시나리오 텍스트의 MD5 해시 8자리. Neo4j 캐시 키·trace_id로 사용 (채팅·독립성 검토 공통)."""
+    """시나리오 MD5 해시 8자리. Neo4j 캐시 키(trace_id)."""
     return hashlib.md5(scenario.encode()).hexdigest()[:8].upper()
 
 
 def _enrich_legal_ref_urls(analysis: AnalysisResult) -> AnalysisResult:
-    """legal_references에 url이 없으면 법령 레지스트리(CSV 기반)로 URL 보강.
-    CSV에 없는 항목(자율규정, 윤리기준 등)은 텍스트만 표시 (URL 없음)."""
+    """legal_references에 url 없으면 CSV 레지스트리로 URL 보강. CSV에 없으면 텍스트만 표시."""
     if not analysis.legal_references:
         return analysis
     enriched = []
     no_url_items = []
     for ref in analysis.legal_references:
         name = ref.name.strip()
-        # CSV 레지스트리에 있는 법령만 URL 생성
+        # CSV에 있는 법령만 URL 생성
         if is_valid_law(name):
             url = ref.url or get_law_url(name)
             enriched.append(LegalRefItem(name=name, url=url))
         else:
-            # 자율규정/윤리기준 등은 텍스트만 표시 (URL 없음)
+            # CSV에 없으면 URL 없음
             no_url_items.append(name)
             enriched.append(LegalRefItem(name=name, url=None))
     if no_url_items:
@@ -41,7 +38,7 @@ def _enrich_legal_ref_urls(analysis: AnalysisResult) -> AnalysisResult:
     return analysis.model_copy(update={"legal_references": enriched})
 
 
-# 프롬프트 (Colab 기반 + 보고서 품질·언어 일관성 보강)
+# 프롬프트
 class _PromptTemplates:
     EXTRACTION_SYSTEM = """You are an expert at extracting structured relationships from Korean audit scenarios.
 Output only valid JSON with this exact structure (no markdown, no explanation):
@@ -112,15 +109,8 @@ def build_mermaid_graph(
     rel_map: IndependenceMap,
     vulnerable_connections: list[VulnerableConnection] | None = None
 ) -> str:
-    """Mermaid flowchart 생성 (엔티티 유형별 스타일 + 취약 관계 하이라이트).
-    
-    Args:
-        rel_map: 추출된 엔티티/관계 맵
-        vulnerable_connections: 독립성 위협 관계 목록 (빨간색으로 표시)
-    """
-    lines = ["graph TD"]  # Top-Down: 관계 계층 표현에 적합
-    
-    # 취약 관계 집합 생성 (빠른 조회용)
+    """Mermaid flowchart. 취약 관계는 점선·[!] 라벨로 표시."""
+    lines = ["graph TD"]
     vulnerable_set = set()
     vulnerable_entities = set()
     if vulnerable_connections:
@@ -129,29 +119,27 @@ def build_mermaid_graph(
             vulnerable_entities.add(vc.source_id)
             vulnerable_entities.add(vc.target_id)
     
-    # 노드 모양 매핑 (엔티티 유형별)
     shape_map = {
-        "회계법인": ("[[", "]]"),     # 서브루틴 (이중 세로선)
+        "회계법인": ("[[", "]]"),
         "감사인": ("[[", "]]"),
-        "공인회계사": ("([", "])"),   # 스타디움 (둥근 양끝)
+        "공인회계사": ("([", "])"),
         "인물": ("([", "])"),
-        "회사": ("[", "]"),           # 사각형 (기본)
+        "회사": ("[", "]"),
         "피감사회사": ("[", "]"),
         "감사대상회사": ("[", "]"),
-        "배우자": ("((", "))"),       # 원형
+        "배우자": ("((", "))"),
         "가족": ("((", "))"),
         "직계가족": ("((", "))"),
-        "임원": ("(", ")"),           # 둥근 사각형
+        "임원": ("(", ")"),
         "이사": ("(", ")"),
         "대표이사": ("(", ")"),
         "재무이사": ("(", ")"),
     }
     
-    # classDef: 참고 코드와 동일 (노드 정의 전에 선언)
     lines.append("    classDef normalNode fill:#fff,stroke:#333,stroke-width:1px")
     lines.append("    classDef riskyNode fill:#fff5f5,stroke:#c62828,stroke-width:2px,stroke-dasharray:5 5")
     
-    # 노드 정의 (취약 노드는 riskyNode 클래스로 표시)
+    # 노드 정의
     for entity in rel_map.entities:
         clean_name = re.sub(r"[^가-힣a-zA-Z0-9\s]", "", entity.name)
         label = entity.label or ""
@@ -160,13 +148,13 @@ def build_mermaid_graph(
         node_class = "riskyNode" if entity.id in vulnerable_entities else "normalNode"
         lines.append(f'    {entity.id}{open_s}"{node_text}"{close_s}:::{node_class}')
     
-    # 엣지 정의 (참고: 라벨은 반드시 큰따옴표로 감싸야 파서 오류 방지)
+    # 엣지 정의
     for conn in rel_map.connections:
         raw_rel = (conn.rel_type or "관계").strip()[:20]
         rel = raw_rel.replace('"', "'").replace("\n", " ")
         is_vulnerable = (conn.source_id, conn.target_id) in vulnerable_set
         if is_vulnerable:
-            # 취약 관계: 점선 + "[!] 관계명" (참고 Colab과 동일 패턴)
+            # 취약 관계: 점선 + [!] 라벨
             lines.append(f'    {conn.source_id} -. "[!] {rel}" .-> {conn.target_id}')
         else:
             lines.append(f'    {conn.source_id} ---|"{rel}"| {conn.target_id}')
@@ -175,20 +163,12 @@ def build_mermaid_graph(
 
 
 def get_independence_map_from_neo4j(trace_id: str) -> IndependenceMap | None:
-    """Neo4j에서 trace_id 기반 엔티티-관계 조회. 없으면 None 반환.
-    
-    Args:
-        trace_id: 시나리오 텍스트의 MD5 해시 (8자리)
-        
-    Returns:
-        IndependenceMap 객체 또는 None (데이터 없음)
-    """
+    """trace_id로 Neo4j에서 엔티티-관계 조회. 없으면 None."""
     from backend.database import get_neo4j_session
     from backend.models.independence import AuditEntity, Relationship
 
     try:
         with get_neo4j_session() as session:
-            # 엔티티 조회
             entity_result = session.run(
                 """
                 MATCH (n:IndependenceEntity {trace_id: $trace_id})
@@ -200,11 +180,9 @@ def get_independence_map_from_neo4j(trace_id: str) -> IndependenceMap | None:
             
             entities_data = [record.data() for record in entity_result]
             
-            # 엔티티가 없으면 None 반환
             if not entities_data:
                 return None
             
-            # 엔티티 객체 생성
             entities = [
                 AuditEntity(
                     id=record["id"],
@@ -214,7 +192,6 @@ def get_independence_map_from_neo4j(trace_id: str) -> IndependenceMap | None:
                 for record in entities_data
             ]
             
-            # 관계 조회
             relation_result = session.run(
                 """
                 MATCH (a:IndependenceEntity {trace_id: $trace_id})-[r:RELATION]->(b:IndependenceEntity {trace_id: $trace_id})
@@ -226,7 +203,6 @@ def get_independence_map_from_neo4j(trace_id: str) -> IndependenceMap | None:
             
             connections_data = [record.data() for record in relation_result]
             
-            # 관계 객체 생성
             connections = [
                 Relationship(
                     source_id=record["source_id"],
@@ -239,12 +215,11 @@ def get_independence_map_from_neo4j(trace_id: str) -> IndependenceMap | None:
             return IndependenceMap(entities=entities, connections=connections)
             
     except Exception:
-        # Neo4j 미연결 또는 기타 에러 시 None 반환 (폴백)
         return None
 
 
 def save_independence_map_to_neo4j(trace_id: str, rel_map: IndependenceMap) -> None:
-    """독립성 검토 결과(엔티티·관계)를 Neo4j에 저장. 실행(trace_id)별로 서브그래프 분리."""
+    """엔티티·관계를 Neo4j에 저장 (trace_id별)."""
     from backend.database import get_neo4j_session
 
     with get_neo4j_session() as session:
@@ -278,7 +253,7 @@ def build_independence_report(
     analysis: AnalysisResult,
     save_to_neo4j: bool = True,
 ) -> dict:
-    """3단계: 법령 URL 보강, Mermaid 생성, Neo4j 저장. (실제 진행률 연동용 — docs/WORKFLOW_STEP_CODE_MAPPING.md)"""
+    """3단계: 법령 URL 보강, Mermaid 생성, Neo4j 저장."""
     trace_id = get_trace_id(scenario)
     analysis = _enrich_legal_ref_urls(analysis)
     mermaid_code = build_mermaid_graph(rel_map, analysis.vulnerable_connections)
@@ -286,7 +261,7 @@ def build_independence_report(
         try:
             save_independence_map_to_neo4j(trace_id, rel_map)
         except Exception:
-            pass  # Neo4j 미연결 시 무시
+            pass
     return {
         "trace_id": trace_id,
         "rel_map": rel_map.model_dump(),
@@ -296,7 +271,7 @@ def build_independence_report(
 
 
 async def run_independence_review(scenario: str, save_to_neo4j: bool = True) -> dict:
-    """추출(Neo4j 캐시 있으면 재사용) → 분석 → Mermaid 생성. 선택 시 Neo4j 저장."""
+    """캐시 조회 → 추출(필요 시) → 분석 → Mermaid·Neo4j 저장."""
     scenario_stripped = scenario.strip()
     trace_id = get_trace_id(scenario_stripped)
     rel_map = get_independence_map_from_neo4j(trace_id)

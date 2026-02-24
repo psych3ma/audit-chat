@@ -74,6 +74,6 @@
 ## 개발·운영 참고
 
 - **설정**: 비밀값·DB 주소는 `.env`에만 두고, 저장소에는 올리지 않음 (`.gitignore`). 새 환경은 `.env.example`을 복사해 사용.
-- **문서**: `docs/README.md`(인덱스), `docs/ARCHITECTURE.md`, `docs/CONTRIBUTING.md`, `docs/PORTFOLIO_CLEANUP.md`.
+- **문서**: `docs/ARCHITECTURE.md` (시스템 구성·API·모듈 설명).
 - **Git 푸시 전**: `git status`로 `.env`·`venv/`가 포함되지 않았는지 확인. API 키·DB 비밀번호가 코드·README에 없어야 함.
 - **커밋 메시지**: Cursor 사용 시 `Co-authored-by` 제거가 필요하면 `scripts/git-hooks/commit-msg`를 `.git/hooks/`에 복사해 사용.

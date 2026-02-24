@@ -7,10 +7,7 @@ def get_llm_response(
     messages: list[dict[str, Any]],
     stream: bool = False,
 ) -> str:
-    """
-    OpenAI API를 사용해 채팅 완성.
-    OPENAI_API_KEY가 없으면 플레이스홀더 응답 반환.
-    """
+    """OpenAI 채팅 완성. API 키 없으면 플레이스홀더 반환."""
     settings = get_settings()
     if not settings.openai_api_key:
         return (

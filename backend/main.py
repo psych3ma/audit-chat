@@ -35,7 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 준비 완료 체크 (Neo4j 없이 즉시 200, run.sh 대기용)
+# 준비 완료: run.sh 대기용
 @app.get("/ready")
 def ready():
     return {"status": "ok"}
@@ -45,7 +45,7 @@ app.include_router(chat.router)
 app.include_router(graph.router)
 app.include_router(independence.router)
 
-# Static files (삼일PwC 내부통제 AI 검토 UI)
+# 정적 파일: 감사 독립성 UI
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 if STATIC_DIR.is_dir():
     from fastapi.staticfiles import StaticFiles
@@ -54,7 +54,7 @@ if STATIC_DIR.is_dir():
 
 @app.get("/")
 def root():
-    """Redirect to 내부통제 AI 검토 UI. internal-control.html(레거시) 없으면 audit-chat-pwc.html 사용."""
+    """감사 독립성 UI로 리다이렉트. internal-control.html 없으면 audit-chat-pwc.html."""
     internal_control = STATIC_DIR / "internal-control.html"
     pwc_html = STATIC_DIR / "audit-chat-pwc.html"
     if internal_control.is_file():
@@ -70,7 +70,7 @@ def root():
 
 @app.get("/pwc")
 def pwc_ui():
-    """PwC 내부통제 UI (audit-chat-pwc.html) — /chat/completions 백엔드 연동."""
+    """감사 독립성 UI (audit-chat-pwc.html) — /chat/completions API 연동."""
     pwc_html = STATIC_DIR / "audit-chat-pwc.html"
     if pwc_html.is_file():
         return RedirectResponse(url="/static/audit-chat-pwc.html", status_code=302)

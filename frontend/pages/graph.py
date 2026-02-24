@@ -20,4 +20,4 @@ def render():
             st.caption(desc)
         render_mermaid(code, height=500)
     except Exception as e:
-        st.error(f"그래프를 불러올 수 없습니다. 백엔드/Neo4j를 확인하세요. {e}")
+        st.error(f"그래프를 불러올 수 없습니다. 서버·Neo4j를 확인하세요. {e}")

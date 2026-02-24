@@ -30,7 +30,7 @@ class Neo4jDriver:
 
 @contextmanager
 def get_neo4j_session() -> Generator:
-    """Context manager for Neo4j session. Use in API routes or services."""
+    """Neo4j 세션 컨텍스트 매니저."""
     driver = Neo4jDriver.get_driver()
     session = driver.session()
     try:
@@ -40,7 +40,7 @@ def get_neo4j_session() -> Generator:
 
 
 def verify_connection() -> bool:
-    """Verify Neo4j connectivity. Useful for health checks."""
+    """Neo4j 연결 확인."""
     try:
         with get_neo4j_session() as session:
             session.run("RETURN 1")
