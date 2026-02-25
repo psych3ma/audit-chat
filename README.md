@@ -169,5 +169,5 @@ API_PORT=8001
 ---
 
 <div align="center">
-  <sub>데이터 출처: CPA2차 회계감사 · Made with Cursor AI</sub>
+  <sub>데이터 출처: CPA2차 회계감사 기출 · Made with Cursor AI</sub>
 </div>
