@@ -169,5 +169,5 @@ API_PORT=8001
 ---
 
 <div align="center">
-  <sub>Made with ☕ and FastAPI · Neo4j · OpenAI</sub>
+  <sub>데이터 출처: CPA2차 회계감사 · Made with Cursor AI</sub>
 </div>
