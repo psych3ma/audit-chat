@@ -11,7 +11,7 @@
 
 ## 🎬 데모
 
-[![데모 영상](docs/image/audit-chat_thumbnail.png)](https://bit.ly/_psych3ma_audit-chat)
+[![데모 영상](docs/image/audit-chat_thumbnail.png)](https://drive.google.com/drive/folders/1JgG3vykhsO898z7PuJpC2QAV8D4tTeKy)
 > 이미지 클릭 시 데모 영상으로 이동합니다.
 
 ---
