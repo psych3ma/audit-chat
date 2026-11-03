@@ -25,8 +25,9 @@ const ok = (cond, msg) => {
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const MERMAID = 'flowchart LR\n  A["㈜대한"] --> B["B회계법인"]';
 const REPORT = {
-  trace_id: "T1", mermaid_code: "",
+  trace_id: "T1", mermaid_code: MERMAID,
   analysis: {
     status: "안전장치 적용 시 수임 가능", risk_level: "Medium",
     considerations: "<img src=x onerror=alert(1)>결론",
@@ -42,7 +43,6 @@ async function boot({ html = sourceHtml, url, mode = {}, brandFetch = true }) {
     url, runScripts: "dangerously", pretendToBeVisual: true,
     beforeParse(w) {
       w.HTMLElement.prototype.scrollIntoView = () => {};
-      w.print = () => w.dispatchEvent(new w.Event("afterprint"));
       w.fetch = async (u, opt) => {
         const p = String(u);
         if (mode.cloneError && opt && opt.signal) { const e = new Error("AbortSignal object could not be cloned."); e.name = "DataCloneError"; throw e; }
@@ -100,8 +100,18 @@ async function boot({ html = sourceHtml, url, mode = {}, brandFetch = true }) {
   ok(d.body.classList.contains("has-conversation"), "대화 중 입력창 안내 숨김 클래스");
   ok(d.querySelectorAll(".post-chips .chip").length === 6, "하단 시나리오 칩");
   ok(!d.body.textContent.includes("여신") && !d.body.textContent.includes("통제 미흡"), "은행 폴백 문구 없음");
-  card.querySelector(".report-actions .btn").click(); await sleep(20);
-  ok(!d.body.classList.contains("print-mode"), "인쇄 후 print-mode 정리");
+  ok(!d.querySelector(".report-actions") && !/인쇄|PDF/.test(card.textContent), "인쇄/PDF UI 없음");
+  ok(card.dataset.mermaidCode === MERMAID, "mermaid 원문 dataset 보관");
+  const codeBtn = card.querySelector(".viz-code-btn");
+  ok(!!codeBtn && codeBtn.textContent === "코드 보기", "코드 보기 버튼");
+  codeBtn.click(); await sleep(20);
+  const panel = card.querySelector(".viz-source-panel");
+  ok(panel && !panel.hidden && panel.querySelector(".viz-source").textContent === MERMAID, "코드 패널에 원문 표시");
+  let copied = "";
+  w.navigator.clipboard = { writeText: async (t) => { copied = t; } };
+  card.querySelector(".viz-copy-btn").click(); await sleep(30);
+  ok(copied === MERMAID, "복사 버튼이 원문 clipboard 기록");
+  ok(card.querySelector(".viz-copy-btn").textContent === "복사됨", "복사 성공 피드백");
   d.getElementById("resetBtn").click();
   ok(d.getElementById("messages").hidden && !d.getElementById("emptyState").hidden, "초기화 → 홈");
   ok(!d.body.classList.contains("has-conversation"), "초기화 → 입력창 안내 복원");

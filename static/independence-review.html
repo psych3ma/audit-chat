@@ -611,22 +611,57 @@
       .details-text .section-title:not(:first-child) {
         margin-top: var(--space-5);
       }
+      .viz-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        margin-bottom: var(--space-3);
+      }
+      .viz-head .section-title {
+        margin-bottom: 0;
+      }
       .viz-wrap {
         min-height: 220px;
         display: flex;
         align-items: center;
+        justify-content: flex-start;
         overflow-x: auto;
       }
-      /* justify-content:center 는 넘칠 때 왼쪽이 잘려 스크롤 불가 → auto margin 으로 가로·세로 가운데 */
-      .viz-wrap > * {
-        margin: auto;
+      .viz-wrap.is-centered {
+        justify-content: center;
+      }
+      .viz-frame {
+        flex: 0 0 auto;
       }
       .viz-wrap svg {
         height: auto;
+        display: block;
       }
-      .viz-wrap pre.mermaid {
+      .viz-source-panel {
+        margin-bottom: var(--space-3);
+        padding: var(--space-3);
+        background: var(--color-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+      }
+      .viz-source-panel[hidden] {
+        display: none !important;
+      }
+      .viz-source-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: var(--space-2);
+      }
+      .viz-source {
         margin: 0;
-        flex: 0 0 auto; /* 좁은 화면에서 축소(글자 판독 불가) 대신 가로 스크롤 */
+        max-height: 220px;
+        overflow: auto;
+        font-size: var(--fs-caption);
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+        color: var(--color-text);
       }
       .viz-message {
         padding: var(--space-5);
@@ -675,15 +710,11 @@
         display: none;
       }
       .report-footer {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
         margin-top: var(--space-5);
         padding-top: var(--space-3);
         border-top: 1px solid var(--color-border);
       }
       .report-disclaimer {
-        flex: 1;
         font-size: var(--fs-caption);
         color: var(--color-text-muted);
       }
@@ -894,33 +925,6 @@
         }
       }
 
-      /* ── Print: 선택한 결과 카드만 출력 ──────────────── */
-      @media print {
-        body.print-mode {
-          display: block;
-          height: auto;
-        }
-        body.print-mode .header,
-        body.print-mode .input-area,
-        body.print-mode .skip-link,
-        body.print-mode .empty-state,
-        body.print-mode .report-actions,
-        body.print-mode .messages > :not(.is-printing) {
-          display: none !important;
-        }
-        body.print-mode .chat-area {
-          overflow: visible;
-        }
-        body.print-mode .report {
-          box-shadow: none;
-          animation: none;
-        }
-        body.print-mode .report-header,
-        body.print-mode .report-accent {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-      }
     </style>
   </head>
 
@@ -3050,6 +3054,9 @@ Expecting `+Ze.join(", ")+", got '"+(this.terminals_[Ne]||Ne)+"'":Dt="Parse erro
           },
         };
 
+        /** 임시 QA: Mermaid 원문 보기/복사. 확인 후 false 또는 관련 블록 삭제. */
+        const FEATURE_MERMAID_SOURCE = true;
+
         /** 진행 단계: 각 단계 API 응답 수신 시점에 전환된다(타이머 없음). */
         const STEPS = [
           { name: "관계 추출", desc: "시나리오에서 인물·회사·관계 구조를 추출하고 있습니다." },
@@ -3721,11 +3728,22 @@ Expecting `+Ze.join(", ")+", got '"+(this.terminals_[Ne]||Ne)+"'":Dt="Parse erro
           );
           const meta = [traceId ? `검토 ID: ${traceId}` : "", `검토 일시: ${when}`].filter(Boolean).join(" · ");
 
-          const printBtn = h("button", {
-            type: "button",
-            class: "btn",
-            text: "인쇄 / PDF 저장",
-          });
+          const viewCodeBtn = FEATURE_MERMAID_SOURCE
+            ? h("button", { type: "button", class: "btn viz-code-btn", "aria-expanded": "false", text: "코드 보기" })
+            : null;
+          const copyBtn = FEATURE_MERMAID_SOURCE
+            ? h("button", { type: "button", class: "btn viz-copy-btn", text: "복사" })
+            : null;
+          const sourcePre = FEATURE_MERMAID_SOURCE ? h("pre", { class: "viz-source" }) : null;
+          const sourcePanel = FEATURE_MERMAID_SOURCE
+            ? h(
+                "div",
+                { class: "viz-source-panel", hidden: true },
+                h("div", { class: "viz-source-actions" }, copyBtn),
+                sourcePre,
+              )
+            : null;
+
           const card = h(
             "section",
             { class: "report", "data-status": tone, "aria-label": "독립성 검토 결과" },
@@ -3757,7 +3775,13 @@ Expecting `+Ze.join(", ")+", got '"+(this.terminals_[Ne]||Ne)+"'":Dt="Parse erro
                 h(
                   "div",
                   { class: "details-viz" },
-                  h("h3", { class: "section-title", text: "이해관계 구조" }),
+                  h(
+                    "div",
+                    { class: "viz-head" },
+                    h("h3", { class: "section-title", text: "이해관계 구조" }),
+                    viewCodeBtn,
+                  ),
+                  sourcePanel,
                   h("div", { class: "viz-wrap" }, h("div", { class: "viz-skeleton skeleton", "aria-hidden": "true" })),
                 ),
                 h(
@@ -3774,19 +3798,38 @@ Expecting `+Ze.join(", ")+", got '"+(this.terminals_[Ne]||Ne)+"'":Dt="Parse erro
                 "div",
                 { class: "report-footer" },
                 h("p", { class: "report-disclaimer", text: state.brand.copy.disclaimer }),
-                h("div", { class: "report-actions" }, printBtn),
               ),
             ),
           );
           card.dataset.verdict = status + risk;
-          printBtn.addEventListener("click", () => printReport(card));
+
+          if (FEATURE_MERMAID_SOURCE && viewCodeBtn && sourcePanel && sourcePre && copyBtn) {
+            viewCodeBtn.addEventListener("click", () => {
+              const open = sourcePanel.hidden;
+              sourcePanel.hidden = !open;
+              viewCodeBtn.setAttribute("aria-expanded", open ? "true" : "false");
+              viewCodeBtn.textContent = open ? "코드 숨기기" : "코드 보기";
+              sourcePre.textContent = card.dataset.mermaidCode || "";
+            });
+            copyBtn.addEventListener("click", () => copyMermaidSource(card.dataset.mermaidCode || "", copyBtn));
+          }
           return card;
+        }
+
+        function layoutViz(wrap, frame) {
+          if (!wrap || !frame) return;
+          if (frame.offsetWidth <= wrap.clientWidth) wrap.classList.add("is-centered");
+          else wrap.classList.remove("is-centered");
         }
 
         async function renderDiagram(card, code) {
           const wrap = card.querySelector(".viz-wrap");
           if (!wrap) return;
-          const message = (text) => wrap.replaceChildren(h("div", { class: "viz-message", text }));
+          card.dataset.mermaidCode = typeof code === "string" ? code : "";
+          const message = (text) => {
+            wrap.classList.remove("is-centered");
+            wrap.replaceChildren(h("div", { class: "viz-message", text }));
+          };
           if (!code || typeof code !== "string") return message("표시할 관계도가 없습니다.");
           if (!window.mermaid) return message("관계도 라이브러리를 불러오지 못했습니다.");
           try {
@@ -3804,21 +3847,50 @@ Expecting `+Ze.join(", ")+", got '"+(this.terminals_[Ne]||Ne)+"'":Dt="Parse erro
               svg.style.maxWidth = "none";
               svg.style.width = natural + "px";
             }
+            const frame = h("div", { class: "viz-frame" });
+            frame.appendChild(svg);
+            wrap.replaceChildren(frame);
+            layoutViz(wrap, frame);
+            if (typeof ResizeObserver !== "undefined") {
+              if (wrap._vizRo) wrap._vizRo.disconnect();
+              wrap._vizRo = new ResizeObserver(() => layoutViz(wrap, frame));
+              wrap._vizRo.observe(wrap);
+            }
           } catch (err) {
             console.error("[independence-review] 관계도 렌더 실패", err);
             message("관계도를 표시하지 못했습니다.");
           }
         }
 
-        function printReport(card) {
-          const cleanup = () => {
-            card.classList.remove("is-printing");
-            document.body.classList.remove("print-mode");
+        async function copyMermaidSource(text, btn) {
+          const done = () => {
+            btn.textContent = "복사됨";
+            setTimeout(() => {
+              btn.textContent = "복사";
+            }, 1500);
           };
-          card.classList.add("is-printing");
-          document.body.classList.add("print-mode");
-          window.addEventListener("afterprint", cleanup, { once: true });
-          window.print();
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(text);
+              done();
+              return;
+            }
+          } catch (_) {
+            /* fall through */
+          }
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            document.execCommand("copy");
+            done();
+          } finally {
+            ta.remove();
+          }
         }
 
         function buildPostChips() {
@@ -3841,7 +3913,7 @@ Expecting `+Ze.join(", ")+", got '"+(this.terminals_[Ne]||Ne)+"'":Dt="Parse erro
           if (state.abort) state.abort.abort();
           state.abort = null;
           state.loading = false;
-          document.body.classList.remove("print-mode", "has-conversation");
+          document.body.classList.remove("has-conversation");
           els.messages.replaceChildren();
           els.messages.hidden = true;
           els.emptyState.hidden = false;

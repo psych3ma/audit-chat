@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-tests/browser-qa.py — 실제 Chrome 으로 하는 QA (레이아웃·콘솔·Mermaid·인쇄·키보드)
+tests/browser-qa.py — 실제 Chrome 으로 하는 QA (레이아웃·콘솔·Mermaid·키보드)
 
 준비:  pip install playwright   (브라우저 다운로드는 불필요: 설치된 Chrome 사용)
 실행:  python3 tests/browser-qa.py [스크린샷_출력_폴더]
@@ -108,7 +108,7 @@ def main():
                 check(not errs, f"[{name}] 콘솔 오류 없음 {errs[:2]}")
                 ctx.close()
 
-            # 2) 키보드 · 중복 전송 · 인쇄
+            # 2) 키보드 · 중복 전송 · Mermaid 코드 보기
             ctx = br.new_context(viewport={"width": 1280, "height": 800}); hits = []
             ctx.on("request", lambda r: hits.append(r.url) if "/independence/" in r.url else None); routes(ctx)
             pg = ctx.new_page(); pg.goto(f"http://localhost:{PORT}/core.html"); pg.wait_for_selector("#chipGrid .chip")
@@ -126,12 +126,11 @@ def main():
             pg.click("#sendBtn"); pg.click("#sendBtn", force=True)
             pg.wait_for_selector(".report"); pg.wait_for_timeout(500)
             check(len([h for h in hits if h.endswith("/extract")]) == 1, "더블 클릭해도 요청 1회")
-            pg.evaluate("document.querySelector('.report-actions .btn').click = null")
-            pg.evaluate("() => { const c=document.querySelector('.report'); c.classList.add('is-printing'); document.body.classList.add('print-mode'); }")
-            pdf = f"{OUT}/print.pdf"; pg.pdf(path=pdf, print_background=True)
-            if shutil.which("pdftotext"):
-                txt = subprocess.run(["pdftotext", pdf, "-"], capture_output=True, text=True).stdout
-                check("검토 결론" in txt and "감사 독립성 검토 AI" not in txt.split("검토 결론")[0], "인쇄: 결과 카드만 출력(헤더·입력창 제외)")
+            check(pg.locator(".report-actions").count() == 0, "인쇄/PDF UI 없음")
+            pg.click(".viz-code-btn")
+            check(pg.is_visible(".viz-source-panel"), "코드 보기 패널 표시")
+            src = pg.inner_text(".viz-source")
+            check("flowchart" in src and "㈜대한그룹" in src, "코드 패널에 Mermaid 원문")
             ctx.close()
 
             # 3) 초기화 경합 (실제 브라우저)
