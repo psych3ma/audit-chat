@@ -49,6 +49,14 @@ neo4j_data/
 tmp/
 temp/
 *.tmp
+source/
+
+# Node (web/ frontend tooling)
+node_modules/
+web/node_modules/
+
+# Front-end build outputs (web/dist, internal/*/dist)
+# root pattern already covers **/dist/ via "dist/"
 
 # Docs archive (개인·내부 작업용, 포트폴리오 공유 제외)
 docs/archive/

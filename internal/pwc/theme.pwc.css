@@ -1,0 +1,51 @@
+/* ==========================================================================
+   theme.pwc.css — 삼일PwC 전용 토큰 오버라이드
+   --------------------------------------------------------------------------
+   - brand.pwc.json 의 "theme": "theme.pwc.css" 로 로드되며, theme.css 뒤에 적용된다.
+   - 토큰만 덮어쓴다. 레이아웃·컴포넌트 규칙은 절대 넣지 않는다.
+   - 이 파일은 PwC 내부 배포용입니다. 일반 제출 패키지에는 포함하지 마세요.
+   ========================================================================== */
+
+:root {
+  --color-brand: #ad1b02;
+  --color-brand-hover: #8f1601;
+  --color-on-brand: #ffffff;
+  --color-accent: #9a3412; /* 텍스트용 (흰색 대비 7.3:1) */
+  --color-focus: #ad1b02;
+  --focus-ring: rgba(173, 27, 2, 0.2);
+
+  --color-bg: #fafaf8;
+  --color-surface: #ffffff;
+  --color-subtle: #f4f1ed;
+  --color-border: #e8e4df;
+  --color-border-control: #8a817a;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6b6560;
+  --color-bubble-user-bg: #000000;
+  --color-bubble-user-text: #ffffff;
+
+  --header-rule: 3px solid var(--color-brand);
+  /* 장식용(텍스트 아님)이므로 대비 요건 대상 아님 */
+  --accent-bar: linear-gradient(
+    to right,
+    #ad1b02,
+    #d85604,
+    #e88d14,
+    #f3be26
+  );
+
+  /* 기존 PwC 화면의 상태 표기 유지 (대비 개선: 주황 → 4.5:1 이상) */
+  --status-danger: #ad1b02;
+  --status-warn: #b54708;
+  --status-ok: #1a5c38;
+  --status-danger-soft: #fff4f1;
+
+  --skeleton-base: #f4f1ed;
+  --skeleton-highlight: #e8e4df;
+
+  --accent-bar-height: 4px;
+
+  --shadow-header: 0 1px 8px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 4px 16px rgba(173, 27, 2, 0.08);
+}

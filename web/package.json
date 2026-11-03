@@ -1,0 +1,18 @@
+{
+  "name": "independence-review",
+  "version": "1.0.0",
+  "private": true,
+  "description": "감사 독립성 검토 AI 프론트엔드 (일반 제출용). PwC 브랜드는 ../internal/pwc 에서만 빌드.",
+  "scripts": {
+    "build": "node build.mjs --out ../static/independence-review.html && node build.mjs --out dist/independence-review.html",
+    "build:general": "npm run build",
+    "build:pwc": "node build.mjs --brand pwc --brand-dir ../internal/pwc --out ../internal/pwc/dist/independence-review.pwc.html",
+    "build:all": "npm run build && npm run build:pwc",
+    "test": "node tests/smoke.cjs",
+    "test:contrast": "python3 tests/contrast.py",
+    "qa:browser": "python3 tests/browser-qa.py"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.3"
+  }
+}

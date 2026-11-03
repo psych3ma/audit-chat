@@ -1,0 +1,1796 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>감사 독립성 검토 AI</title>
+
+    <!--
+      1) 디자인 토큰 (기본: Graphite sky). 브랜드 오버라이드는 brand.json 의 "theme" 로 추가 로드.
+      단일 파일 빌드(build.mjs)는 이 태그를 <style> 로 치환한다. (아래 마커 문자열 변경 금지)
+    -->
+    <link rel="stylesheet" href="theme.css" />
+
+    <!--
+      2) core 레이아웃·컴포넌트
+      규칙: 색상/폰트/간격 리터럴 금지 — theme.css 의 var(--token) 만 사용한다.
+    -->
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: var(--font-sans);
+        font-size: var(--fs-body);
+        line-height: var(--lh-base);
+        /* 한글은 단어(어절) 단위로 줄바꿈, 긴 문자열만 강제 분리 */
+        word-break: keep-all;
+        overflow-wrap: break-word;
+      }
+      button,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      :focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 2px;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        z-index: 100;
+        padding: var(--space-2) var(--space-3);
+        background: var(--color-surface);
+        border-radius: var(--radius-md);
+      }
+      .skip-link:focus {
+        left: var(--space-3);
+        top: var(--space-3);
+      }
+
+      /* ── Buttons ─────────────────────────────────────── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-3);
+        background: transparent;
+        border: 1.5px solid var(--color-border-control);
+        border-radius: var(--radius-md);
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        color: var(--color-text-muted);
+        transition:
+          border-color 0.15s,
+          color 0.15s,
+          background 0.15s;
+      }
+      .btn:hover {
+        border-color: var(--color-brand);
+        color: var(--color-brand);
+        background: var(--color-subtle);
+      }
+      .btn-solid {
+        background: var(--color-brand);
+        border-color: var(--color-brand);
+        color: var(--color-on-brand);
+      }
+      .btn-solid:hover {
+        background: var(--color-brand-hover);
+        border-color: var(--color-brand-hover);
+        color: var(--color-on-brand);
+      }
+
+      /* ── Header ──────────────────────────────────────── */
+      .header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        min-height: var(--header-height);
+        padding: 0 var(--space-6);
+        background: var(--header-bg);
+        border-bottom: var(--header-rule);
+        box-shadow: var(--shadow-header);
+        flex-shrink: 0;
+      }
+      .home-trigger {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-1) var(--space-2);
+        border: 0;
+        background: transparent;
+        border-radius: var(--radius-sm);
+        text-align: left;
+        min-width: 0;
+      }
+      .brand-slot {
+        display: inline-flex;
+        align-items: center;
+      }
+      .brand-logo {
+        display: block;
+        height: 28px;
+        width: auto;
+      }
+      .brand-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        padding: 0 6px;
+        border-radius: var(--radius-sm);
+        background: var(--color-brand);
+        color: var(--color-on-brand);
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+      .header-divider {
+        width: 1px;
+        height: 18px;
+        background: var(--color-border-control);
+      }
+      body[data-state="loading"] .header-divider {
+        visibility: hidden;
+      }
+      .service-name {
+        font-size: var(--fs-lead);
+        font-weight: 500;
+      }
+      .powered-by {
+        margin-left: var(--space-2);
+        font-size: var(--fs-sm);
+        font-weight: 400;
+        color: var(--color-text-muted);
+      }
+      .header-actions {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+      .badge {
+        padding: var(--space-1) var(--space-3);
+        border: 1px solid var(--color-border-control);
+        border-radius: var(--radius-pill);
+        font-size: var(--fs-sm);
+        color: var(--color-text-muted);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      /* ── Chat area / Empty state ─────────────────────── */
+      .chat-area {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      .empty-state {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: var(--space-8) var(--space-5);
+        text-align: center;
+      }
+      .eyebrow {
+        margin-bottom: var(--space-3);
+        font-size: var(--fs-body);
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        color: var(--color-accent);
+      }
+      .empty-title {
+        margin-bottom: var(--space-2);
+        font-size: var(--fs-title);
+        font-weight: 700;
+        line-height: 1.25;
+        letter-spacing: -0.5px;
+      }
+      .empty-sub {
+        margin-bottom: var(--space-7);
+        font-size: var(--fs-lead);
+        line-height: 1.7;
+        color: var(--color-text-muted);
+      }
+
+      /* ── Chips (홈·결과 하단 공용) ───────────────────── */
+      .chip-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-3);
+        width: 100%;
+        max-width: var(--content-max);
+      }
+      .chip {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        min-height: var(--chip-min-height);
+        padding: var(--space-4) var(--space-5);
+        background: var(--color-surface);
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        text-align: left;
+        transition:
+          border-color 0.15s,
+          transform 0.15s,
+          box-shadow 0.15s;
+      }
+      .chip::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+        background: var(--color-brand);
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .chip:hover,
+      .chip.is-selected {
+        border-color: var(--color-brand);
+        box-shadow: var(--shadow-hover);
+      }
+      .chip:hover {
+        transform: translateY(-1px);
+      }
+      .chip:hover::before,
+      .chip.is-selected::before {
+        opacity: 1;
+      }
+      .chip > * {
+        display: block;
+      }
+      .chip-label {
+        margin-bottom: var(--space-1);
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        color: var(--color-accent);
+      }
+      .chip-text {
+        font-size: var(--fs-sm);
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .chip-source {
+        margin-top: auto;
+        padding-top: var(--space-2);
+        font-size: var(--fs-caption);
+        color: var(--color-text-muted);
+      }
+      .chip--compact {
+        min-height: 0;
+        padding: var(--space-3);
+        border-radius: var(--radius-md);
+      }
+
+      /* ── Skeleton ────────────────────────────────────── */
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          var(--skeleton-base) 0%,
+          var(--skeleton-highlight) 50%,
+          var(--skeleton-base) 100%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s ease-in-out infinite;
+      }
+      .chip-skeleton {
+        min-height: var(--chip-min-height);
+        border-radius: var(--radius-lg);
+      }
+      .viz-skeleton {
+        width: 100%;
+        height: 180px;
+        border-radius: var(--radius-md);
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* ── Messages ────────────────────────────────────── */
+      .messages {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-5);
+        width: 100%;
+        max-width: var(--content-max);
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-6) var(--space-5);
+      }
+      .bubble-user {
+        align-self: flex-end;
+        max-width: 62%;
+        padding: var(--space-3) var(--space-4);
+        background: var(--color-bubble-user-bg);
+        color: var(--color-bubble-user-text);
+        border-radius: 16px 16px 3px 16px;
+        font-size: var(--fs-body);
+        line-height: var(--lh-relaxed);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .notice {
+        align-self: flex-start;
+        max-width: 85%;
+        padding: var(--space-4) var(--space-5);
+        background: var(--status-danger-soft);
+        border: 1.5px solid var(--status-danger);
+        border-radius: 16px 16px 16px 3px;
+        color: var(--status-danger);
+      }
+      .notice-title {
+        font-weight: 700;
+        margin-bottom: var(--space-1);
+      }
+      .notice-body {
+        margin-bottom: var(--space-3);
+        line-height: var(--lh-relaxed);
+      }
+
+      /* ── Progress ────────────────────────────────────── */
+      .progress {
+        align-self: flex-start;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-5);
+        background: var(--color-surface);
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--radius-lg);
+      }
+      .progress-dots {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-border);
+      }
+      .dot.is-done {
+        background: var(--color-text-muted);
+      }
+      .dot.is-active {
+        background: var(--color-accent);
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.4);
+        }
+      }
+      .progress-step {
+        font-weight: 700;
+        color: var(--color-text-muted);
+      }
+      .progress-desc {
+        color: var(--color-text-muted);
+      }
+
+      /* ── Report ──────────────────────────────────────── */
+      .report {
+        --status-bg: var(--status-neutral);
+        --status-on: var(--on-status-neutral);
+        align-self: stretch;
+        scroll-margin-top: var(--space-5);
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+        animation: fade-in 0.4s ease-out;
+      }
+      .report[data-status="danger"] {
+        --status-bg: var(--status-danger);
+        --status-on: var(--on-status-danger);
+      }
+      .report[data-status="warn"] {
+        --status-bg: var(--status-warn);
+        --status-on: var(--on-status-warn);
+      }
+      .report[data-status="ok"] {
+        --status-bg: var(--status-ok);
+        --status-on: var(--on-status-ok);
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .report-header {
+        padding: var(--space-4) var(--space-5);
+        background: var(--status-bg);
+        color: var(--status-on);
+      }
+      .report-verdict {
+        font-size: var(--fs-lead);
+        font-weight: 700;
+      }
+      .report-meta {
+        margin-top: var(--space-1);
+        font-size: var(--fs-caption);
+      }
+      .report-accent {
+        height: var(--accent-bar-height);
+        background: var(--accent-bar);
+      }
+      .report-body {
+        padding: var(--space-5);
+      }
+      .section-title {
+        margin-bottom: var(--space-2);
+        font-size: var(--fs-body);
+        font-weight: 700;
+      }
+      .opinion {
+        margin-bottom: var(--space-4);
+        padding: var(--space-3);
+        background: var(--color-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        line-height: var(--lh-relaxed);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .details {
+        display: flex;
+        gap: var(--space-5);
+      }
+      .details-viz {
+        flex: 0 0 50%;
+        max-width: 500px;
+        min-width: 0;
+        padding-right: var(--space-5);
+        border-right: 1px solid var(--color-border);
+      }
+      .details-text {
+        flex: 1;
+        min-width: 0;
+      }
+      .details-text .section-title:not(:first-child) {
+        margin-top: var(--space-5);
+      }
+      .viz-wrap {
+        min-height: 220px;
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
+      }
+      /* justify-content:center 는 넘칠 때 왼쪽이 잘려 스크롤 불가 → auto margin 으로 가로·세로 가운데 */
+      .viz-wrap > * {
+        margin: auto;
+      }
+      .viz-wrap svg {
+        height: auto;
+      }
+      .viz-wrap pre.mermaid {
+        margin: 0;
+        flex: 0 0 auto; /* 좁은 화면에서 축소(글자 판독 불가) 대신 가로 스크롤 */
+      }
+      .viz-message {
+        padding: var(--space-5);
+        text-align: center;
+        font-size: var(--fs-sm);
+        color: var(--color-text-muted);
+      }
+      .report ul {
+        margin: 0;
+        padding-left: var(--space-4);
+      }
+      .report li + li {
+        margin-top: var(--space-1);
+      }
+      .law-box {
+        line-height: var(--lh-relaxed);
+        color: var(--color-text-muted);
+        overflow-wrap: anywhere;
+      }
+      .law-link {
+        color: var(--color-accent);
+        font-weight: 500;
+        text-decoration: none;
+      }
+      .law-link:hover {
+        text-decoration: underline;
+      }
+      .legal {
+        margin-top: var(--space-5);
+      }
+      .risk {
+        white-space: nowrap;
+      }
+      .dev-notice {
+        max-width: var(--content-max);
+        margin: 0 0 var(--space-5);
+        padding: var(--space-3) var(--space-4);
+        background: var(--status-warn-soft);
+        border: 1px solid var(--status-warn);
+        border-radius: var(--radius-md);
+        color: var(--status-warn);
+        font-size: var(--fs-sm);
+        text-align: left;
+      }
+      body.has-conversation .input-hint {
+        display: none;
+      }
+      .report-footer {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        margin-top: var(--space-5);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--color-border);
+      }
+      .report-disclaimer {
+        flex: 1;
+        font-size: var(--fs-caption);
+        color: var(--color-text-muted);
+      }
+
+      /* ── Post chips ──────────────────────────────────── */
+      .post-chips-label {
+        margin-bottom: var(--space-3);
+        color: var(--color-text-muted);
+      }
+
+      /* ── Input area ──────────────────────────────────── */
+      .input-area {
+        flex-shrink: 0;
+        padding: var(--space-3) var(--space-6)
+          calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+        background: var(--color-bg);
+        border-top: 1.5px solid var(--color-border);
+      }
+      .input-inner {
+        max-width: var(--content-max);
+        margin: 0 auto;
+      }
+      .mode-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-2);
+        margin-bottom: 6px;
+        font-size: var(--fs-sm);
+      }
+      .mode-label {
+        padding: var(--space-1) var(--space-2);
+        background: none;
+        border: 0;
+        border-radius: var(--radius-sm);
+        color: var(--color-text-muted);
+      }
+      .mode-label[aria-pressed="true"] {
+        color: var(--color-brand);
+        font-weight: 700;
+      }
+      .switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        padding: 0;
+        border: 0;
+        border-radius: 12px;
+        background: var(--color-border-control);
+        transition: background 0.2s;
+      }
+      .switch::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--color-surface);
+        transition: transform 0.2s;
+      }
+      .switch[aria-checked="true"] {
+        background: var(--color-brand);
+      }
+      .switch[aria-checked="true"]::after {
+        transform: translateX(20px);
+      }
+      .input-wrap {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        background: var(--color-surface);
+        border: 1.5px solid var(--color-border-control);
+        border-radius: var(--radius-lg);
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .input-wrap:focus-within {
+        border-color: var(--color-focus);
+        box-shadow: 0 0 0 3px var(--focus-ring);
+      }
+      .input-wrap textarea {
+        flex: 1;
+        min-width: 0;
+        max-height: 120px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        outline: none;
+        resize: none;
+        line-height: var(--lh-relaxed);
+      }
+      .input-wrap textarea::placeholder {
+        color: var(--color-text-muted);
+      }
+      .input-wrap textarea[readonly] {
+        cursor: default;
+      }
+      .send-btn {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        background: var(--color-brand);
+        color: var(--color-on-brand);
+        border: 0;
+        border-radius: var(--radius-md);
+        transition: background 0.15s;
+      }
+      .send-btn:hover:not(:disabled) {
+        background: var(--color-brand-hover);
+      }
+      .send-btn:disabled {
+        background: var(--color-border);
+        color: var(--color-text-muted);
+        cursor: not-allowed;
+      }
+      .send-btn svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
+      .input-hint {
+        margin-top: var(--space-2);
+        font-size: var(--fs-caption);
+        color: var(--color-text-muted);
+        text-align: center;
+      }
+
+      /* ── Responsive ──────────────────────────────────── */
+      @media (max-width: 900px) {
+        .chip-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 640px) {
+        .header {
+          padding: 0 var(--space-4);
+        }
+        .header-divider,
+        .powered-by {
+          display: none;
+        }
+        .service-name {
+          font-size: var(--fs-body);
+        }
+        .empty-state {
+          padding: var(--space-6) var(--space-4);
+        }
+        .empty-title {
+          font-size: var(--fs-lead);
+        }
+        .empty-sub {
+          margin-bottom: var(--space-5);
+          font-size: var(--fs-body);
+        }
+        .chip-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .chip {
+          min-height: 0;
+        }
+        .messages {
+          padding: var(--space-4);
+        }
+        .bubble-user,
+        .notice {
+          max-width: 92%;
+        }
+        .details {
+          flex-direction: column;
+        }
+        .details-viz {
+          flex: none;
+          max-width: none;
+          padding-right: 0;
+          padding-bottom: var(--space-4);
+          border-right: 0;
+          border-bottom: 1px solid var(--color-border);
+        }
+        .report-body {
+          padding: var(--space-4);
+        }
+        .report-footer {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .input-area {
+          padding-left: var(--space-4);
+          padding-right: var(--space-4);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        .skeleton {
+          background: var(--skeleton-base);
+        }
+      }
+
+      /* ── Print: 선택한 결과 카드만 출력 ──────────────── */
+      @media print {
+        body.print-mode {
+          display: block;
+          height: auto;
+        }
+        body.print-mode .header,
+        body.print-mode .input-area,
+        body.print-mode .skip-link,
+        body.print-mode .empty-state,
+        body.print-mode .report-actions,
+        body.print-mode .messages > :not(.is-printing) {
+          display: none !important;
+        }
+        body.print-mode .chat-area {
+          overflow: visible;
+        }
+        body.print-mode .report {
+          box-shadow: none;
+          animation: none;
+        }
+        body.print-mode .report-header,
+        body.print-mode .report-accent {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+
+  <body data-state="loading">
+    <a class="skip-link" href="#inputBox">입력창으로 이동</a>
+
+    <header class="header">
+      <button type="button" class="home-trigger" id="homeTrigger">
+        <span class="brand-slot" id="brandSlot"></span>
+        <span class="header-divider" aria-hidden="true"></span>
+        <span class="service">
+          <span class="service-name" id="serviceName"></span>
+          <span class="powered-by" id="poweredBy" hidden></span>
+        </span>
+      </button>
+      <div class="header-actions">
+        <span class="badge" id="badge" hidden></span>
+        <button type="button" class="btn" id="resetBtn" hidden></button>
+      </div>
+    </header>
+
+    <main class="chat-area" id="chatArea">
+      <section class="empty-state" id="emptyState" aria-labelledby="emptyTitle">
+        <p class="eyebrow" id="emptyEyebrow"></p>
+        <h1 class="empty-title" id="emptyTitle"></h1>
+        <p class="empty-sub" id="emptySub"></p>
+        <p class="dev-notice" id="devNotice" role="note" hidden>
+          브랜드 설정(brand.json)을 불러오지 못해 기본 설정으로 표시 중입니다. 정적 서버로 실행하거나
+          단일 파일 빌드(dist/*.html)를 사용하세요.
+        </p>
+        <div
+          class="chip-grid"
+          id="chipGrid"
+          aria-label="예시 시나리오"
+          aria-busy="true"
+        >
+          <div class="chip-skeleton skeleton" aria-hidden="true"></div>
+          <div class="chip-skeleton skeleton" aria-hidden="true"></div>
+          <div class="chip-skeleton skeleton" aria-hidden="true"></div>
+          <div class="chip-skeleton skeleton" aria-hidden="true"></div>
+          <div class="chip-skeleton skeleton" aria-hidden="true"></div>
+          <div class="chip-skeleton skeleton" aria-hidden="true"></div>
+        </div>
+      </section>
+      <div class="messages" id="messages" hidden></div>
+    </main>
+
+    <div class="sr-only" id="liveRegion" role="status" aria-live="polite"></div>
+
+    <footer class="input-area">
+      <div class="input-inner">
+        <div class="mode-toggle" id="modeToggle" hidden>
+          <button type="button" class="mode-label" data-mode="chip" aria-pressed="true">예시 선택</button>
+          <button
+            type="button"
+            class="switch"
+            id="modeSwitch"
+            role="switch"
+            aria-checked="false"
+            aria-label="직접 입력 모드"
+          ></button>
+          <button type="button" class="mode-label" data-mode="free" aria-pressed="false">직접 입력</button>
+        </div>
+        <div class="input-wrap">
+          <textarea id="inputBox" rows="1" aria-label="검토할 시나리오"></textarea>
+          <button type="button" class="send-btn" id="sendBtn" aria-label="검토 요청" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21L23 12 2 3v7l15 2-15 2z" /></svg>
+          </button>
+        </div>
+        <p class="input-hint" id="disclaimer"></p>
+      </div>
+    </footer>
+
+    <noscript>이 서비스는 JavaScript가 필요합니다.</noscript>
+
+    <!--
+      Mermaid 10.9.8 (vendor/ 에 고정 보관, 해시는 vendor/mermaid.min.js.sha384).
+      CDN 의존 없음 → 사내망·오프라인·file:// 에서도 동작. 로드 실패 시 관계도 영역만 안내 문구로 대체됨.
+    -->
+    <script src="vendor/mermaid.min.js"></script>
+
+    <!-- build:brand-data -->
+    <script>
+      (() => {
+        "use strict";
+
+        /* ═══════════════════════════════════════════════════════════
+           1. CONFIG / CONSTANTS
+           ═══════════════════════════════════════════════════════════ */
+
+        const CONFIG = {
+          brandFile: "brand.json",
+          brandTimeoutMs: 10000,
+          themeTimeoutMs: 5000,
+          requestTimeoutMs: 60000,
+          storagePrefix: "independence-review.",
+          endpoints: {
+            extract: "/independence/extract",
+            analyze: "/independence/analyze",
+            report: "/independence/report",
+          },
+        };
+
+        /** 진행 단계: 각 단계 API 응답 수신 시점에 전환된다(타이머 없음). */
+        const STEPS = [
+          { name: "관계 추출", desc: "시나리오에서 인물·회사·관계 구조를 추출하고 있습니다." },
+          { name: "독립성 분석", desc: "추출된 구조를 바탕으로 수임 가능성과 위험을 판단하고 있습니다." },
+          { name: "보고서 생성", desc: "결론, 관계도, 법령 링크를 정리해 보고서를 만들고 있습니다." },
+        ];
+
+        /** 백엔드 status 문자열 → 색상 톤(CSS data-status). 새 상태는 여기에만 추가. */
+        const STATUS_TONE = {
+          "수임 불가": "danger",
+          "안전장치 적용 시 수임 가능": "warn",
+          "수임 가능": "ok",
+        };
+
+        /** brand.json 로드 실패 시 사용하는 중립 기본값 (예시 시나리오 없음 → 직접 입력 모드) */
+        const FALLBACK_BRAND = {
+          id: "fallback",
+          name: "감사 독립성 검토 AI",
+          serviceName: "감사 독립성 검토 AI",
+          poweredBy: null,
+          badge: "Beta",
+          logo: { src: null, alt: "", text: "IR" },
+          theme: null,
+          api: { baseUrl: "", allowedOrigins: [] },
+          copy: {
+            homeLabel: "홈으로 가기",
+            eyebrow: "AI 기반 감사 독립성 검토",
+            title: "수임 검토 시 복잡한 이해관계 구조를 한눈에 파악하세요",
+            subtitle: "잠재적 독립성 이슈 포인트를 선제적으로 확인할 수 있습니다.",
+            badgeTitle: "실험 단계 서비스입니다",
+            newReview: "새 검토 시작",
+            placeholderChip: "예시 시나리오를 선택하세요",
+            placeholderFree: "감사 독립성 검토가 필요한 시나리오를 입력하세요",
+            postChipsLabel: "다른 시나리오를 선택하세요",
+            disclaimer:
+              "*AI 분석 결과는 전문가 판단을 지원하기 위한 참고 자료이며, 최종 의사결정은 담당자의 전문적 판단에 따릅니다.",
+          },
+          scenarios: [],
+        };
+
+        /* ═══════════════════════════════════════════════════════════
+           2. STATE / DOM CACHE
+           ═══════════════════════════════════════════════════════════ */
+
+        const state = {
+          brand: FALLBACK_BRAND,
+          apiBase: "",
+          inputMode: "chip",
+          loading: false,
+          run: 0, // 요청 세대 번호: 초기화 후 도착한 이전 응답 무시용
+          abort: null,
+          lastScenario: "",
+        };
+
+        const $ = (id) => document.getElementById(id);
+        const els = {};
+
+        /* ═══════════════════════════════════════════════════════════
+           3. UTILITIES
+           ═══════════════════════════════════════════════════════════ */
+
+        /** XSS 방지: innerHTML 대신 DOM 노드를 만든다. 모든 텍스트는 textContent 로만 주입. */
+        function h(tag, props = {}, ...children) {
+          const node = document.createElement(tag);
+          for (const [key, value] of Object.entries(props)) {
+            if (value == null || value === false) continue;
+            if (key === "class") node.className = value;
+            else if (key === "text") node.textContent = value;
+            else if (key.startsWith("on") && typeof value === "function") {
+              node.addEventListener(key.slice(2).toLowerCase(), value);
+            } else node.setAttribute(key, value === true ? "" : String(value));
+          }
+          for (const child of children.flat()) {
+            if (child == null || child === false) continue;
+            node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+          }
+          return node;
+        }
+
+        const storage = {
+          get(key) {
+            try {
+              return localStorage.getItem(CONFIG.storagePrefix + key);
+            } catch (_) {
+              return null;
+            }
+          },
+          set(key, value) {
+            try {
+              localStorage.setItem(CONFIG.storagePrefix + key, value);
+            } catch (_) {
+              /* 사생활 보호 모드 등: 무시 */
+            }
+          },
+        };
+
+        const prefersReducedMotion = () =>
+          window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const cssVar = (name) =>
+          getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+        function isHttpUrl(value) {
+          try {
+            const u = new URL(value);
+            return u.protocol === "https:" || u.protocol === "http:";
+          } catch (_) {
+            return false;
+          }
+        }
+
+        /** 상대 경로(스킴·상위 경로 없음) 또는 https URL 만 허용 */
+        const isSafeAssetPath = (v) =>
+          typeof v === "string" &&
+          (/^https:\/\//i.test(v) ||
+            /^data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+/=]+$/.test(v) || // 단일 파일 빌드의 인라인 로고
+            (/^[\w\-./]+$/.test(v) && !v.includes("..") && !v.startsWith("/")));
+
+        const isSafeCssPath = (v) => isSafeAssetPath(v) && /\.css$/i.test(v) && !/^https?:/i.test(v);
+
+        function announce(message) {
+          els.live.textContent = "";
+          setTimeout(() => {
+            els.live.textContent = message;
+          }, 50);
+        }
+
+        function scrollToBottom() {
+          requestAnimationFrame(() => {
+            els.chatArea.scrollTop = els.chatArea.scrollHeight;
+          });
+        }
+
+        function scrollToElement(el) {
+          requestAnimationFrame(() => {
+            el.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+          });
+        }
+
+        /**
+         * fetch + AbortSignal. 미리보기/임베드 환경처럼 fetch 를 postMessage 로 중계하는 곳에서는
+         * AbortSignal 을 복제할 수 없어 DataCloneError 가 난다. 이 경우 signal 없이 재시도하고,
+         * 취소·타임아웃은 Promise 경쟁(race)으로 동일하게 처리한다.
+         */
+        function abortError() {
+          return new DOMException("The operation was aborted.", "AbortError");
+        }
+        async function fetchAbortable(url, options, signal) {
+          try {
+            return await fetch(url, { ...options, signal });
+          } catch (err) {
+            if (!err || err.name !== "DataCloneError") throw err;
+            return new Promise((resolve, reject) => {
+              if (signal.aborted) return reject(abortError());
+              signal.addEventListener("abort", () => reject(abortError()), { once: true });
+              fetch(url, options).then(resolve, reject);
+            });
+          }
+        }
+
+        function fetchWithTimeout(url, options, timeoutMs) {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), timeoutMs);
+          return fetchAbortable(url, options, controller.signal).finally(() => clearTimeout(timer));
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           4. BRAND LOADING
+           ═══════════════════════════════════════════════════════════ */
+
+        function normalizeScenarios(list) {
+          if (!Array.isArray(list)) return [];
+          return list
+            .filter((s) => s && typeof s.text === "string" && s.text.trim())
+            .map((s) => ({
+              label: String(s.label || s.text.slice(0, 24)),
+              text: s.text.trim(),
+              source: s.source ? String(s.source) : "",
+            }));
+        }
+
+        function mergeBrand(raw) {
+          const b = raw && typeof raw === "object" ? raw : {};
+          return {
+            ...FALLBACK_BRAND,
+            ...b,
+            logo: { ...FALLBACK_BRAND.logo, ...(b.logo || {}) },
+            api: { ...FALLBACK_BRAND.api, ...(b.api || {}) },
+            copy: { ...FALLBACK_BRAND.copy, ...(b.copy || {}) },
+            scenarios: normalizeScenarios(b.scenarios),
+          };
+        }
+
+        /** 단일 파일 빌드가 심어 둔 브랜드 데이터 (<script type="application/json" id="brand-data">) */
+        function readInlineBrand() {
+          const node = document.getElementById("brand-data");
+          if (!node) return null;
+          try {
+            return JSON.parse(node.textContent);
+          } catch (err) {
+            console.warn("[independence-review] 내장 brand-data 파싱 실패, 파일에서 다시 시도합니다.", err);
+            return null;
+          }
+        }
+
+        /**
+         * 우선순위: 내장 brand-data(단일 파일 빌드) → ?brand=acme → brand.acme.json / 기본 brand.json
+         * 모두 실패하면 FALLBACK_BRAND(loadFailed 표시).
+         */
+        async function loadBrand() {
+          const inline = readInlineBrand();
+          if (inline) return mergeBrand(inline);
+          const name = new URLSearchParams(location.search).get("brand");
+          const file = name && /^[a-z0-9-]+$/i.test(name) ? `brand.${name}.json` : CONFIG.brandFile;
+          try {
+            const res = await fetchWithTimeout(file, { cache: "no-cache" }, CONFIG.brandTimeoutMs);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return mergeBrand(await res.json());
+          } catch (err) {
+            console.warn(
+              `[independence-review] ${file} 을(를) 불러오지 못해 기본 설정을 사용합니다. ` +
+                "file:// 로 열었다면 정적 서버(예: python3 -m http.server)로 실행하세요.",
+              err,
+            );
+            return { ...FALLBACK_BRAND, scenarios: [], loadFailed: true };
+          }
+        }
+
+        function loadThemeOverride(href) {
+          return new Promise((resolve) => {
+            if (!href) return resolve();
+            if (!isSafeCssPath(href)) {
+              console.warn("[independence-review] 허용되지 않은 theme 경로:", href);
+              return resolve();
+            }
+            const link = h("link", { rel: "stylesheet", href, "data-brand-theme": "" });
+            // 응답이 없어도 앱이 멈추지 않도록 상한을 둔다.
+            const timer = setTimeout(() => {
+              console.warn("[independence-review] theme 로드 지연, 계속 진행합니다:", href);
+              resolve();
+            }, CONFIG.themeTimeoutMs);
+            link.addEventListener("load", () => {
+              clearTimeout(timer);
+              resolve();
+            });
+            link.addEventListener("error", () => {
+              clearTimeout(timer);
+              console.warn("[independence-review] theme 로드 실패:", href);
+              resolve();
+            });
+            document.head.append(link);
+          });
+        }
+
+        /** ?api= 는 localhost 또는 brand.api.allowedOrigins 만 허용 (시나리오 유출 방지) */
+        function resolveApiBase(brand) {
+          const override = new URLSearchParams(location.search).get("api");
+          if (override) {
+            try {
+              const u = new URL(override);
+              const isLocal = ["localhost", "127.0.0.1", "[::1]"].includes(u.hostname);
+              const allowed = (brand.api.allowedOrigins || []).includes(u.origin);
+              if ((u.protocol === "http:" || u.protocol === "https:") && (isLocal || allowed)) {
+                return (u.origin + u.pathname).replace(/\/$/, "");
+              }
+              console.warn("[independence-review] 허용되지 않은 api 오버라이드를 무시합니다:", u.origin);
+            } catch (_) {
+              console.warn("[independence-review] 잘못된 api 파라미터를 무시합니다.");
+            }
+          }
+          const fromWindow = window.APP_CONFIG && window.APP_CONFIG.apiBaseUrl;
+          return String(fromWindow ?? brand.api.baseUrl ?? "").replace(/\/$/, "");
+        }
+
+        function initMermaid() {
+          if (!window.mermaid) return;
+          window.mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: "strict",
+            theme: "base",
+            flowchart: { curve: "linear" },
+            themeVariables: {
+              fontFamily: cssVar("--font-sans"),
+              background: cssVar("--color-surface"),
+              primaryColor: cssVar("--color-surface"),
+              primaryTextColor: cssVar("--color-text"),
+              primaryBorderColor: cssVar("--color-brand"),
+              lineColor: cssVar("--color-text-muted"),
+              secondaryColor: cssVar("--color-subtle"),
+              tertiaryColor: cssVar("--color-bg"),
+            },
+          });
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           5. BRAND → DOM
+           ═══════════════════════════════════════════════════════════ */
+
+        function buildLogo(brand) {
+          const mark = () =>
+            h("span", { class: "brand-mark", "aria-hidden": "true", text: brand.logo.text || "AI" });
+          if (!brand.logo.src || !isSafeAssetPath(brand.logo.src)) return mark();
+          const img = h("img", {
+            class: "brand-logo",
+            src: brand.logo.src,
+            alt: brand.logo.alt || brand.name,
+            decoding: "async",
+          });
+          img.addEventListener("error", () => img.replaceWith(mark()), { once: true });
+          return img;
+        }
+
+        function applyBrand(brand) {
+          const { copy } = brand;
+          document.title = brand.name;
+          els.brandSlot.replaceChildren(buildLogo(brand));
+          els.homeTrigger.setAttribute("aria-label", copy.homeLabel);
+          els.serviceName.textContent = brand.serviceName;
+          els.poweredBy.textContent = brand.poweredBy || "";
+          els.poweredBy.hidden = !brand.poweredBy;
+          els.badge.textContent = brand.badge || "";
+          els.badge.title = copy.badgeTitle || "";
+          els.resetBtn.textContent = "↩ " + copy.newReview;
+          els.emptyEyebrow.textContent = copy.eyebrow;
+          els.emptyTitle.textContent = copy.title;
+          els.emptySub.textContent = copy.subtitle;
+          els.disclaimer.textContent = copy.disclaimer;
+          updateBadge();
+        }
+
+        function updateBadge() {
+          els.badge.hidden = !state.brand.badge || !els.messages.hidden;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           6. SCENARIO CHIPS / INPUT
+           ═══════════════════════════════════════════════════════════ */
+
+        function createChip(scenario, index, compact) {
+          return h(
+            "button",
+            {
+              type: "button",
+              class: "chip" + (compact ? " chip--compact" : ""),
+              "data-index": index,
+              "aria-pressed": "false",
+              title: scenario.text,
+              onclick: () => selectScenario(index),
+            },
+            h("span", { class: "chip-label", text: scenario.label }),
+            h("span", { class: "chip-text", text: scenario.text }),
+            scenario.source ? h("span", { class: "chip-source", text: "출처: " + scenario.source }) : null,
+          );
+        }
+
+        function renderChips() {
+          const scenarios = state.brand.scenarios;
+          els.chipGrid.replaceChildren(...scenarios.map((s, i) => createChip(s, i, false)));
+          els.chipGrid.setAttribute("aria-busy", "false");
+          els.chipGrid.hidden = scenarios.length === 0;
+          els.modeToggle.hidden = scenarios.length === 0;
+        }
+
+        function markSelected(index) {
+          document.querySelectorAll(".chip").forEach((chip) => {
+            const on = Number(chip.dataset.index) === index;
+            chip.classList.toggle("is-selected", on);
+            chip.setAttribute("aria-pressed", String(on));
+          });
+        }
+
+        function selectScenario(index) {
+          const scenario = state.brand.scenarios[index];
+          if (!scenario || state.loading) return;
+          els.input.value = scenario.text;
+          autoResize();
+          markSelected(index);
+          updateSendState();
+          els.input.focus({ preventScroll: true });
+        }
+
+        function setInputMode(mode, persist = true) {
+          const hasScenarios = state.brand.scenarios.length > 0;
+          state.inputMode = hasScenarios && mode === "chip" ? "chip" : "free";
+          if (persist && hasScenarios) storage.set("inputMode", state.inputMode);
+
+          const free = state.inputMode === "free";
+          els.modeSwitch.setAttribute("aria-checked", String(free));
+          document.querySelectorAll(".mode-label").forEach((btn) => {
+            btn.setAttribute("aria-pressed", String(btn.dataset.mode === state.inputMode));
+          });
+          els.input.readOnly = !free;
+          els.input.placeholder = free ? state.brand.copy.placeholderFree : state.brand.copy.placeholderChip;
+
+          // 예시 선택 모드에서는 예시와 일치하지 않는 직접 입력 내용을 비운다.
+          if (!free) {
+            const matches = state.brand.scenarios.some((s) => s.text === els.input.value.trim());
+            if (!matches) {
+              els.input.value = "";
+              markSelected(-1);
+            }
+          }
+          autoResize();
+          updateSendState();
+        }
+
+        function autoResize() {
+          els.input.style.height = "auto";
+          els.input.style.height = Math.min(els.input.scrollHeight, 120) + "px";
+        }
+
+        function updateSendState() {
+          els.sendBtn.disabled = state.loading || !els.input.value.trim();
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           7. API
+           ═══════════════════════════════════════════════════════════ */
+
+        class ApiError extends Error {
+          constructor(kind, step, status = 0, detail = "") {
+            super(`${kind}${status ? " " + status : ""}${detail ? ": " + detail : ""}`);
+            this.name = "ApiError";
+            this.kind = kind; // timeout | network | http | invalid
+            this.step = step;
+            this.status = status;
+          }
+        }
+
+        async function api(step, body, parentSignal) {
+          const controller = new AbortController();
+          const onParentAbort = () => controller.abort();
+          parentSignal.addEventListener("abort", onParentAbort, { once: true });
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            controller.abort();
+          }, CONFIG.requestTimeoutMs);
+          try {
+            const res = await fetchAbortable(
+              state.apiBase + CONFIG.endpoints[step],
+              { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+              controller.signal,
+            );
+            if (!res.ok) {
+              const detail = await res
+                .json()
+                .then((b) => (b && typeof b.detail === "string" ? b.detail : ""))
+                .catch(() => "");
+              throw new ApiError("http", step, res.status, detail);
+            }
+            try {
+              return await res.json();
+            } catch (_) {
+              throw new ApiError("invalid", step);
+            }
+          } catch (err) {
+            if (err instanceof ApiError) throw err;
+            if (parentSignal.aborted) throw err; // 사용자 초기화
+            if (timedOut) throw new ApiError("timeout", step);
+            throw new ApiError("network", step, 0, err && err.message);
+          } finally {
+            clearTimeout(timer);
+            parentSignal.removeEventListener("abort", onParentAbort);
+          }
+        }
+
+        /** 사용자용 문구만 반환. 상세 원인은 콘솔에만 남긴다. */
+        function describeError(err) {
+          if (!(err instanceof ApiError)) return "검토 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+          if (err.kind === "timeout") return "응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.";
+          if (err.kind === "network") return "검토 서버에 연결하지 못했습니다. 네트워크 상태를 확인해 주세요.";
+          if (err.kind === "invalid") return "응답 형식이 올바르지 않습니다. 잠시 후 다시 시도해 주세요.";
+          if (err.status === 404) return "검토 서비스를 찾을 수 없습니다. 관리자에게 문의해 주세요.";
+          if (err.status === 429) return "요청이 많아 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+          if (err.status >= 500) return "검토 서버에서 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+          return "요청을 처리할 수 없습니다. 입력 내용을 확인해 주세요.";
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           8. REVIEW FLOW
+           ═══════════════════════════════════════════════════════════ */
+
+        function showConversation() {
+          els.emptyState.hidden = true;
+          els.messages.hidden = false;
+          els.resetBtn.hidden = false;
+          document.body.classList.add("has-conversation"); // 결과 카드 안에 면책 문구가 있으므로 입력창 안내는 숨김
+          updateBadge();
+        }
+
+        function createProgress() {
+          const dots = STEPS.map(() => h("span", { class: "dot" }));
+          const stepEl = h("div", { class: "progress-step" });
+          const descEl = h("div", { class: "progress-desc" });
+          const node = h(
+            "div",
+            { class: "progress", role: "status" },
+            h("div", { class: "progress-dots", "aria-hidden": "true" }, dots),
+            stepEl,
+            descEl,
+          );
+          function set(index) {
+            const step = STEPS[index];
+            if (!step) return;
+            stepEl.textContent = `(${index + 1}/${STEPS.length}) ${step.name}`;
+            descEl.textContent = step.desc;
+            dots.forEach((dot, i) => {
+              dot.classList.toggle("is-done", i < index);
+              dot.classList.toggle("is-active", i === index);
+            });
+          }
+          set(0);
+          return { node, set };
+        }
+
+        function submit() {
+          if (state.loading) return;
+          const text = els.input.value.trim();
+          if (!text) return;
+          els.input.value = "";
+          autoResize();
+          markSelected(-1);
+          showConversation();
+          els.messages.append(h("div", { class: "bubble-user", text }));
+          runReview(text);
+        }
+
+        async function runReview(scenario) {
+          const runId = ++state.run;
+          const controller = new AbortController();
+          state.abort = controller;
+          state.loading = true;
+          state.lastScenario = scenario;
+          updateSendState();
+
+          const progress = createProgress();
+          els.messages.append(progress.node);
+          scrollToBottom();
+
+          const stale = () => runId !== state.run;
+          const need = (value, key) => {
+            if (!value || typeof value !== "object" || !(key in value)) throw new ApiError("invalid", key);
+            return value;
+          };
+
+          try {
+            const extracted = need(await api("extract", { scenario }, controller.signal), "rel_map");
+            if (stale()) return;
+            progress.set(1);
+
+            const analyzed = need(
+              await api("analyze", { scenario, rel_map: extracted.rel_map }, controller.signal),
+              "analysis",
+            );
+            if (stale()) return;
+            progress.set(2);
+
+            const report = need(
+              await api(
+                "report",
+                { scenario, rel_map: extracted.rel_map, analysis: analyzed.analysis },
+                controller.signal,
+              ),
+              "analysis",
+            );
+            if (stale()) return;
+
+            progress.node.remove();
+            const card = buildReportCard(report);
+            els.messages.append(card);
+            els.messages.append(buildPostChips());
+            scrollToElement(card);
+            announce("검토가 완료되었습니다. " + (card.dataset.verdict || ""));
+            await renderDiagram(card, report.mermaid_code);
+          } catch (err) {
+            if (stale() || controller.signal.aborted) return;
+            console.error("[independence-review]", err);
+            if (err instanceof ApiError && err.status === 404) {
+              console.info(
+                "[independence-review] 404: 검토 API 경로를 찾을 수 없습니다. " +
+                  "개발 환경에서는 ?api=http://localhost:8001 로 백엔드를 지정할 수 있습니다.",
+              );
+            }
+            progress.node.remove();
+            els.messages.append(buildErrorNotice(describeError(err), scenario));
+            scrollToBottom();
+          } finally {
+            if (!stale()) {
+              state.loading = false;
+              state.abort = null;
+              updateSendState();
+            }
+          }
+        }
+
+        function buildErrorNotice(message, scenario) {
+          const retry = h("button", {
+            type: "button",
+            class: "btn btn-solid",
+            text: "다시 시도",
+          });
+          const notice = h(
+            "div",
+            { class: "notice", role: "alert" },
+            h("p", { class: "notice-title", text: "검토를 완료하지 못했습니다" }),
+            h("p", { class: "notice-body", text: message }),
+            retry,
+          );
+          retry.addEventListener("click", () => {
+            if (state.loading) return;
+            notice.remove();
+            runReview(scenario);
+          });
+          return notice;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           9. REPORT RENDERING
+           ═══════════════════════════════════════════════════════════ */
+
+        const asList = (v) => (Array.isArray(v) ? v.map((x) => String(x)).filter(Boolean) : []);
+
+        function buildLegalRefs(refs) {
+          if (!Array.isArray(refs) || refs.length === 0) return null;
+          const parts = [];
+          refs.forEach((ref, i) => {
+            const name = typeof ref === "string" ? ref : ref && ref.name ? String(ref.name) : "";
+            if (!name) return;
+            const url = ref && typeof ref === "object" ? ref.url : "";
+            if (parts.length) parts.push(", ");
+            if (url && isHttpUrl(url)) {
+              parts.push(
+                h(
+                  "a",
+                  { class: "law-link", href: url, target: "_blank", rel: "noopener noreferrer" },
+                  name,
+                  " ↗",
+                ),
+              );
+            } else parts.push(name);
+          });
+          if (!parts.length) return null;
+          return h(
+            "div",
+            { class: "legal" },
+            h("h3", { class: "section-title", text: "근거 법령" }),
+            h("div", { class: "law-box" }, parts),
+          );
+        }
+
+        function buildList(items, emptyText) {
+          const list = asList(items);
+          return h(
+            "ul",
+            {},
+            (list.length ? list : [emptyText]).map((item) => h("li", { text: item })),
+          );
+        }
+
+        function buildReportCard(data) {
+          const analysis = (data && data.analysis) || {};
+          const status = analysis.status ? String(analysis.status) : "검토 완료";
+          const tone = STATUS_TONE[status] || "neutral";
+          const risk = analysis.risk_level ? ` (위험도: ${analysis.risk_level})` : "";
+          const traceId = data && data.trace_id ? String(data.trace_id) : "";
+          const when = new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeStyle: "short" }).format(
+            new Date(),
+          );
+          const meta = [traceId ? `검토 ID: ${traceId}` : "", `검토 일시: ${when}`].filter(Boolean).join(" · ");
+
+          const printBtn = h("button", {
+            type: "button",
+            class: "btn",
+            text: "인쇄 / PDF 저장",
+          });
+          const card = h(
+            "section",
+            { class: "report", "data-status": tone, "aria-label": "독립성 검토 결과" },
+            h(
+              "header",
+              { class: "report-header" },
+              h(
+                "h2",
+                { class: "report-verdict" },
+                status,
+                risk ? " " : null,
+                risk ? h("span", { class: "risk", text: risk.trim() }) : null,
+              ),
+              h("p", { class: "report-meta", text: meta }),
+            ),
+            h("div", { class: "report-accent", "aria-hidden": "true" }),
+            h(
+              "div",
+              { class: "report-body" },
+              h(
+                "div",
+                {},
+                h("h3", { class: "section-title", text: "검토 결론" }),
+                h("div", { class: "opinion", text: analysis.considerations ? String(analysis.considerations) : "결론이 제공되지 않았습니다." }),
+              ),
+              h(
+                "div",
+                { class: "details" },
+                h(
+                  "div",
+                  { class: "details-viz" },
+                  h("h3", { class: "section-title", text: "이해관계 구조" }),
+                  h("div", { class: "viz-wrap" }, h("div", { class: "viz-skeleton skeleton", "aria-hidden": "true" })),
+                ),
+                h(
+                  "div",
+                  { class: "details-text" },
+                  h("h3", { class: "section-title", text: "주요 이슈" }),
+                  buildList(analysis.key_issues, "주요 이슈 없음"),
+                  h("h3", { class: "section-title", text: "권고 안전장치" }),
+                  buildList(analysis.suggested_safeguards, "권고 안전장치 없음"),
+                  buildLegalRefs(analysis.legal_references),
+                ),
+              ),
+              h(
+                "div",
+                { class: "report-footer" },
+                h("p", { class: "report-disclaimer", text: state.brand.copy.disclaimer }),
+                h("div", { class: "report-actions" }, printBtn),
+              ),
+            ),
+          );
+          card.dataset.verdict = status + risk;
+          printBtn.addEventListener("click", () => printReport(card));
+          return card;
+        }
+
+        async function renderDiagram(card, code) {
+          const wrap = card.querySelector(".viz-wrap");
+          if (!wrap) return;
+          const message = (text) => wrap.replaceChildren(h("div", { class: "viz-message", text }));
+          if (!code || typeof code !== "string") return message("표시할 관계도가 없습니다.");
+          if (!window.mermaid) return message("관계도 라이브러리를 불러오지 못했습니다.");
+          try {
+            await window.mermaid.parse(code);
+            const pre = h("pre", { class: "mermaid" });
+            pre.textContent = code;
+            wrap.replaceChildren(pre);
+            await window.mermaid.run({ nodes: [pre] });
+            const svg = pre.querySelector("svg");
+            if (!svg) throw new Error("SVG 없음");
+            // Mermaid 기본값(width:100%)은 넓은 관계도를 극단적으로 축소한다. 원래 크기를 유지하고
+            // 영역을 넘으면 .viz-wrap 이 가로 스크롤하도록 한다.
+            const natural = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal.width : 0;
+            if (natural > 0) {
+              svg.style.maxWidth = "none";
+              svg.style.width = natural + "px";
+            }
+          } catch (err) {
+            console.error("[independence-review] 관계도 렌더 실패", err);
+            message("관계도를 표시하지 못했습니다.");
+          }
+        }
+
+        function printReport(card) {
+          const cleanup = () => {
+            card.classList.remove("is-printing");
+            document.body.classList.remove("print-mode");
+          };
+          card.classList.add("is-printing");
+          document.body.classList.add("print-mode");
+          window.addEventListener("afterprint", cleanup, { once: true });
+          window.print();
+        }
+
+        function buildPostChips() {
+          const scenarios = state.brand.scenarios;
+          if (!scenarios.length) return document.createComment("no-scenarios");
+          return h(
+            "section",
+            { class: "post-chips", "aria-label": state.brand.copy.postChipsLabel },
+            h("p", { class: "post-chips-label", text: state.brand.copy.postChipsLabel }),
+            h("div", { class: "chip-grid" }, scenarios.map((s, i) => createChip(s, i, true))),
+          );
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           10. RESET
+           ═══════════════════════════════════════════════════════════ */
+
+        function resetChat() {
+          state.run++;
+          if (state.abort) state.abort.abort();
+          state.abort = null;
+          state.loading = false;
+          document.body.classList.remove("print-mode", "has-conversation");
+          els.messages.replaceChildren();
+          els.messages.hidden = true;
+          els.emptyState.hidden = false;
+          els.resetBtn.hidden = true;
+          els.input.value = "";
+          markSelected(-1);
+          setInputMode(state.inputMode, false);
+          updateBadge();
+          els.chatArea.scrollTop = 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           11. EVENTS / BOOT
+           ═══════════════════════════════════════════════════════════ */
+
+        function bindEvents() {
+          els.homeTrigger.addEventListener("click", resetChat);
+          els.resetBtn.addEventListener("click", resetChat);
+          els.sendBtn.addEventListener("click", submit);
+          els.input.addEventListener("input", () => {
+            autoResize();
+            updateSendState();
+          });
+          els.input.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter" || e.shiftKey) return;
+            // 한글 등 IME 조합 중 Enter 는 글자 확정용이므로 전송하지 않는다.
+            if (e.isComposing || e.keyCode === 229) return;
+            e.preventDefault();
+            submit();
+          });
+          els.modeToggle.addEventListener("click", (e) => {
+            const label = e.target.closest(".mode-label");
+            if (label) return setInputMode(label.dataset.mode);
+            if (e.target.closest("#modeSwitch")) {
+              setInputMode(state.inputMode === "chip" ? "free" : "chip");
+            }
+          });
+        }
+
+        async function init() {
+          [
+            "homeTrigger", "brandSlot", "serviceName", "poweredBy", "badge", "resetBtn", "chatArea",
+            "emptyState", "emptyEyebrow", "emptyTitle", "emptySub", "chipGrid", "messages", "liveRegion",
+            "modeToggle", "modeSwitch", "inputBox", "sendBtn", "disclaimer", "devNotice",
+          ].forEach((id) => (els[id] = $(id)));
+          els.live = els.liveRegion;
+          els.input = els.inputBox;
+
+          bindEvents();
+
+          const brand = await loadBrand();
+          await loadThemeOverride(brand.theme);
+          state.brand = brand;
+          state.apiBase = resolveApiBase(brand);
+
+          initMermaid();
+          applyBrand(brand);
+          els.devNotice.hidden = !brand.loadFailed;
+          renderChips();
+          setInputMode(storage.get("inputMode") || "chip", false);
+          document.body.dataset.state = "ready";
+        }
+
+        init().catch((err) => {
+          console.error("[independence-review] 초기화 실패", err);
+          document.body.dataset.state = "ready";
+        });
+      })();
+    </script>
+  </body>
+</html>

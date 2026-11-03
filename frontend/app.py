@@ -42,7 +42,7 @@ if page == "홈":
     """)
     st.info("먼저 터미널에서 `./run.sh` 또는 API 서버(uvicorn)를 실행하세요.")
     st.markdown("---")
-    st.markdown("**감사 독립성 UI** (단일 페이지)는 **API 서버**에서 제공됩니다. Streamlit(8502)에는 해당 경로가 없습니다.")
+    st.markdown("**감사 독립성 UI**(일반 제출용)는 **API 서버** `/` 에서 제공됩니다.")
     st.markdown(f"[감사 독립성 UI 열기]({API_BASE}/)")
 elif page == "독립성 검토":
     independence.render()

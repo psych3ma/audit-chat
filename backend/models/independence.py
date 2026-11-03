@@ -43,10 +43,12 @@ class LegalRefItem(BaseModel):
 
 
 def _normalize_legal_ref(v: Any) -> LegalRefItem:
+    if isinstance(v, LegalRefItem):
+        return v
     if isinstance(v, str):
         return LegalRefItem(name=v.strip(), url=None)
     if isinstance(v, dict):
-        return LegalRefItem(name=v.get("name", str(v)).strip(), url=v.get("url") or None)
+        return LegalRefItem(name=str(v.get("name", "")).strip() or str(v), url=v.get("url") or None)
     return LegalRefItem(name=str(v), url=None)
 
 

@@ -1,9 +1,10 @@
 """법령명 → 국가법령정보센터(law.go.kr) URL 조회.
 
 - 단일 소스: 법령검색목록.csv(법령MST·법령명) 기반.
-- 조문 링크(제N조): 한글 경로 https://www.law.go.kr/법령/{법령명}/{조문} (해당 조문으로 바로 이동).
+- 조문 링크(제N조): 한글 경로 https://www.law.go.kr/법령/{법령명}/{조문}.
 - 전체 법령 링크: lsInfoP.do?lsiSeq={법령MST}.
-- 확장: CSV 경로는 설정(LAW_CSV_PATH) 또는 기본 위치(프로젝트 루트 법령검색목록.csv).
+- 비법률 표준(윤리기준·감사기준): STANDARDS_URLS 고정 맵.
+- CSV 기본 경로: docs/법령검색목록.csv (루트에 있으면 우선).
 """
 from __future__ import annotations
 
@@ -11,16 +12,23 @@ import csv
 import re
 from pathlib import Path
 from typing import Optional
-# 조문 직접 링크
+
 LAW_GO_KR_ARTICLE_BASE = "https://www.law.go.kr"
-# 전체 법령 본문
 LAW_GO_KR_LSINFO_BASE = "https://www.law.go.kr/LSW/lsInfoP.do"
 
-# 약칭 → 법령명
 ALIASES: dict[str, str] = {
     "외부감사법": "주식회사 등의 외부감사에 관한 법률",
     "외부감사법 시행령": "주식회사 등의 외부감사에 관한 법률 시행령",
     "외부감사법 시행규칙": "주식회사 등의 외부감사에 관한 법률 시행규칙",
+    "외감법": "주식회사 등의 외부감사에 관한 법률",
+}
+
+# CSV에 없는 전문 기준 → KICPA 공개 게시판(안정 URL)
+STANDARDS_URLS: dict[str, str] = {
+    "공인회계사 윤리기준": "https://www.kicpa.or.kr/",
+    "공인회계사윤리기준": "https://www.kicpa.or.kr/",
+    "윤리기준": "https://www.kicpa.or.kr/",
+    "회계감사기준": "https://www.kicpa.or.kr/board/list.brd?boardId=acc0102",
 }
 
 _registry: Optional[dict[str, str]] = None
@@ -31,7 +39,12 @@ def _project_root() -> Path:
 
 
 def _default_csv_path() -> Path:
-    return _project_root() / "법령검색목록.csv"
+    """루트 CSV가 있으면 우선, 없으면 docs/법령검색목록.csv."""
+    root = _project_root()
+    at_root = root / "법령검색목록.csv"
+    if at_root.is_file():
+        return at_root
+    return root / "docs" / "법령검색목록.csv"
 
 
 def _parse_csv(path: Path) -> list[tuple[str, str]]:
@@ -115,6 +128,8 @@ def _normalize_candidates(raw: str) -> list[str]:
         candidates.append(no_jo)
     if s in ALIASES:
         candidates.append(ALIASES[s])
+    if no_jo in ALIASES:
+        candidates.append(ALIASES[no_jo])
     return candidates
 
 
@@ -133,8 +148,19 @@ def get_registry(force_reload: bool = False) -> dict[str, str]:
     return _registry
 
 
+def get_standard_url(name: str) -> Optional[str]:
+    """비법률 전문 기준 고정 URL."""
+    s = (name or "").strip()
+    if not s:
+        return None
+    if s in STANDARDS_URLS:
+        return STANDARDS_URLS[s]
+    base = strip_article_from_name(s) or s
+    return STANDARDS_URLS.get(base)
+
+
 def get_law_url(law_name: str) -> Optional[str]:
-    """법령 표기 → law.go.kr URL (조문 링크 또는 전체 본문)."""
+    """법령 표기 → law.go.kr URL (조문 링크 또는 전체 본문). 표준 맵은 별도."""
     s = (law_name or "").strip()
     if not s:
         return None
@@ -144,13 +170,31 @@ def get_law_url(law_name: str) -> Optional[str]:
         base_name, article = parsed
         for candidate in _normalize_candidates(s):
             name_for_lookup = strip_article_from_name(candidate) or candidate
+            if name_for_lookup in ALIASES:
+                name_for_lookup = ALIASES[name_for_lookup]
             if name_for_lookup in reg:
                 return _build_article_url(name_for_lookup, article)
-        return _build_article_url(base_name, article)
+        resolved = ALIASES.get(base_name, base_name)
+        return _build_article_url(resolved, article)
     for candidate in _normalize_candidates(s):
-        if candidate in reg:
-            return f"{LAW_GO_KR_LSINFO_BASE}?lsiSeq={reg[candidate]}"
+        name = ALIASES.get(candidate, candidate)
+        if name in reg:
+            return f"{LAW_GO_KR_LSINFO_BASE}?lsiSeq={reg[name]}"
     return None
+
+
+def resolve_reference_url(name: str, existing_url: Optional[str] = None) -> Optional[str]:
+    """enrichment용: 기존 url → CSV/조문 → 표준 맵 순."""
+    if existing_url and str(existing_url).strip().startswith(("http://", "https://")):
+        return str(existing_url).strip()
+    s = (name or "").strip()
+    if not s:
+        return None
+    if is_valid_law(s) or _parse_article_ref(s):
+        url = get_law_url(s)
+        if url:
+            return url
+    return get_standard_url(s)
 
 
 def clear_cache() -> None:

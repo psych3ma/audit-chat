@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 from backend.config import get_settings
 from backend.models.independence import AnalysisResult, IndependenceMap, LegalRefItem, VulnerableConnection
 from backend.services.llm_structured import chat_completion_structured
-from backend.utils.law_registry import get_law_url, is_valid_law
+from backend.utils.law_registry import resolve_reference_url
 
 logger = logging.getLogger(__name__)
 
@@ -18,23 +18,19 @@ def get_trace_id(scenario: str) -> str:
 
 
 def _enrich_legal_ref_urls(analysis: AnalysisResult) -> AnalysisResult:
-    """legal_references에 url 없으면 CSV 레지스트리로 URL 보강. CSV에 없으면 텍스트만 표시."""
+    """legal_references URL 보강: CSV/조문 → 표준 맵. 없으면 텍스트만."""
     if not analysis.legal_references:
         return analysis
     enriched = []
     no_url_items = []
     for ref in analysis.legal_references:
         name = ref.name.strip()
-        # CSV에 있는 법령만 URL 생성
-        if is_valid_law(name):
-            url = ref.url or get_law_url(name)
-            enriched.append(LegalRefItem(name=name, url=url))
-        else:
-            # CSV에 없으면 URL 없음
+        url = resolve_reference_url(name, ref.url)
+        enriched.append(LegalRefItem(name=name, url=url))
+        if not url:
             no_url_items.append(name)
-            enriched.append(LegalRefItem(name=name, url=None))
     if no_url_items:
-        logger.info(f"URL 미생성 (CSV에 없음, 텍스트만 표시): {no_url_items}")
+        logger.info("URL 미생성 (CSV·표준 맵에 없음, 텍스트만 표시): %s", no_url_items)
     return analysis.model_copy(update={"legal_references": enriched})
 
 
@@ -53,7 +49,7 @@ Rules:
 2. Write all of the following in Korean only: key_issues, considerations, suggested_safeguards, legal_references. Do not use English for these fields.
 3. considerations: Write a clear paragraph of at least 2–4 sentences explaining the independence threat and your reasoning. Be concrete.
 4. key_issues: List concrete issues that reference the scenario and the Relationship Map; avoid one-line generic statements.
-5. legal_references: You may cite Korean laws (e.g. "공인회계사법 제21조") and professional standards/ethics codes (e.g. "공인회계사 윤리기준", "회계감사기준").
+5. legal_references: Prefer citable Korean statutes with article numbers when applicable (e.g. "공인회계사법 제21조", "주식회사 등의 외부감사에 관한 법률 제N조"). You may also cite professional standards (e.g. "공인회계사 윤리기준", "회계감사기준"). Prefer at least one statute citation when the threat maps to a legal prohibition.
 6. vulnerable_connections: IMPORTANT - Identify which specific connections in the Relationship Map cause independence threats. Use the exact source_id and target_id from the map. This will be highlighted in the visualization.
 
 Output only valid JSON with: "status" (one of: 수임 불가, 안전장치 적용 시 수임 가능, 수임 가능), "risk_level", "key_issues" (array of strings, Korean), "legal_references" (array of strings e.g. ["공인회계사법 제21조"] or objects with "name" and optional "url"), "considerations" (string, Korean, 2–4 sentences), "suggested_safeguards" (array of strings, Korean), "vulnerable_connections" (array of objects with "source_id", "target_id", and optional "reason" in Korean - identify the problematic relationships from the map). No markdown, no explanation."""
@@ -109,8 +105,11 @@ def build_mermaid_graph(
     rel_map: IndependenceMap,
     vulnerable_connections: list[VulnerableConnection] | None = None
 ) -> str:
-    """Mermaid flowchart. 취약 관계는 점선·[!] 라벨로 표시."""
-    lines = ["graph TD"]
+    """Mermaid flowchart TD. 직교(linear), 라벨 따옴표, 취약 엔티티만 파스텔 keyNode."""
+    lines = [
+        "%%{init: {\"flowchart\": {\"curve\": \"linear\"}}}%%",
+        "flowchart TD",
+    ]
     vulnerable_set = set()
     vulnerable_entities = set()
     if vulnerable_connections:
@@ -118,7 +117,7 @@ def build_mermaid_graph(
             vulnerable_set.add((vc.source_id, vc.target_id))
             vulnerable_entities.add(vc.source_id)
             vulnerable_entities.add(vc.target_id)
-    
+
     shape_map = {
         "회계법인": ("[[", "]]"),
         "감사인": ("[[", "]]"),
@@ -135,30 +134,28 @@ def build_mermaid_graph(
         "대표이사": ("(", ")"),
         "재무이사": ("(", ")"),
     }
-    
-    lines.append("    classDef normalNode fill:#fff,stroke:#333,stroke-width:1px")
-    lines.append("    classDef riskyNode fill:#fff5f5,stroke:#c62828,stroke-width:2px,stroke-dasharray:5 5")
-    
-    # 노드 정의
+
+    # 중성 파스텔: 취약 핵심만. PwC 레드/dash 사용 금지.
+    lines.append("    classDef normalNode fill:#ffffff,stroke:#64748b,stroke-width:1px,color:#111827")
+    lines.append("    classDef keyNode fill:#eef2ff,stroke:#64748b,stroke-width:2px,color:#111827")
+
     for entity in rel_map.entities:
         clean_name = re.sub(r"[^가-힣a-zA-Z0-9\s]", "", entity.name)
         label = entity.label or ""
         open_s, close_s = shape_map.get(label, ("[", "]"))
         node_text = f"{clean_name}<br>{label}" if label else clean_name
-        node_class = "riskyNode" if entity.id in vulnerable_entities else "normalNode"
+        node_class = "keyNode" if entity.id in vulnerable_entities else "normalNode"
         lines.append(f'    {entity.id}{open_s}"{node_text}"{close_s}:::{node_class}')
-    
-    # 엣지 정의
+
     for conn in rel_map.connections:
-        raw_rel = (conn.rel_type or "관계").strip()[:20]
+        raw_rel = (conn.rel_type or "관계").strip()[:40]
         rel = raw_rel.replace('"', "'").replace("\n", " ")
         is_vulnerable = (conn.source_id, conn.target_id) in vulnerable_set
         if is_vulnerable:
-            # 취약 관계: 점선 + [!] 라벨
             lines.append(f'    {conn.source_id} -. "[!] {rel}" .-> {conn.target_id}')
         else:
-            lines.append(f'    {conn.source_id} ---|"{rel}"| {conn.target_id}')
-    
+            lines.append(f'    {conn.source_id} -->|"{rel}"| {conn.target_id}')
+
     return "\n".join(lines)
 
 

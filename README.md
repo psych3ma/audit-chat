@@ -78,8 +78,10 @@ Audit Chat은 시나리오를 입력하면 **LLM이 인물·회사·관계를 �
 ```
 audit-chat/
 ├── backend/          # FastAPI 서버, DB 연결, 분석 서비스
-├── frontend/         # Streamlit 앱
-├── static/           # PwC 스타일 정적 HTML UI
+├── frontend/         # Streamlit 앱 (내부 디버그)
+├── web/              # 일반 제출용 UI 소스 (core + theme + brand)
+├── static/           # 외부 서빙: 빌드된 independence-review.html 만
+├── internal/pwc/     # PwC 브랜드·산출물 (내부 서버 전용, 외부 제출 금지)
 ├── data/law/html/    # 법령 원문 데이터
 ├── docs/             # 아키텍처·기여 가이드 문서
 ├── scripts/          # 유틸리티 스크립트 (git hooks 등)
@@ -88,13 +90,17 @@ audit-chat/
 └── run.sh            # 전체 앱 실행 스크립트
 ```
 
+> **제출 규칙:** 외부에는 일반 UI(`static/independence-review.html`)만 내보냅니다.  
+> PwC는 `internal/pwc/`에만 두고, 서버에서는 `SERVE_INTERNAL_PWC=1`일 때만 `/pwc`로 엽니다.  
+> UI 빌드: `cd web && npm run build` (안내는 `web/package.json` / `web/README.md`).
+
 ---
 
 ## 🛠️ 기술 스택
 
 | 영역 | 기술 | 선택 이유 |
 |------|------|-----------|
-| Frontend | Streamlit, HTML | 빠른 프로토타이핑, PwC 감사 UI 재현 |
+| Frontend | 단일 HTML(`web/`), Streamlit | 제출용 브랜드 분리 UI + 내부 디버그 |
 | Backend | FastAPI | 비동기 처리, 자동 API 문서화(/docs) |
 | Graph DB | Neo4j | 사람·회사·역할 간 복잡한 관계 탐색에 최적 |
 | AI 분석 | OpenAI LLM | 자연어 시나리오에서 구조화된 관계 추출 |
@@ -128,14 +134,18 @@ cp .env.example .env            # .env 파일에 API 키·DB 주소 입력
 
 | 서비스 | 주소 |
 |--------|------|
-| 메인 UI (PwC 스타일) | http://localhost:8001 |
+| 메인 UI (일반) | http://localhost:8001 |
 | Streamlit 앱 | http://localhost:8501 |
 | API 문서 (Swagger) | http://localhost:8001/docs |
+| PwC UI (내부만) | `SERVE_INTERNAL_PWC=1` 후 http://localhost:8001/pwc |
 
-> **UI만 미리 보고 싶다면** (DB·LLM 연결 없이):
-> ```bash
-> python run_static_only.py
-> ```
+```bash
+# 최초·UI 변경 후: 일반 제출용 HTML 빌드
+cd web && npm run build && cd ..
+
+# UI만 미리 보기 (DB·LLM 없이)
+python run_static_only.py
+```
 
 ---
 

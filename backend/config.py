@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     debug: bool = False
     log_level: str = "INFO"
 
-    # 법령 CSV 경로 (비우면 루트 기본)
+    # 법령 CSV 경로 (비우면 docs/법령검색목록.csv, 루트에 있으면 루트 우선)
     law_csv_path: str = ""
     # 국가법령정보센터 API 키 (OC 파라미터)
     law_go_kr_oc: str = ""
