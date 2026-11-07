@@ -4,7 +4,7 @@
   "serviceName": "감사 독립성 검토 AI",
   "poweredBy": null,
   "badge": "Beta",
-  "logo": { "src": null, "alt": "", "text": "IR" },
+  "logo": { "src": null, "alt": "", "text": "IT Audit" },
   "theme": null,
   "api": { "baseUrl": "", "allowedOrigins": [] },
   "copy": {

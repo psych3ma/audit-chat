@@ -28,8 +28,8 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4-turbo-preview"
     llm_temperature: float = 0.7
     # 독립성 검토용 모델
-    independence_extraction_model: str = "gpt-4o-mini"
-    independence_analysis_model: str = "gpt-4o"
+    independence_extraction_model: str = "gpt-4o-mini" #  o3-mini
+    independence_analysis_model: str = "gpt-4o" # o3-mini
     independence_temperature_structured: float = 0.0
     independence_temperature_creative: float = 0.3
 

@@ -475,8 +475,37 @@
         font-weight: 700;
       }
       .report-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
         margin-top: var(--space-1);
         font-size: var(--fs-caption);
+      }
+      .meta-eye {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        padding: 0;
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+      .meta-eye:hover {
+        background: color-mix(in srgb, currentColor 16%, transparent);
+      }
+      .meta-eye-icon {
+        display: block;
+        width: 1rem;
+        height: 1rem;
+      }
+      .meta-eye[aria-pressed="false"] .icon-hide,
+      .meta-eye[aria-pressed="true"] .icon-show {
+        display: none;
       }
       .report-accent {
         height: var(--accent-bar-height);
@@ -959,7 +988,7 @@
           serviceName: "감사 독립성 검토 AI",
           poweredBy: null,
           badge: "Beta",
-          logo: { src: null, alt: "", text: "IR" },
+          logo: { src: null, alt: "", text: "IT Audit" },
           theme: null,
           api: { baseUrl: "", allowedOrigins: [] },
           copy: {
@@ -1598,6 +1627,69 @@
           );
         }
 
+        /** 헤더 글자색을 따르는 눈 아이콘. slashed 이면 가림 상태. */
+        function metaEyeIcon(slashed) {
+          const ns = "http://www.w3.org/2000/svg";
+          const svg = document.createElementNS(ns, "svg");
+          svg.setAttribute("viewBox", "0 0 24 24");
+          svg.setAttribute("class", "meta-eye-icon " + (slashed ? "icon-hide" : "icon-show"));
+          svg.setAttribute("aria-hidden", "true");
+          const add = (name, attrs) => {
+            const el = document.createElementNS(ns, name);
+            for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+            svg.append(el);
+          };
+          add("path", {
+            d: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z",
+            fill: "none",
+            stroke: "currentColor",
+            "stroke-width": "1.75",
+            "stroke-linejoin": "round",
+          });
+          add("circle", {
+            cx: "12",
+            cy: "12",
+            r: "3",
+            fill: "none",
+            stroke: "currentColor",
+            "stroke-width": "1.75",
+          });
+          if (slashed) {
+            add("path", {
+              d: "M4 4l16 16",
+              fill: "none",
+              stroke: "currentColor",
+              "stroke-width": "1.75",
+              "stroke-linecap": "round",
+            });
+          }
+          return svg;
+        }
+
+        /** 검토 ID는 항상 보이고, 검토 일시는 카드마다 숨김이 기본이다. */
+        function buildReviewMeta(traceId, when) {
+          const labels = { show: "검토 일시 보기", hide: "검토 일시 숨기기" };
+          const time = h("span", { class: "meta-time", hidden: true, text: "검토 일시: " + when });
+          const eye = h(
+            "button",
+            {
+              type: "button",
+              class: "meta-eye",
+              "aria-pressed": "false",
+              "aria-label": labels.show,
+            },
+            metaEyeIcon(false),
+            metaEyeIcon(true),
+          );
+          eye.addEventListener("click", () => {
+            const show = eye.getAttribute("aria-pressed") !== "true";
+            eye.setAttribute("aria-pressed", String(show));
+            eye.setAttribute("aria-label", show ? labels.hide : labels.show);
+            time.hidden = !show;
+          });
+          return [traceId ? h("span", { text: "검토 ID: " + traceId }) : null, time, eye];
+        }
+
         function buildReportCard(data) {
           const analysis = (data && data.analysis) || {};
           const status = analysis.status ? String(analysis.status) : "검토 완료";
@@ -1607,7 +1699,7 @@
           const when = new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeStyle: "short" }).format(
             new Date(),
           );
-          const meta = [traceId ? `검토 ID: ${traceId}` : "", `검토 일시: ${when}`].filter(Boolean).join(" · ");
+          const meta = buildReviewMeta(traceId, when);
 
           const viewCodeBtn = FEATURE_MERMAID_SOURCE
             ? h("button", { type: "button", class: "btn viz-code-btn", "aria-expanded": "false", text: "코드 보기" })
@@ -1638,7 +1730,7 @@
                 risk ? " " : null,
                 risk ? h("span", { class: "risk", text: risk.trim() }) : null,
               ),
-              h("p", { class: "report-meta", text: meta }),
+              h("p", { class: "report-meta" }, meta),
             ),
             h("div", { class: "report-accent", "aria-hidden": "true" }),
             h(
