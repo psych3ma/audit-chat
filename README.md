@@ -3,7 +3,7 @@
 시나리오 한 편을 넣으면 **결론, 근거 조문, 관계도**가 한 화면에 나옵니다.  
 회계사가 독립성 규정을 적용하기 전에 보는 **검토 초안**입니다. 최종 수임 판단은 전문가의 몫입니다.
 
-![데모 영상](data/assets/audit-chat_img.png)
+[![데모 영상][demo-thumb]][demo-video]
 
 이미지를 누르면 데모 영상으로 이동합니다.
 
@@ -112,3 +112,6 @@ cp .env.example .env   # OPENAI_API_KEY 입력
 - `.env`의 API 키는 저장소에 올리지 않습니다.
 
 더 짧은 프론트 설명은 [`web/README.md`](web/README.md)에 있습니다.
+
+[demo-thumb]: data/assets/audit-chat_img.png
+[demo-video]: https://youtu.be/WPOpcItps0M
