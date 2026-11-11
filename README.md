@@ -1,183 +1,114 @@
-# 🔍 [audit-chat] AI 기반 회계감사 독립성 분석 엔진 
+# [audit-chat] 감사 독립성 검토 AI
 
-> 감사인이 특정 고객의 감사를 맡아도 되는지 판단하는 **독립성 검토**를 AI로 자동화한 웹 애플리케이션입니다.
+시나리오 한 편을 넣으면 **결론, 근거 조문, 관계도**가 한 화면에 나옵니다.  
+회계사가 독립성 규정을 적용하기 전에 보는 **검토 초안**입니다. 최종 수임 판단은 전문가의 몫입니다.
 
-[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.11x-green?logo=fastapi)](https://fastapi.tiangolo.com)
-[![Neo4j](https://img.shields.io/badge/Neo4j-Graph_DB-008CC1?logo=neo4j)](https://neo4j.com)
-[![Streamlit](https://img.shields.io/badge/Streamlit-UI-red?logo=streamlit)](https://streamlit.io)
+![데모 영상](data/assets/audit-chat_img.png)
 
----
-
-## 🎬 데모
-
-[![데모 영상](docs/image/audit-chat_thumbnail.png)](https://drive.google.com/file/d/1XGw466-XIMJvjf3PVgGmZ7a86GWpZ8qq/view?usp=sharing)
-> 이미지 클릭 시 데모 영상으로 이동합니다.
+이미지를 누르면 데모 영상으로 이동합니다.
 
 ---
 
-## 💡 어떤 문제를 풀었나요?
+## 한 줄로 보면
 
-회계·감사 업계에서는 **감사인이 고객과 어떤 관계에 있는지**에 따라 독립성이 훼손될 수 있습니다.  
-예를 들어 친인척이 임원으로 있거나, 과거에 해당 회사 직원이었다면 감사를 맡을 수 없습니다.
+독립성 규정은 “누가 누구와 어떤 사이인가”로 갈립니다.  
+그 글을 사람이 매번 읽고 조문을 찾으면, 관계와 근거가 흩어집니다.
 
-기존에는 이 검토를 **사람이 수동으로** 했습니다.  
-Audit Chat은 시나리오를 입력하면 **LLM이 인물·회사·관계를 자동 추출**하고, **관련 법령과 기준에 비추어 수임 가능 여부를 판단**해 리포트로 출력합니다.
+이 도구는 그 순서를 고정합니다.
 
----
-
-## 🎬 주요 기능
-
-| 기능 | 설명 |
-|------|------|
-| 📝 시나리오 분석 | 자연어로 입력한 상황 설명에서 인물·회사·관계를 자동 추출 |
-| ⚖️ 독립성 판단 | 공인회계사법·윤리기준에 따라 수임 가능 여부와 위험도 산출 |
-| 🕸️ 관계도 시각화 | 추출된 이해관계자 구조를 다이어그램(Mermaid)으로 자동 렌더링 |
-| 📄 리포트 출력 | 결론·근거 조항·위험 요인을 구조화된 형식으로 정리 |
-| 🔗 법령 링크 | 판단 근거가 된 법령 조항을 클릭 가능한 링크로 제공 |
-
----
-
-## 🏗️ 아키텍처
-
-```
-사용자 입력 (시나리오 텍스트)
-        │
-        ▼
-┌──────────────────┐
-│  Frontend        │  ← Streamlit 앱 / PwC 스타일 정적 HTML
-│  (화면·입력)     │
-└────────┬─────────┘
-         │ HTTP 요청
-         ▼
-┌──────────────────┐
-│  Backend API     │  ← FastAPI
-│  (비즈니스 로직) │
-│                  │
-│  ┌────────────┐  │
-│  │ LLM 분석  │  │  ← OpenAI API (관계 추출 · 독립성 판단)
-│  └────────────┘  │
-│  ┌────────────┐  │
-│  │ Neo4j 저장│  │  ← 인물·회사·관계를 그래프 DB에 저장
-│  └────────────┘  │
-└────────┬─────────┘
-         │ 결과 반환
-         ▼
-리포트 + 관계도(Mermaid) + 법령 링크
+```mermaid
+flowchart LR
+  A["상황 설명"] --> B["사람·회사·관계"]
+  B --> C["수임 초안"]
+  C --> D["조문과 관계도"]
 ```
 
-### 설계 원칙
-
-- **그래프 DB 활용** — 관계 중심 데이터(사람-회사-역할)를 Neo4j 그래프 구조로 표현해 복잡한 이해관계 탐색 최적화
-- **확장 가능 구조** — 새 법령·판단 기준은 데이터와 프롬프트만 수정하면 반영 가능
+| 받는 것 | 뜻                                           |
+| ------- | -------------------------------------------- |
+| 결론    | 수임 불가 · 안전장치를 두면 가능 · 수임 가능 |
+| 근거    | `법령명 제N조`. 등록된 이름과 맞을 때만 링크 |
+| 관계도  | 인물·회사·연결을 한 장의 그림으로            |
 
 ---
 
-## 🗂️ 프로젝트 구조
+## 단계별 처리 흐름
 
+검토 내용 입력 → 관계 정보 추출 → 독립성 검토 → 보고서 표시
+
+```mermaid
+sequenceDiagram
+  actor 사용자
+  participant 화면
+  participant API
+  participant 추출 as 추출 모델
+  participant 판단 as 판단 모델
+
+  사용자->>화면: 시나리오 입력
+  화면->>API: 1. 관계 추출
+  API->>추출: 사람·회사·연결만
+  추출-->>API: 관계 지도
+  화면->>API: 2. 독립성 판단
+  API->>판단: 시나리오 + 관계 지도
+  판단-->>API: 결론·위험·조문 이름
+  화면->>API: 3. 리포트
+  API-->>화면: 링크 보강 + 관계도
 ```
-audit-chat/
-├── backend/          # FastAPI 서버, DB 연결, 분석 서비스
-├── frontend/         # Streamlit 앱 (내부 디버그)
-├── web/              # 일반 제출용 UI 소스 (core + theme + brand)
-├── static/           # 외부 서빙: 빌드된 independence-review.html 만
-├── internal/pwc/     # PwC 브랜드·산출물 (내부 서버 전용, 외부 제출 금지)
-├── data/law/html/    # 법령 원문 데이터
-├── docs/             # 아키텍처·기여 가이드 문서
-├── scripts/          # 유틸리티 스크립트 (git hooks 등)
-├── .env.example      # 환경 변수 템플릿
-├── docker-compose.yml
-└── run.sh            # 전체 앱 실행 스크립트
+
+| 단계   | 하는 일                         | 모델        |
+| ------ | ------------------------------- | ----------- |
+| 추출   | 인물·회사·연결만 고름           | GPT-4o mini |
+| 판단   | 지도 위에서 수임 의견을 씀      | GPT-4o      |
+| 리포트 | 조문 링크와 Mermaid 그림을 붙임 | 호출 없음   |
+
+같은 글을 다시 넣으면 관계 지도는 Neo4j에서 재사용합니다.  
+Neo4j가 없어도 리포트는 만들어집니다. 저장 실패는 판단을 막지 않습니다.
+
+---
+
+## 주요 구성
+
+다음 세 가지 원칙에 따라 구성했습니다.
+
+```mermaid
+flowchart TB
+  M["추출과 판단을 다른 모델에"] --> M1["구조는 가볍게, 의견은 크게"]
+  L["조문 링크는 이름 대조로"] --> L1["등록된 법령명 제N조만 클릭"]
+  B["판단과 저장을 분리"] --> B1["저장이 없어도 리포트는 나옴"]
 ```
 
-> **제출 규칙:** 외부에는 일반 UI(`static/independence-review.html`)만 내보냅니다.  
-> PwC는 `internal/pwc/`에만 두고, 서버에서는 `SERVE_INTERNAL_PWC=1`일 때만 `/pwc`로 엽니다.  
-> UI 빌드: `cd web && npm run build` (안내는 `web/package.json` / `web/README.md`).
+1. **추출과 판단은 다른 모델입니다.** 관계 추출은 형식이 중요해서 가볍고 온도 0입니다. 수임 의견은 더 큰 모델이 담당합니다.
+2. **링크는 이름 대조입니다.** `공인회계사법 제33조`처럼 등록된 표기만 열립니다. 주제 설명이나 “확인 필요” 문장은 글자로만 남습니다.
+3. **판단과 저장은 분리되어 있습니다.** Neo4j는 같은 시나리오의 관계 지도를 다시 쓰는 저장소입니다. 연결이 없거나 저장이 실패해도 추출과 판단은 그대로 끝납니다.
+
+검토 시각은 서버에 저장하지 않습니다. 리포트가 그려질 때의 브라우저 시각이고, 눈 아이콘으로 숨기거나 볼 수 있습니다. 기본은 숨김입니다.
 
 ---
 
-## 🛠️ 기술 스택
+## 실행
 
-| 영역 | 기술 | 선택 이유 |
-|------|------|-----------|
-| Frontend | 단일 HTML(`web/`), Streamlit | 제출용 브랜드 분리 UI + 내부 디버그 |
-| Backend | FastAPI | 비동기 처리, 자동 API 문서화(/docs) |
-| Graph DB | Neo4j | 사람·회사·역할 간 복잡한 관계 탐색에 최적 |
-| AI 분석 | OpenAI LLM | 자연어 시나리오에서 구조화된 관계 추출 |
-| 관계도 | Mermaid.js | 코드 기반 다이어그램 자동 렌더링 |
-| 컨테이너 | Docker Compose | Neo4j + 앱 일괄 실행 환경 구성 |
-
----
-
-## 🚀 빠른 시작
-
-### 사전 요건
-- Python 3.9+ (권장 3.11)
-- Docker (Neo4j 실행용, 선택사항)
-- OpenAI API 키
-
-### 설치 및 실행
+Python 3.11, OpenAI API 키. Neo4j는 관계 지도를 다시 쓸 때만 필요합니다.
 
 ```bash
-# 1. 저장소 클론
 git clone https://github.com/psych3ma/audit-chat.git
 cd audit-chat
-
-# 2. 환경 설정 (최초 1회)
-make venv
-source venv/bin/activate       # Windows: venv\Scripts\activate
-cp .env.example .env            # .env 파일에 API 키·DB 주소 입력
-
-# 3. 실행
+make venv && source venv/bin/activate
+cp .env.example .env   # OPENAI_API_KEY 입력
 ./run.sh
 ```
 
-| 서비스 | 주소 |
-|--------|------|
-| 메인 UI (일반) | http://localhost:8001 |
-| Streamlit 앱 | http://localhost:8501 |
-| API 문서 (Swagger) | http://localhost:8001/docs |
-| PwC UI (내부만) | `SERVE_INTERNAL_PWC=1` 후 http://localhost:8001/pwc |
+| 여는 곳   | 주소                       |
+| --------- | -------------------------- |
+| 검토 화면 | http://localhost:8000      |
+| API 문서  | http://localhost:8000/docs |
 
-```bash
-# 최초·UI 변경 후: 일반 제출용 HTML 빌드
-cd web && npm run build && cd ..
-
-# UI만 미리 보기 (DB·LLM 없이)
-python run_static_only.py
-```
+화면 문구·로고를 바꾼 뒤에는 `cd web && npm run build`로 정적 페이지를 다시 만듭니다.
 
 ---
 
-## 📐 상세 문서
+## 이 초안이 하지 않는 일
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — 레이어 설계, 데이터 흐름 상세 다이어그램
-- [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — 개발 환경 세팅, PR 가이드
+- 법령 원문을 검색해 조문 번호를 검증하지 않습니다. 모델이 고른 이름을, 등록표와 맞춰 링크만 붙입니다.
+- 수임 가능 여부를 법적으로 확정하지 않습니다.
+- `.env`의 API 키는 저장소에 올리지 않습니다.
 
----
-
-## 🔒 환경 변수
-
-`.env.example`을 복사해 `.env`로 사용하세요. `.env`는 `.gitignore`에 포함되어 저장소에 올라가지 않습니다.
-
-```
-OPENAI_API_KEY=sk-...
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=your-password
-API_PORT=8001
-```
-
----
-
-## 📝 개발 배경
-
-공인회계사 시험을 준비하며 독립성 기준의 복잡성을 경험했습니다.  
-감사인이 수백 가지 관계 유형을 기억하고 적용해야 하는 과정을 **자동화하면 실무 부담을 줄일 수 있다**는 아이디어에서 출발했습니다.  
-그래프 DB와 LLM을 결합해 관계 기반 법적 판단을 구조화하는 것이 핵심 기술적 도전이었습니다.
-
----
-
-<div align="center">
-  <sub>데이터 출처: CPA2차 회계감사 기출 · Made with Cursor AI</sub>
-</div>
+더 짧은 프론트 설명은 [`web/README.md`](web/README.md)에 있습니다.
